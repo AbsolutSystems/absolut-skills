@@ -45,7 +45,8 @@ Detection heuristics and the subagent brief: [references/analysis.md](references
 Work in the main thread and keep it cheap:
 
 - List tracked files (`git ls-files`, scoped to `[path]`) and derive the directory tree.
-- Find existing `AGENTS.md`, `CLAUDE.md` and `.guidelines/` directories.
+- Find existing `AGENTS.md`, `CLAUDE.md` and `.guidelines/` directories. Check whether either file is a symlink
+  (`ls -l`, `git ls-files -s` mode `120000`): an `AGENTS.md` ↔ `CLAUDE.md` symlink is reported as `MIGRATE`.
 - If `docs/spec/` exists, map each spec page to its directory using the `Source` entry of its `<dl class="meta">`
   (grep for it; do not read the pages).
 - Classify directories into repo root / app root / module / skip using [references/analysis.md](references/analysis.md).
@@ -90,7 +91,7 @@ Present one table, one row per file to be touched:
 | `UPDATE` | File exists; list each drift item (false claim + evidence) and each missing fact |
 | `OK` | File matches the code |
 | `STALE` | File documents a directory that no longer deserves its own file, or describes removed things |
-| `MIGRATE` | `CLAUDE.md` with real content but no `AGENTS.md` — content moves to `AGENTS.md` |
+| `MIGRATE` | `CLAUDE.md` with real content but no `AGENTS.md`, or a symlink between them — content moves to a regular `AGENTS.md` |
 
 Then a **Recommendations** section: what would make a coding agent more effective, beyond documentation. Examples: no
 command to run a single test, no lint/format script, undocumented environment variables or missing `.env.example`, no
@@ -104,12 +105,15 @@ With `--check`, stop here. Otherwise ask for approval: all, a selected subset, o
 - Create or update `.guidelines/` files only for areas with evidence or user answers; keep the app `AGENTS.md` index in sync.
 - Keep the `<!-- as:working-principles … -->` block (or its `off` marker) in the root `AGENTS.md` untouched: it is owned
   by `as:init`, is not drift, and does not count toward the line budget.
-- `CLAUDE.md` next to each `AGENTS.md` contains exactly `@AGENTS.md`. For `MIGRATE`, move the content first.
+- `CLAUDE.md` next to each `AGENTS.md` contains exactly `@AGENTS.md`. For `MIGRATE`, move the content first. If
+  either file is a symlink, remove the symlink and write both as regular files — writing through a symlink would make
+  `CLAUDE.md` import itself.
 - Never delete files (including `STALE` ones) unless the user explicitly approved that deletion.
 - Do not touch application code; recommendations are reported, not implemented.
 
 ### 6. Verify
 
+- No `AGENTS.md`/`CLAUDE.md` is a symlink, and every `CLAUDE.md` is exactly `@AGENTS.md`.
 - Every path mentioned in the written files exists, including links to `docs/spec/` pages; a module with a spec page
   and no link is reported as `UPDATE`.
 - Every command mentioned exists in a manifest, script or build file.

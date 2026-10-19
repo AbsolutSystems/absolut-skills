@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.1
+
+- `agent-docs`: detects `AGENTS.md` ↔ `CLAUDE.md` symlinks and migrates them to regular files.
+- `recommended-plugins.md`: retry with `claude plugin marketplace update claude-plugins-official` when a plugin is
+  not found in an outdated local marketplace copy.
+- Maintainer docs: `AGENTS.md` (regular file instead of a symlink), `skills/AGENTS.md`, `.guidelines/` for skill
+  authoring and testing.
+
 ## 0.3.0
 
 - `tech-lead` skill (auto-invoked): designs features and investigates bugs grounded in code, `AGENTS.md` and spec;

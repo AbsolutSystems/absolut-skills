@@ -33,5 +33,7 @@ claude plugin install <plugin>@claude-plugins-official      # MISSING
 claude plugin enable <plugin>@claude-plugins-official       # DISABLED
 ```
 
-If the marketplace is unknown, first run `claude plugin marketplace add anthropics/claude-plugins-official`.
+If the marketplace is unknown, first run `claude plugin marketplace add anthropics/claude-plugins-official`. If install
+fails with "not found in marketplace", the local copy is outdated: run
+`claude plugin marketplace update claude-plugins-official` and retry.
 Newly installed plugins become available after the Claude Code session is restarted.

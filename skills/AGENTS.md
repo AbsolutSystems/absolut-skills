@@ -13,6 +13,7 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
 - `tech-lead` — design and bug investigation; writes change proposals to `docs/spec/changes/`.
 - `finish` — wraps up a branch; merges and archives change proposals; owns `references/review.md`.
 - `health` — periodic whole-project check; writes `docs/health/`.
+- `worktree-create`, `worktree-close` — branch + git worktree in `../<repo>-worktrees/`; close keeps the branch.
 
 ## Dependencies between skills
 

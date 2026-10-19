@@ -1,0 +1,6 @@
+interface:
+  display_name: "Worktree Create"
+  short_description: "New branch and git worktree next to the repo, from the current or a given branch"
+  default_prompt: "Use $as:worktree-create to create a branch and worktree named feature-x."
+policy:
+  allow_implicit_invocation: false

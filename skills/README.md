@@ -7,6 +7,8 @@
 | `init` | `/as:init` | `$as:init` | Onboard a repo: `agent-docs`, then `spec-docs` for a chosen scope, then links between them |
 | `finish` | `/as:finish` | `$as:finish` | Wrap up a feature: simplify, review, spec drift check, missing contract tests, docs refresh — for the branch's changes |
 | `health` | `/as:health` | `$as:health` | Periodic project health: hotspots, coupling, coverage and test quality, dead code, deps, docs drift; report with trends in `docs/health/` |
+| `worktree-create` | `/as:worktree-create` | `$as:worktree-create` | New branch and git worktree in `../<repo>-worktrees/<name>`, from the current branch or `from <branch>`; optionally copies `.env*` |
+| `worktree-close` | `/as:worktree-close` | `$as:worktree-close` | Offers to commit leftovers, then removes the worktree folder; the branch stays |
 | `agent-docs` | `/as:agent-docs` | `$as:agent-docs` | Build and audit hierarchical `AGENTS.md`/`CLAUDE.md` docs and per-app `.guidelines/` |
 | `spec-docs` | `/as:spec-docs` | `$as:spec-docs` | Human-readable HTML spec of module contracts (scenarios with stable IDs) in `docs/spec/`, plus scenario test coverage report |
 

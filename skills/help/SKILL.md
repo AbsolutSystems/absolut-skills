@@ -2,7 +2,7 @@
 name: help
 description: "Show how to work with Claude Code (or Codex) using the as: commands, the recommended Anthropic plugins and plan mode: confirms the plugin is installed, lists as: skills, reports which recommended plugins are installed, and walks through the task workflow from onboarding to planning, building, review, finishing a feature, commit, docs upkeep and periodic health checks. Use only when the user explicitly invokes as:help."
 disable-model-invocation: true
-argument-hint: "[onboarding|plan|build|review|finish|commit|docs|health]"
+argument-hint: "[onboarding|plan|build|review|finish|commit|worktree|docs|health]"
 ---
 
 # Help
@@ -69,6 +69,12 @@ With a topic argument, show only that section of the guide. Without one, show:
 - `/commit-commands:commit` — commit with a generated message.
 - `/commit-commands:commit-push-pr` — commit, push and open a PR.
 - `/commit-commands:clean_gone` — remove local branches deleted on the remote.
+
+### worktree — parallel branches
+
+- `/as:worktree-create <name> [from <branch>]` — new branch and worktree in `../<repo>-worktrees/<name>`; start a new
+  session in that folder to work on it.
+- `/as:worktree-close [<name>]` — offers to commit leftovers, then removes the folder; the branch stays.
 
 ### docs — keeping documentation true
 

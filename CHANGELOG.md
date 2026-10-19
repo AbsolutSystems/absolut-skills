@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0
+
+- `worktree-create` skill: creates a branch and a git worktree in `../<repo>-worktrees/<name>` from the current branch
+  or `from <branch>`; asks before reusing an existing branch and offers to copy ignored `.env*` files.
+- `worktree-close` skill: offers to commit uncommitted changes, shows unpushed commits and ignored files to be deleted,
+  then removes the worktree (never `--force`) and keeps the branch.
+
 ## 0.3.1
 
 - `agent-docs`: detects `AGENTS.md` ↔ `CLAUDE.md` symlinks and migrates them to regular files.

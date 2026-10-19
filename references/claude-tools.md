@@ -12,5 +12,8 @@
   `skills/finish/references/review.md` with read-only subagents.
 - Plan mode (`as:tech-lead` handoff): switch with the EnterPlanMode tool (the user confirms the switch); in plan mode,
   write the plan to the plan file and request approval with ExitPlanMode.
+- Worktrees (`as:worktree-create`, `as:worktree-close`): do not use EnterWorktree/ExitWorktree — they manage their own
+  worktrees in `.claude/worktrees`. After create, suggest `cd <path> && claude` in a new terminal. Before removing a
+  worktree the session is in, `cd <main>` in Bash first.
 - Launching another command (`as:tech-lead` handoff): invoke `feature-dev:feature-dev` with the Skill tool, passing the
   brief as arguments, only after the user agreed. Check it is installed first (`references/recommended-plugins.md`).

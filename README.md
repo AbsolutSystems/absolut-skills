@@ -57,7 +57,7 @@ planning in plan mode, building, review, commit, keeping docs true.
 
 ```text
 /as:help                            # everything
-/as:help plan                       # one topic: onboarding | plan | build | review | commit | docs
+/as:help plan                       # one topic: onboarding | plan | build | review | commit | worktree | docs
 ```
 
 ### `tech-lead` — design partner (starts on its own)
@@ -145,6 +145,22 @@ without being added to the project (`uvx lizard`, `npx madge`, `npx jscpd`, osv-
 git history and code reading always. The report goes to `docs/health/<date>.html` with a `<date>.json` snapshot, so
 the next run shows what improved or got worse. Small findings are fixed with tests before and after; tests are
 removed only with per-test consent; larger findings become task briefs for plan mode or `/feature-dev:feature-dev`.
+
+### `worktree-create` / `worktree-close` — parallel branches in git worktrees
+
+Work on several branches at once, each in its own folder next to the repository (`../<repo>-worktrees/<name>`).
+
+```text
+/as:worktree-create feature-x               # new branch feature-x from the current branch
+/as:worktree-create feature-x from develop  # ... from develop (local, or origin/develop)
+/as:worktree-close feature-x                # close by branch or folder name
+/as:worktree-close                          # close the worktree you are in
+```
+
+`worktree-create` stops if the branch is already checked out elsewhere, asks before reusing an existing branch, and
+offers to copy ignored `.env*` files from the main worktree. `worktree-close` offers to commit uncommitted changes,
+shows unpushed commits and ignored files that will be deleted, and after your confirmation runs `git worktree remove`
+(never `--force`). The branch is never deleted.
 
 ### `agent-docs` — documentation tree for coding agents
 

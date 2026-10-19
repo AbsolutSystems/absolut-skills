@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills Health"
+  short_description: "Periodic project health: hotspots, coupling, tests, dead code, deps"
+  default_prompt: "Use $as:health to check the health of this project and propose what to clean up."
+policy:
+  allow_implicit_invocation: false

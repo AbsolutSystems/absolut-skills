@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills Tech Lead"
+  short_description: "Design features and investigate bugs: code-grounded options, decision, spec change, plan"
+  default_prompt: "Use $as:tech-lead to discuss and plan this feature with me before we write code."
+policy:
+  allow_implicit_invocation: true

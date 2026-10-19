@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills Help"
+  short_description: "How to work with as: commands, recommended plugins and planning"
+  default_prompt: "Use $as:help to see how to work with Absolut Skills."
+policy:
+  allow_implicit_invocation: false

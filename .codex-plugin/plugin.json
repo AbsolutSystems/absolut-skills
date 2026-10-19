@@ -1,0 +1,24 @@
+{
+  "name": "as",
+  "version": "0.3.0",
+  "description": "Absolut Skills — a set of commands and skills for Claude Code and Codex.",
+  "author": {
+    "name": "Absolut Systems"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Absolut Skills",
+    "shortDescription": "Absolut Systems commands and skills",
+    "longDescription": "A shared set of commands and skills for Claude Code and Codex, invoked as $as:<skill>.",
+    "developerName": "Absolut Systems",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use $as:help to see how to work with Absolut Skills."
+    ],
+    "brandColor": "#1F4B99"
+  }
+}

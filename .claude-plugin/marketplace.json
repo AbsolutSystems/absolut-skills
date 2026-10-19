@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "absolut-skills",
+  "description": "Absolut Skills — commands and skills for Claude Code and Codex",
+  "owner": {
+    "name": "Absolut Systems"
+  },
+  "plugins": [
+    {
+      "name": "as",
+      "description": "Absolut Skills commands (/as:<skill>)",
+      "source": ".",
+      "category": "development"
+    }
+  ]
+}

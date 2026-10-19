@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills Finish"
+  short_description: "Wrap up a feature: simplify, review, spec, contract tests, docs"
+  default_prompt: "Use $as:finish to wrap up the feature on this branch before opening a PR."
+policy:
+  allow_implicit_invocation: false

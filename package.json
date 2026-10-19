@@ -1,0 +1,9 @@
+{
+  "name": "absolut-skills",
+  "version": "0.3.0",
+  "description": "Absolut Skills — a set of commands and skills for Claude Code and Codex.",
+  "private": true,
+  "keywords": [
+    "agent-skills"
+  ]
+}

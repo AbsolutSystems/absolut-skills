@@ -5,5 +5,11 @@
   "private": true,
   "keywords": [
     "agent-skills"
-  ]
+  ],
+  "homepage": "https://github.com/AbsolutSystems/absolut-skills",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AbsolutSystems/absolut-skills.git"
+  },
+  "license": "MIT"
 }

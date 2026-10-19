@@ -12,19 +12,39 @@ The skill catalogue lives in [`skills/README.md`](skills/README.md).
 
 ## Installation
 
+Repository: <https://github.com/AbsolutSystems/absolut-skills>
+
 ### Claude Code
 
+Inside Claude Code:
+
 ```text
-/plugin marketplace add /path/to/absolut-skills     # or a git URL
+/plugin marketplace add AbsolutSystems/absolut-skills
 /plugin install as@absolut-skills
 ```
 
-Check: `/as:help`.
+or from the shell:
+
+```bash
+claude plugin marketplace add AbsolutSystems/absolut-skills
+claude plugin install as@absolut-skills
+```
+
+Restart the session, then check: `/as:help`. Update later with `/plugin marketplace update absolut-skills`.
 
 ### Codex
 
-The repository contains a Codex marketplace in `.agents/plugins/marketplace.json` and a manifest in `.codex-plugin/plugin.json`.
-Add the marketplace (local path or git) in Codex, install the `as` plugin, then check: `$as:help`.
+```bash
+codex plugin marketplace add AbsolutSystems/absolut-skills
+codex plugin add as@absolut-skills
+```
+
+Then check: `$as:help`. Update later with `codex plugin marketplace upgrade`.
+
+### Local development
+
+Point either host at a local clone instead of `AbsolutSystems/absolut-skills`, e.g.
+`claude plugin marketplace add ./absolut-skills` or `codex plugin marketplace add ./absolut-skills`.
 
 ## Skills
 

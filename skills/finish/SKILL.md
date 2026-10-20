@@ -29,7 +29,8 @@ spec and tests after the code is final; docs last.
 - Base: `[base]`, else `git merge-base HEAD origin/HEAD`, else the merge-base with `main` or `master`.
 - Changed files: commits since base plus uncommitted and untracked changes (`git diff --name-only <base>`,
   `git status --porcelain`). Ignore generated files and `docs/spec/`.
-- Map files to apps and modules using the `AGENTS.md` tree and the `Source` entries of `docs/spec/` pages.
+- Map files to apps and modules using the `Source` entries of `docs/spec/` pages, the `AGENTS.md` tree, and the
+  classification heuristics in [../agent-docs/references/analysis.md](../agent-docs/references/analysis.md).
 - Show the scope (base, files count, touched modules). Empty diff → stop.
 
 ### 2. Baseline tests
@@ -88,7 +89,8 @@ assertion to make it pass.
 ### 7. Agent docs
 
 Run `agent-docs` for the touched directories (and their parents when the map of apps or modules changed): report,
-approval, write. This also links new spec pages.
+approval, write. Only fix facts the branch made false and add facts it made necessary (a new command, rule or pitfall);
+never add descriptions of the new code. This also links new spec pages.
 
 ### 8. Summary
 

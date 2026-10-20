@@ -7,7 +7,7 @@
 - Subagents: use them if the host provides them; otherwise run the same analysis sequentially in the main thread.
 - Asking the user: ask in plain text, numbered, with suggested options, and wait for the answer.
 - Simplify and review (`as:finish`): follow `skills/finish/references/review.md`; use subagents for the review if available.
-- Plan mode and `/feature-dev` (`as:tech-lead` handoff) are Claude Code features: on Codex, present the plan, wait for
+- Plan mode (`as:tech-lead` handoff) is a Claude Code feature: on Codex, present the plan, wait for
   approval, then implement step by step.
 - Worktrees (`as:worktree-create`, `as:worktree-close`): after create, suggest starting Codex in `<path>`; before
   removing a worktree the session is in, run the commands from `<main>` (`git -C <main>` or `cd <main>`).

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.0
+
+- `tech-lead`: large changes go to plan mode with milestones instead of `/feature-dev:feature-dev`, which cannot skip
+  its exploration and architecture phases and would redo the design.
+- Claude mapping: built-in `code-review` (local diff) is distinguished from the `code-review` plugin (PR); built-in
+  skills are used only when the Claude Code version lists them. `claude-security` is invoked as `/claude-security`.
+- `agent-docs`: writes only what the code cannot tell (line test); no purpose, stack, public API or dependencies
+  sections; module `AGENTS.md` only for modules with pitfalls or rules; new `PRUNE` status; spec module links move to
+  the app `AGENTS.md`. `finish` only corrects or adds necessary facts. Based on arXiv:2602.11988.
+
 ## 0.4.0
 
 - `worktree-create` skill: creates a branch and a git worktree in `../<repo>-worktrees/<name>` from the current branch

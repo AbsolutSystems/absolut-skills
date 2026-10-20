@@ -71,7 +71,8 @@ between technical options. It behaves like a tech lead:
 4. Records the **decision and proposed scenarios** in `docs/spec/changes/<slug>.html` — module pages keep describing
    current behaviour until `as:finish` merges the proposal and archives it in `docs/spec/changes/archive/` (decision log).
 5. Writes the **plan** (steps, tests per scenario ID, risks) and offers the **handoff**: implement directly (small),
-   switch to plan mode (medium), or launch `/feature-dev:feature-dev` with the agreed brief (large).
+   or switch to plan mode (medium; large gets milestones). It does not hand off to `/feature-dev:feature-dev`, which
+   would redo the exploration and architecture already done.
 
 Bugs follow their own path: reproduce, find the violated or missing scenario, verify hypotheses, root cause, then a
 failing test first. No production code is written before you approve the plan.
@@ -124,7 +125,7 @@ The counterpart of `init`, run after delivering a feature and before the PR. Wor
 `/commit-commands:commit-push-pr`.
 
 Simplify runs before review so the review sees the code that ships. In Claude Code it uses the built-in `/simplify`
-and `/code-review`; elsewhere the criteria in `skills/finish/references/review.md`.
+and `/code-review` (local diff, not the `code-review` plugin's PR review) when the version has them; elsewhere the criteria in `skills/finish/references/review.md`.
 
 ### `health` — periodic project health check
 
@@ -164,8 +165,12 @@ shows unpushed commits and ignored files that will be deleted, and after your co
 
 ### `agent-docs` — documentation tree for coding agents
 
-Builds and keeps up to date a hierarchical set of docs that an agent reads progressively: a short overview at the repo
-root, more detail inside each application and module, and detailed rules in `.guidelines/` loaded only when needed.
+Builds and keeps up to date the smallest set of docs that changes what an agent does: commands, rules the code does not
+enforce, target vs legacy conventions, internal libraries and pitfalls. It does not describe the code (stack, public API,
+dependencies): agents read that themselves, and context files that repeat the repository make agents explore more and
+cost more without solving more tasks ([Gloaguen et al., 2026](https://arxiv.org/abs/2602.11988)). Each line must pass
+the **line test**: without it, an agent would do something wrong or have to guess. The code analysis mainly produces
+questions for the team — their answers are the valuable part.
 
 ```text
 /as:agent-docs                      # whole repository: analyse, ask, report, write after approval
@@ -179,16 +184,14 @@ In Codex use `$as:agent-docs` with the same arguments.
 Resulting layout (example monorepo):
 
 ```text
-AGENTS.md                           # what the project is + map: backend/, frontend/, ...
+AGENTS.md                           # one sentence + map: backend/, frontend/, ... + repo-wide commands
 CLAUDE.md                           # @AGENTS.md
-backend/AGENTS.md                   # purpose, stack, architecture (where modules live), key libraries, commands, guideline index
+backend/AGENTS.md                   # commands, unenforced rules, internal libraries (e.g. preboot), pitfalls, spec links, guideline index
 backend/CLAUDE.md                   # @AGENTS.md
-backend/.guidelines/
-  testing-guideline.md              # test levels, frameworks, data setup, how to run a single test
-  libraries-guideline.md            # internal libraries (e.g. preboot) first, preferred choices
-  architecture-guideline.md         # module boundaries, allowed dependencies, where new code goes
-  code-style-guideline.md           # naming, error handling, logging, mapping
-backend/src/.../modules/orders/AGENTS.md   # responsibility, public API, dependencies, pitfalls
+backend/.guidelines/                # only rules the team confirmed or a tool enforces
+  testing-guideline.md              # what a feature ships with, which test level for what, helpers to use
+  architecture-guideline.md         # where new code goes, allowed communication
+backend/src/.../modules/orders/AGENTS.md   # only because it has pitfalls or rules
 frontend/AGENTS.md
 ...
 ```
@@ -196,11 +199,12 @@ frontend/AGENTS.md
 How a run works:
 
 1. **Inventory** — classifies directories (repo root / app root / module / skip) and shows the planned tree.
-2. **Analysis** — read-only subagents, bottom-up (modules → apps → repo root); each reports facts with evidence,
-   drift in existing docs, open questions and recommendations.
+2. **Analysis** — read-only subagents, bottom-up (modules → apps → repo root); each reports what an agent would get
+   wrong (conflicts, unenforced rules, pitfalls, missing commands) with evidence, lines to prune, drift, open questions
+   and recommendations.
 3. **Questions** — asks you about what code cannot tell (role of an internal library, conflicting conventions,
    unclear or legacy directories, testing strategy).
-4. **Report** — one row per file: `NEW` / `UPDATE` (with drift list) / `OK` / `STALE` / `MIGRATE`, plus
+4. **Report** — one row per file: `NEW` / `UPDATE` (with drift list) / `PRUNE` / `OK` / `STALE` / `MIGRATE`, plus
    recommendations that would make an agent more effective (missing scripts, env docs, reference examples…).
 5. **Write** (after your approval) — minimal edits that keep hand-written sections; never deletes files without consent.
 6. **Verify** — every referenced path and command exists; guideline indexes match `.guidelines/`.
@@ -236,8 +240,8 @@ Pages contain content only — no inline styles or scripts — so an agent updat
 styling. Open `docs/spec/index.html` in a browser; it also prints well. To make `--tests` mapping deterministic, put the
 scenario ID in contract test names or tags (e.g. `@Tag("ORD-003")`, `it("ORD-003 rejects out-of-stock order")`).
 
-When `docs/spec/` exists, `agent-docs` adds a one-line "Specification" link to the repo, app and module `AGENTS.md`
-files (a link, not an `@` import), so an agent knows the module's contract before changing its behaviour. Run
+When `docs/spec/` exists, `agent-docs` links it from the repo `AGENTS.md` and lists the module pages in each app
+`AGENTS.md` (links, not `@` imports), so an agent knows a module's contract before changing its behaviour. Run
 `agent-docs` after `spec-docs` creates new pages.
 
 ## Structure

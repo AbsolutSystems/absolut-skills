@@ -33,13 +33,13 @@ With a topic argument, show only that section of the guide. Without one, show:
 - **`as:tech-lead`** starts on its own when you describe a feature, a bug or a design question (or call
   `/as:tech-lead <topic>`): it reads the code and spec first, asks targeted questions, compares 2–3 architectures,
   records the decision and proposed scenarios in `docs/spec/changes/<slug>.html`, writes the plan, and offers the
-  next step — plan mode for medium changes, `/feature-dev:feature-dev` for large ones.
+  next step — plan mode (large changes get milestones).
 - **Plan mode** (Claude Code): press Shift+Tab until the mode indicator shows plan mode. Claude reads code, asks
   questions and proposes a plan without editing; you approve it or ask for changes, then it implements.
   Use it for multi-file changes, unclear requirements, and anything that changes a module's contract — ask Claude to
   read the module's spec page (linked from its `AGENTS.md`) while planning.
-- **Larger features**: `/feature-dev:feature-dev <description>` — explores the codebase, designs the architecture,
-  implements and reviews in guided phases.
+- **Larger features without `as:tech-lead`**: `/feature-dev:feature-dev <description>` — explores the codebase,
+  designs the architecture, implements and reviews in guided phases.
 - On Codex: ask for a plan first and say not to edit until you approve it.
 
 ### build — implementing
@@ -54,7 +54,7 @@ With a topic argument, show only that section of the guide. Without one, show:
 - Default path: `/as:finish` (next section) — it runs simplify and review for you. The items below are for ad-hoc use.
 - Ask Claude to run the `code-simplifier` agent on the recent changes.
 - `/as:spec-docs --tests` — which contract scenarios lack tests (unhappy paths first).
-- Security-sensitive changes or a release: run `claude-security` (ask for a security scan).
+- Security-sensitive changes or a release: run `/claude-security` (or ask for a security scan).
 - PR open: `/code-review:code-review`.
 
 ### finish — after delivering a feature

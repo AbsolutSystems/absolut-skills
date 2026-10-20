@@ -26,7 +26,7 @@ Host-specific mechanics (subagents, asking questions): [Claude Code](../../refer
 
 ## Why this order
 
-`agent-docs` is cheaper and settles the structure (apps, modules, boundaries, public API, legacy areas). `spec-docs`
+`agent-docs` is cheaper and settles the structure (apps, modules, boundary rules, legacy areas). `spec-docs`
 then reuses the module reports and `AGENTS.md` instead of rediscovering them, and asks only about behaviour. The links
 from `AGENTS.md` to the spec are added last, when the spec pages exist.
 
@@ -73,7 +73,7 @@ the report and go to step 6.
 
 ### 4. Link
 
-For every spec page that now exists, add the "Specification" section to the matching repo, app and module `AGENTS.md`
+For every spec page that now exists, add the "Specification" section to the matching repo and app `AGENTS.md`
 as defined in the `agent-docs` templates — minimal edits only. Verify every linked path exists.
 
 ### 5. Summary

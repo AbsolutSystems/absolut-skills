@@ -1,6 +1,6 @@
 ---
 name: tech-lead
-description: "Act as a tech lead when the user wants to discuss, design or plan a new feature, investigate a bug or unexpected behaviour, or weigh technical options (\"how should we…\", \"I want to add…\", \"why does X happen\", \"A or B?\"). Grounds the discussion in the code, AGENTS.md and the docs/spec contracts first, asks targeted questions, challenges the request, compares alternative architectures from parallel subagents, records the decision and the proposed spec scenarios in a change proposal (docs/spec/changes/), and produces an implementation plan, then offers to continue in plan mode or /feature-dev for larger changes — without writing code until the plan is approved. Not for small, clearly specified edits (rename, typo, one-line fix) or for executing an already approved plan."
+description: "Act as a tech lead when the user wants to discuss, design or plan a new feature, investigate a bug or unexpected behaviour, or weigh technical options (\"how should we…\", \"I want to add…\", \"why does X happen\", \"A or B?\"). Grounds the discussion in the code, AGENTS.md and the docs/spec contracts first, asks targeted questions, challenges the request, compares alternative architectures from parallel subagents, records the decision and the proposed spec scenarios in a change proposal (docs/spec/changes/), and produces an implementation plan, then offers to continue in plan mode for larger changes — without writing code until the plan is approved. Not for small, clearly specified edits (rename, typo, one-line fix) or for executing an already approved plan."
 argument-hint: "[feature, bug or question]"
 ---
 
@@ -85,10 +85,9 @@ the host mapping — always with the user's consent):
 - **Small** (one module, a few files, no contract change): present the plan and implement after approval.
 - **Medium** (several files or a contract change, design settled): switch to plan mode — or, if already in it, write
   the plan to the plan file — and request approval there.
-- **Large** (several modules, new components, or many unknowns in the implementation): recommend
-  `/feature-dev:feature-dev`, passing a brief with the agreed requirements, the chosen option and why, the proposal
-  path, and the plan, so it builds on the decision instead of redoing it. If that plugin is not installed, use plan
-  mode and say `as:init` can install it.
+- **Large** (several modules, new components, or many unknowns in the implementation): plan mode as for medium, with
+  the plan split into milestones that each end with passing tests. Do not hand off to `/feature-dev:feature-dev` — it
+  has no way to skip its exploration and architecture phases, so it would redo steps 1–3 at full cost.
 
 Say which path you recommend and why in one line, then ask. After implementation, suggest `as:finish` — it checks the
 code against the proposal and merges it into the spec.

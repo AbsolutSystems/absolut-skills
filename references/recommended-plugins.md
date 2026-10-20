@@ -6,12 +6,12 @@ Codex, skip any step that checks or installs them and say so in one sentence.
 
 | Plugin | Provides | Invoke | Use when |
 |--------|----------|--------|----------|
-| `feature-dev` | Guided feature workflow; agents `code-explorer`, `code-architect`, `code-reviewer` | `/feature-dev:feature-dev [description]` | Building a feature that spans several files or modules |
+| `feature-dev` | Guided feature workflow; agents `code-explorer`, `code-architect`, `code-reviewer` | `/feature-dev:feature-dev [description]` | Building a multi-module feature without a prior `as:tech-lead` session (it would redo the design) |
 | `frontend-design` | Skill for distinctive, production-grade UI | Triggers automatically on UI work | Building pages, components, frontend apps |
 | `code-simplifier` | Agent that simplifies recently changed code without changing behaviour | Ask Claude to run the `code-simplifier` agent | After implementing, before committing |
 | `code-review` | Multi-agent pull request review with confidence scoring | `/code-review:code-review` | A PR is open |
 | `commit-commands` | Git workflow commands | `/commit-commands:commit`, `/commit-commands:commit-push-pr`, `/commit-commands:clean_gone` | Committing, opening a PR, pruning gone branches |
-| `claude-security` | Deep vulnerability scan with verified findings and opt-in patches | Skill `claude-security` (ask for a security scan) | Before a release, or after changing auth, input handling or data access |
+| `claude-security` | Deep vulnerability scan with verified findings and opt-in patches | `/claude-security` (or ask for a security scan) | Before a release, or after changing auth, input handling or data access |
 
 ## Checking
 

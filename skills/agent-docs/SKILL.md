@@ -1,14 +1,21 @@
 ---
 name: agent-docs
-description: "Build or update hierarchical documentation for coding agents: a short repo-root AGENTS.md, per-application AGENTS.md with architecture and a .guidelines/ folder (testing, libraries, architecture, code style), and per-module AGENTS.md, each with a CLAUDE.md that imports it. Detects missing files and drift, asks about ambiguities, recommends improvements. Use only when the user explicitly invokes as:agent-docs."
+description: "Build or update minimal documentation for coding agents that holds only what the code cannot tell: a short repo-root AGENTS.md, per-application AGENTS.md (commands, unenforced rules, internal libraries, target vs legacy) with on-demand .guidelines/, and module AGENTS.md only where a module has pitfalls or rules, each with a CLAUDE.md that imports it. Analyses the code to ask the team the right questions, detects drift, prunes lines the code already shows, recommends improvements. Use only when the user explicitly invokes as:agent-docs."
 disable-model-invocation: true
 argument-hint: "[path] [--check] [--depth N]"
 ---
 
 # Agent docs
 
-Build and maintain a documentation tree that a coding agent reads progressively: little at the repo root, more as it
-descends into an application or module, and detailed rules in `.guidelines/` only when the task needs them.
+Build and maintain the smallest documentation tree that changes what a coding agent does: commands, rules the code does
+not enforce, which of two conventions is the target, what internal libraries provide, and pitfalls. Descriptions of what
+the code already shows (purpose, stack, public API, dependencies) are left out — agents read them from the code, and
+context files that repeat the repository make agents explore more and cost more without solving more tasks
+([Gloaguen et al., 2026](https://arxiv.org/abs/2602.11988)).
+
+**Line test:** a line stays only if, without it, an agent would do something wrong or have to guess.
+
+The code analysis exists to ask the team good questions; their answers are the most valuable content.
 
 Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex):
 
@@ -22,18 +29,19 @@ Host-specific mechanics (subagents, asking questions): [Claude Code](../../refer
 
 | Level | What it is | Files |
 |-------|------------|-------|
-| Repo root | Git root | `AGENTS.md` (≤ ~40 lines): what the project is, map of top-level directories/apps, global commands, shared rules |
-| App root | Directory with an application manifest (`pom.xml`, `build.gradle*`, app `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, …) | `AGENTS.md` (≤ ~80 lines): purpose, stack, architecture, key libraries, commands, index of `.guidelines/`; plus `.guidelines/*-guideline.md` |
-| Module | Module of a modular monolith, workspace package, or directory with a clear responsibility | `AGENTS.md` (≤ ~40 lines): responsibility, public API/entry points, dependencies, local pitfalls |
+| Repo root | Git root | `AGENTS.md` (≤ ~25 lines): one sentence on the product, map of apps (one line each), repo-wide commands, shared rules |
+| App root | Directory with an application manifest (`pom.xml`, `build.gradle*`, app `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, …) | `AGENTS.md` (≤ ~50 lines): commands (including a single test), rules the code does not enforce, internal libraries and what not to re-implement, target vs legacy, reference module, index of `.guidelines/`, spec links; plus `.guidelines/*-guideline.md` |
+| Module | Module of a modular monolith, workspace package, or directory with a clear responsibility | `AGENTS.md` (≤ ~20 lines) **only when the module has pitfalls or rules** (invariants, "do not call X from outside", legacy parts, a module-specific command) |
 
 - A single-application repository merges repo root and app root into one file.
 - Next to every `AGENTS.md` there is a `CLAUDE.md` containing only `@AGENTS.md`.
 - A child never repeats what its parent says.
 - `.guidelines/` files are **not** imported with `@`; the app `AGENTS.md` lists them with a "read before …" trigger so they are loaded on demand.
 - If the repository has a human-readable specification in `docs/spec/` (from `as:spec-docs`), link it, never import it:
-  the repo root links `docs/spec/index.html`, each app links its `docs/spec/<app>/index.html`, and each module whose spec
-  page names the module directory as its source links that page. One line each, see the templates.
-- Everything written is in English and states only facts backed by the code or by the user's answers. Never invent conventions.
+  the repo root links `docs/spec/index.html`, and each app lists its module pages in one "Specification" section (the
+  module directory from the page's `Source` → page path). See the templates.
+- Everything written is in English and is one of: a user's answer, a command that exists, a rule the code does not
+  enforce (with evidence it is followed), or a pitfall with evidence. Never describe the code; never invent conventions.
 
 Templates for every file type: [references/templates.md](references/templates.md).
 Detection heuristics and the subagent brief: [references/analysis.md](references/analysis.md).
@@ -56,10 +64,12 @@ Work in the main thread and keep it cheap:
 
 ### 2. Analysis (subagents, read-only)
 
-Fan out one read-only subagent per directory (batch tiny sibling modules into one subagent). Go **bottom-up**:
+The analysis looks for what an agent would get wrong, not for what the code contains: conflicting conventions, rules
+followed but not enforced, invariants and traps, missing or non-obvious commands, and lines in existing docs that only
+repeat the code. Fan out one read-only subagent per directory (batch tiny sibling modules into one subagent). Go **bottom-up**:
 
 1. modules,
-2. app roots — they receive the module reports instead of re-reading module code, and also collect guideline material,
+2. app roots — they receive the module reports instead of re-reading module code, and also collect guideline candidates,
 3. repo root — it receives the app reports.
 
 Run independent subagents of the same wave in parallel. Each gets the brief from [references/analysis.md](references/analysis.md)
@@ -71,7 +81,7 @@ If the host has no subagents, do the same analysis sequentially in the main thre
 
 ### 3. Clarify with the user
 
-Collect open questions from all reports, deduplicate them and ask in small batches, most impactful first. Offer concrete
+This is the main work of the skill: the team knows what the code cannot show. Collect open questions from all reports, deduplicate them and ask in small batches, most impactful first. Offer concrete
 options derived from the code when possible. Typical questions:
 
 - What an internal library (for example `preboot`) provides and what must not be re-implemented by hand.
@@ -89,8 +99,9 @@ Present one table, one row per file to be touched:
 |--------|---------|
 | `NEW` | File does not exist and should |
 | `UPDATE` | File exists; list each drift item (false claim + evidence) and each missing fact |
-| `OK` | File matches the code |
-| `STALE` | File documents a directory that no longer deserves its own file, or describes removed things |
+| `PRUNE` | File exists; list the lines that fail the line test (they repeat what the code shows) |
+| `OK` | File matches the code and every line passes the line test |
+| `STALE` | Module file with no pitfalls or rules left, or a file describing removed things |
 | `MIGRATE` | `CLAUDE.md` with real content but no `AGENTS.md`, or a symlink between them — content moves to a regular `AGENTS.md` |
 
 Then a **Recommendations** section: what would make a coding agent more effective, beyond documentation. Examples: no
@@ -102,7 +113,9 @@ With `--check`, stop here. Otherwise ask for approval: all, a selected subset, o
 ### 5. Write
 
 - New files from the templates. Existing files: minimal edits — keep hand-written sections, fix only false or missing facts.
-- Create or update `.guidelines/` files only for areas with evidence or user answers; keep the app `AGENTS.md` index in sync.
+- `PRUNE`: remove only the lines the user approved; a line that may hold team knowledge is kept and asked about.
+- Create or update `.guidelines/` files only for rules the user confirmed or a tool enforces; keep the app `AGENTS.md`
+  index in sync.
 - Keep the `<!-- as:working-principles … -->` block (or its `off` marker) in the root `AGENTS.md` untouched: it is owned
   by `as:init`, is not drift, and does not count toward the line budget.
 - `CLAUDE.md` next to each `AGENTS.md` contains exactly `@AGENTS.md`. For `MIGRATE`, move the content first. If
@@ -114,8 +127,9 @@ With `--check`, stop here. Otherwise ask for approval: all, a selected subset, o
 ### 6. Verify
 
 - No `AGENTS.md`/`CLAUDE.md` is a symlink, and every `CLAUDE.md` is exactly `@AGENTS.md`.
-- Every path mentioned in the written files exists, including links to `docs/spec/` pages; a module with a spec page
-  and no link is reported as `UPDATE`.
+- Every path mentioned in the written files exists, including links to `docs/spec/` pages; an app whose module spec
+  pages are not all listed is reported as `UPDATE`.
+- Every written line passes the line test and every file is within its line budget.
 - Every command mentioned exists in a manifest, script or build file.
 - Each app `AGENTS.md` guideline index matches the files in its `.guidelines/`.
 

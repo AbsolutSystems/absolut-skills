@@ -27,27 +27,33 @@ files with "do not edit" headers), test fixtures and snapshots, assets-only dire
 When a deep Java/Kotlin package path has no content of its own (`src/main/java/com/acme/...`), place the module file at
 the directory that actually holds the module code, not at intermediate package directories.
 
-## Collecting guideline material (app roots)
+## Looking for what an agent would get wrong (app roots and modules)
 
-- **Testing**: test frameworks and assertion/mocking libraries from manifests; where tests live and naming patterns; unit vs
-  integration vs e2e split (directories, tags, profiles, testcontainers, in-memory DBs); fixtures/builders/factories;
-  how to run all tests and a single test; CI test steps. Pick one representative test per kind as a reference path.
-- **Libraries**: dependencies grouped by role. Internal libraries — same groupId/scope/organization as the project,
-  private registry, or a sibling repo/package (e.g. `preboot`) — are listed first with what they provide, as far as the
-  code shows. Detect duplicates for the same role (two HTTP clients, two mappers) and raise them as questions.
-- **Architecture**: modules and boundaries, how modules talk (direct calls, events, ports), layering inside a module,
-  enforced rules (ArchUnit, dependency-cruiser, eslint boundaries), where a new module/feature goes, a reference module.
-- **Code style**: formatter/linter config, naming conventions observed in the code, error handling and logging patterns,
-  DTO/mapping conventions.
-- **Optional areas**, only if present: API (OpenAPI, versioning, controllers), data (migrations tool, ORM, transactions),
-  security (auth, permissions), frontend specifics (state management, components, styling, i18n).
+Read code to find candidates and questions, not to describe it. Each candidate needs an evidence path.
+
+- **Conflicts** — two libraries, frameworks or patterns for one role (two HTTP clients, two test frameworks, two
+  mappers): ask which is the target and which is legacy.
+- **Unenforced rules** — conventions followed consistently but not checked by a tool (module boundaries without
+  ArchUnit/lint rules, events instead of direct calls, a mandatory base class or helper). Enforced rules need no line.
+- **Internal libraries** — same groupId/scope/organization as the project, private registry, or a sibling repo/package
+  (e.g. `preboot`): what they provide that an agent might re-implement by hand; ask when the code does not show it.
+- **Pitfalls** — invariants, ordering or transaction traps, generated or legacy areas not to edit, tests that skip
+  silently, required env or services.
+- **Commands** — how to build, test, run a single test, run locally and lint; flag the ones missing or non-obvious
+  (profiles, env, wrappers).
+- **Testing strategy** — what level of tests a new feature needs, when the code does not make it clear; a reference test
+  per kind to copy.
+- **Existing docs** — lines that only repeat what the code shows (stack, directory contents, public API, dependencies):
+  `PRUNE` candidates.
 
 ## Subagent brief
 
 Fill the placeholders and pass verbatim:
 
 ```text
-You are analyzing one directory of a repository to document it for coding agents. Read-only: do not modify files.
+You are analyzing one directory of a repository to find what a coding agent would get wrong in it. Read-only: do not
+modify files. Do not describe the code: an agent can read it. Report only what the code cannot tell, or tells only
+after long exploration.
 
 Directory: {dir}
 Level: {repo-root | app-root | module}
@@ -55,18 +61,17 @@ Children that get their own AGENTS.md: {list or "none"}
 Child reports (if any): {reports}
 Existing AGENTS.md / CLAUDE.md / .guidelines content: {content or "none"}
 
-Read manifests, entry points, configuration, and a representative sample of code and tests. Prefer evidence over
-assumptions; cite file paths. Do not describe children in depth — one line each.
-{For app-root: also collect guideline material for testing, libraries, architecture, code style, and optional areas
-(API, data, security, frontend) that exist.}
+Read manifests, build and CI files, configuration, and a representative sample of code and tests. Cite file paths.
+Look for conflicts between conventions, rules followed but not enforced, internal libraries, pitfalls, missing or
+non-obvious commands, and the testing strategy.
 
 Return exactly these sections:
-1. Purpose — 1–3 sentences.
-2. Map — subdirectories and key files, one line each.
-3. Commands — build/test/run/lint commands that exist, with where they are defined.
-4. Facts — architecture, libraries, conventions, pitfalls; each with an evidence path.
-5. Guideline material — (app-root only) per area: rules observed, reference file paths.
-6. Drift — for each claim in the existing docs that is false or outdated: the claim, why it is wrong, evidence.
-7. Open questions — what cannot be determined from code and matters to an agent; propose likely answers as options.
-8. Recommendations — concrete improvements that would help a coding agent (missing scripts, env docs, reference examples, inconsistencies).
+1. Map — (repo-root only) apps and top-level directories, one line each.
+2. Commands — build/test/single test/run/lint commands that exist, with where they are defined; note missing ones.
+3. Candidates — non-inferable facts (rules, target vs legacy, internal libraries, pitfalls), each with an evidence path.
+4. Prune — lines in the existing docs that only repeat what the code shows, quoted.
+5. Drift — for each claim in the existing docs that is false or outdated: the claim, why it is wrong, evidence.
+6. Open questions — what only the team can answer and matters to an agent; propose likely answers as options.
+7. Recommendations — concrete improvements that would help a coding agent (missing scripts, env docs, reference
+   examples, rules worth enforcing with a tool).
 ```

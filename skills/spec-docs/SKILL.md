@@ -52,7 +52,7 @@ Work in the main thread and keep it cheap:
 
 - List tracked files (`git ls-files`, scoped to `[path]`) and classify directories into app roots and modules using the
   heuristics in [../agent-docs/references/analysis.md](../agent-docs/references/analysis.md) (section "Classifying directories").
-- If `AGENTS.md` files exist (from `as:agent-docs`), read them: they give purpose, public API and module boundaries cheaply.
+- If `AGENTS.md` files exist (from `as:agent-docs`), read them: they give commands, boundary rules and pitfalls cheaply.
 - If `docs/spec/` exists, read it and collect every existing page, requirement ID and scenario ID with its `data-kind`
   and `data-status`, plus the IDs reserved by open proposals in `docs/spec/changes/*.html` (new IDs must skip them).
   Do not read `spec.css`. Do not edit proposals or `changes/archive/` — they are owned by `as:tech-lead` and `as:finish`.
@@ -120,7 +120,7 @@ With `--check`, stop here. Otherwise ask for approval: all, a selected subset, o
 
 Finish with a short summary (pages created / updated / left as is, scenarios added / removed, open questions) and
 suggest opening `docs/spec/index.html` in a browser and reviewing `git diff`. If pages were created or removed and the
-repository has `AGENTS.md` files, suggest running `as:agent-docs` so module docs link the new pages.
+repository has `AGENTS.md` files, suggest running `as:agent-docs` so the app docs link the new pages.
 
 ## Test coverage
 

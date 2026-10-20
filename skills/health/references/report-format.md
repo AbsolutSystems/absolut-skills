@@ -1,8 +1,8 @@
 # Report and snapshot format
 
-Health pages follow the same rules as spec pages — content only, one stylesheet, the element and class vocabulary of
-[../../spec-docs/references/html-format.md](../../spec-docs/references/html-format.md) — and link `../spec/spec.css`.
-Report language follows the spec pages (`<html lang>` of `docs/spec/index.html`), else English.
+Health pages follow [html-format.md](html-format.md) — content only, one stylesheet, only the listed vocabulary — and
+link `health.css`. Report language follows the spec pages (`lang` in the marker on the first line of
+`docs/spec/index.md`), else English.
 
 ## `docs/health/<YYYY-MM-DD>.html`
 
@@ -14,7 +14,7 @@ Report language follows the spec pages (`<html lang>` of `docs/spec/index.html`)
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="as:health">
   <title>Health 2026-10-19 — Shop</title>
-  <link rel="stylesheet" href="../spec/spec.css">
+  <link rel="stylesheet" href="health.css">
 </head>
 <body>
   <nav class="crumbs"><a href="index.html">Health</a> › 2026-10-19</nav>
@@ -35,7 +35,7 @@ Report language follows the spec pages (`<html lang>` of `docs/spec/index.html`)
       <table>
         <thead><tr><th>Module</th><th class="num">Complexity (max)</th><th class="num">Churn</th><th class="num">Coverage</th><th class="num">Cycles</th><th class="num">Findings</th></tr></thead>
         <tbody>
-          <tr><td><a href="../spec/backend/orders.html">orders</a></td><td class="num">34</td><td class="num">58</td><td class="num">61% <span class="trend" data-dir="up">+6</span></td><td class="num">1</td><td class="num">4</td></tr>
+          <tr><td><a href="../spec/backend/orders.md">orders</a></td><td class="num">34</td><td class="num">58</td><td class="num">61% <span class="trend" data-dir="up">+6</span></td><td class="num">1</td><td class="num">4</td></tr>
         </tbody>
       </table>
     </section>
@@ -70,14 +70,12 @@ Report language follows the spec pages (`<html lang>` of `docs/spec/index.html`)
 </html>
 ```
 
-Classes added for health pages (defined in `spec.css` v2): `article.finding` with `data-severity="high|medium|low"`,
-`span.trend` with `data-dir="up|down|flat"` (direction of the value, not good/bad — the text says which is better),
-`.num` on numeric table cells.
+`span.trend` shows the direction of the value, not good/bad — the text says which is better.
 
 ## `docs/health/index.html`
 
 Header "Health", then `<section id="runs">` with a table: date (link), commit, high/medium/low counts, coverage,
-cycles, with `trend` spans against the previous run. Newest first. Footer link to `../spec/index.html` if it exists.
+cycles, with `trend` spans against the previous run. Newest first. Footer link to `../spec/index.md` if it exists.
 
 ## `docs/health/<YYYY-MM-DD>.json`
 

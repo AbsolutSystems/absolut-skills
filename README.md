@@ -68,7 +68,7 @@ between technical options. It behaves like a tech lead:
 1. **Grounds** the topic in code, `AGENTS.md` and the spec (parallel exploration subagents) before asking anything.
 2. **Clarifies** with targeted questions, and challenges the request when a smaller or existing solution fits.
 3. **Compares** 2–3 architectures from parallel subagents (minimal change / clean boundaries / scale) and recommends one.
-4. Records the **decision and proposed scenarios** in `docs/spec/changes/<slug>.html` — module pages keep describing
+4. Records the **decision and proposed scenarios** in `docs/spec/changes/<slug>.md` — module pages keep describing
    current behaviour until `as:finish` merges the proposal and archives it in `docs/spec/changes/archive/` (decision log).
 5. Writes the **plan** (steps, tests per scenario ID, risks) and offers the **handoff**: implement directly (small),
    or switch to plan mode (medium; large gets milestones). It does not hand off to `/feature-dev:feature-dev`, which
@@ -212,7 +212,7 @@ How a run works:
 Generated docs are in English. `.guidelines/` files are referenced from the app `AGENTS.md`, not `@`-imported, so they
 do not fill the context until the agent needs them. Review the result with `git diff`; re-running should report `OK`.
 
-### `spec-docs` — HTML specification of module contracts
+### `spec-docs` — Markdown specification of module contracts
 
 Builds a specification for people, not agents: what the system does, what each application is for, and what each
 module promises to the rest of the application — requirements with Given/When/Then scenarios for happy, error and edge
@@ -230,14 +230,15 @@ Resulting layout:
 
 ```text
 docs/spec/
-  spec.css                          # one shared stylesheet, copied from the skill
-  index.html                        # system: purpose, actors, apps/modules, main flows
-  backend/index.html                # app: modules and cross-module flows (monorepo only)
-  backend/orders.html               # module contract: operations, requirements, scenarios, rules, dependencies
+  index.md                          # system: purpose, actors, apps/modules, main flows
+  backend/index.md                  # app: modules and cross-module flows (monorepo only)
+  backend/orders.md                 # module contract: operations, requirements, scenarios, rules, dependencies
 ```
 
-Pages contain content only — no inline styles or scripts — so an agent updating them does not spend tokens on
-styling. Open `docs/spec/index.html` in a browser; it also prints well. To make `--tests` mapping deterministic, put the
+Pages are Markdown formatted for people: breadcrumbs, a one-line purpose, a table of contents, requirements as quoted
+SHALL sentences, scenarios marked ✅ happy / ❌ error / ⚠️ edge with Given/When/Then lists, open questions as callouts.
+They read well on GitHub/GitLab, in an IDE preview and in a diff. A spec written by an earlier version as HTML is
+converted to Markdown on the next run (content and IDs unchanged, links from `AGENTS.md` updated). To make `--tests` mapping deterministic, put the
 scenario ID in contract test names or tags (e.g. `@Tag("ORD-003")`, `it("ORD-003 rejects out-of-stock order")`).
 
 When `docs/spec/` exists, `agent-docs` links it from the repo `AGENTS.md` and lists the module pages in each app

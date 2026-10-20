@@ -38,7 +38,7 @@ Host-specific mechanics (subagents, asking questions): [Claude Code](../../refer
 - A child never repeats what its parent says.
 - `.guidelines/` files are **not** imported with `@`; the app `AGENTS.md` lists them with a "read before …" trigger so they are loaded on demand.
 - If the repository has a human-readable specification in `docs/spec/` (from `as:spec-docs`), link it, never import it:
-  the repo root links `docs/spec/index.html`, and each app lists its module pages in one "Specification" section (the
+  the repo root links `docs/spec/index.md`, and each app lists its module pages in one "Specification" section (the
   module directory from the page's `Source` → page path). See the templates.
 - Everything written is in English and is one of: a user's answer, a command that exists, a rule the code does not
   enforce (with evidence it is followed), or a pitfall with evidence. Never describe the code; never invent conventions.

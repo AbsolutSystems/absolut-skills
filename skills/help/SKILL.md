@@ -25,14 +25,14 @@ With a topic argument, show only that section of the guide. Without one, show:
 
 ### onboarding — once per repository
 
-- `/as:init` — builds the `AGENTS.md` hierarchy, the HTML spec for chosen modules, links between them, and checks the
+- `/as:init` — builds the `AGENTS.md` hierarchy, the Markdown spec for chosen modules, links between them, and checks the
   recommended plugins. Rerun parts later with `/as:agent-docs` and `/as:spec-docs`.
 
 ### plan — before non-trivial changes
 
 - **`as:tech-lead`** starts on its own when you describe a feature, a bug or a design question (or call
   `/as:tech-lead <topic>`): it reads the code and spec first, asks targeted questions, compares 2–3 architectures,
-  records the decision and proposed scenarios in `docs/spec/changes/<slug>.html`, writes the plan, and offers the
+  records the decision and proposed scenarios in `docs/spec/changes/<slug>.md`, writes the plan, and offers the
   next step — plan mode (large changes get milestones).
 - **Plan mode** (Claude Code): press Shift+Tab until the mode indicator shows plan mode. Claude reads code, asks
   questions and proposes a plan without editing; you approve it or ask for changes, then it implements.

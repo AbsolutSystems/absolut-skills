@@ -1,6 +1,6 @@
 ---
 name: spec-docs
-description: "Build or update a human-readable HTML specification of the application in docs/spec/: a system overview, per-application pages and per-module contract pages with requirements and Given/When/Then scenarios (happy, error and edge paths) with stable IDs. All pages share one spec.css so they carry content only. Can audit drift against the code and report which contract scenarios are covered by tests. Use only when the user explicitly invokes as:spec-docs."
+description: "Build or update a human-readable Markdown specification of the application in docs/spec/: a system overview, per-application pages and per-module contract pages with requirements and Given/When/Then scenarios (happy, error and edge paths) with stable IDs, formatted to read well rendered and in diffs. Converts a legacy HTML spec to Markdown. Can audit drift against the code and report which contract scenarios are covered by tests. Use only when the user explicitly invokes as:spec-docs."
 disable-model-invocation: true
 argument-hint: "[path] [--check] [--tests] [--lang en|pl]"
 ---
@@ -16,7 +16,8 @@ Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex):
 - `[path]` — limit the run to this subtree (default: repository root). Pages outside it are read for context but not rewritten.
 - `--check` — audit only: report drift between the spec and the code, ask questions, write nothing.
 - `--tests` — test coverage report only: map every scenario to the tests that verify it, write nothing.
-- `--lang en|pl` — language of the page content (default `en`). IDs, file names, `data-*` values and CSS classes stay English.
+- `--lang en|pl` — language of the page content (default `en`). IDs, anchors, file names and the fixed values of the
+  format (kinds, statuses) stay English.
   When updating existing pages, keep their language unless the user asked to change it.
 
 Host-specific mechanics (subagents, asking questions): [Claude Code](../../references/claude-tools.md), [Codex](../../references/codex-tools.md).
@@ -25,23 +26,22 @@ Host-specific mechanics (subagents, asking questions): [Claude Code](../../refer
 
 ```text
 docs/spec/
-  spec.css               # copied from assets/spec.css of this skill; the only styling
-  index.html             # system: purpose, actors, map of apps/modules, main flows
+  index.md               # system: purpose, actors, map of apps/modules, main flows
   changes/               # change proposals from as:tech-lead (open), merged by as:finish into archive/
-  <app>/index.html       # application: purpose, modules and how they relate (monorepo only)
-  <app>/<module>.html    # module contract: operations, requirements, scenarios, rules, dependencies
+  <app>/index.md         # application: purpose, modules and how they relate (monorepo only)
+  <app>/<module>.md      # module contract: operations, requirements, scenarios, rules, dependencies
 ```
 
-- A single-application repository has no `<app>/index.html`; module pages live in `docs/spec/<module>.html` and the
+- A single-application repository has no `<app>/index.md`; module pages live in `docs/spec/<module>.md` and the
   system page covers the application.
-- Pages contain **content only**: no `<style>`, no `style` attributes, no `<script>`, no inline SVG. Each page links
-  `spec.css` with a relative path and uses only the elements and classes from [references/html-format.md](references/html-format.md).
+- Pages are written for people: GitHub-flavoured Markdown using only the constructs and readability rules of
+  [references/markdown-format.md](references/markdown-format.md), so they read well rendered and in a diff.
 - Scenario IDs are stable (`<PREFIX>-NNN`) and are never renumbered or reused; tests refer to them.
 - The spec describes observable behaviour from the point of view of a caller of the module (another module, a user, an
   external system), not the implementation. No internal class names, no algorithms.
 - State only facts backed by the code or by the user's answers. Behaviour that looks like a bug is asked about, not specified.
 
-Page format: [references/html-format.md](references/html-format.md).
+Page format: [references/markdown-format.md](references/markdown-format.md).
 Subagent briefs and report formats: [references/analysis.md](references/analysis.md).
 
 ## Procedure
@@ -53,9 +53,13 @@ Work in the main thread and keep it cheap:
 - List tracked files (`git ls-files`, scoped to `[path]`) and classify directories into app roots and modules using the
   heuristics in [../agent-docs/references/analysis.md](../agent-docs/references/analysis.md) (section "Classifying directories").
 - If `AGENTS.md` files exist (from `as:agent-docs`), read them: they give commands, boundary rules and pitfalls cheaply.
-- If `docs/spec/` exists, read it and collect every existing page, requirement ID and scenario ID with its `data-kind`
-  and `data-status`, plus the IDs reserved by open proposals in `docs/spec/changes/*.html` (new IDs must skip them).
-  Do not read `spec.css`. Do not edit proposals or `changes/archive/` — they are owned by `as:tech-lead` and `as:finish`.
+- If `docs/spec/` exists, read it and collect every existing page, requirement ID and scenario ID with its kind and
+  status, plus the IDs reserved by open proposals in `docs/spec/changes/*.md` (new IDs must skip them).
+  Do not edit proposals or `changes/archive/` — they are owned by `as:tech-lead` and `as:finish` — except to migrate them.
+- **Legacy HTML:** any `*.html` page under `docs/spec/` (including `changes/` and `archive/`) comes from an earlier
+  version. Read it like a Markdown page (see "Legacy HTML pages" in the format reference) and plan its migration: the
+  same path with `.md`. Also list tracked files outside `docs/spec/` that link to its `.html` pages
+  (`git grep -lE 'spec/[^ )"]*\.html'`), typically `AGENTS.md` files and `docs/health/` pages. Do not read `spec.css`.
 - Assign each new module an ID prefix: 2–4 uppercase letters derived from its name, unique across the spec. Existing
   prefixes are kept.
 - Show the user the planned pages (path → source directory → prefix). Ask now if a classification is uncertain.
@@ -92,34 +96,44 @@ One table, one row per page:
 | `UPDATE` | Page exists; list drift items (claim, why it is wrong, evidence) and missing requirements/scenarios |
 | `OK` | Page matches the code |
 | `STALE` | Page documents a module that no longer exists or was merged |
+| `MIGRATE` | Legacy HTML page to convert to Markdown (combined with the status above, e.g. `MIGRATE+UPDATE`) |
 
 Below the table list scenario changes per page: added (new IDs), changed (ID + what changed), removed (ID; will be
-marked `data-status="removed"`, not deleted).
+marked removed, not deleted). For a migration also list the files outside `docs/spec/` whose links will be
+rewritten, and whether `docs/spec/spec.css` can be removed.
 
 With `--check`, stop here. Otherwise ask for approval: all, a selected subset, or cancel.
 
 ### 5. Write
 
-- Create `docs/spec/` if missing. Copy `assets/spec.css` from this skill's directory to `docs/spec/spec.css` with a
-  shell copy (do not read or retype it). If `docs/spec/spec.css` already exists and differs, ask before overwriting —
-  the user may have customised it, or it is an older version (see the version in its first line).
-- New pages from the skeletons in [references/html-format.md](references/html-format.md).
+- Create `docs/spec/` if missing.
+- **Migrate first**, before any content change, so drift fixes show as a separate diff: convert every legacy page one
+  to one with the mapping in [references/markdown-format.md](references/markdown-format.md) — same content, IDs,
+  statuses and language, nothing added or dropped — write the `.md` next to it, then delete the `.html` with
+  `git rm` (or `rm` if untracked). Proposals keep their status and archive date. Then rewrite links: `.html` → `.md`
+  (fragments unchanged) in the converted pages and, only in their link targets, in the files listed in the report.
+  Delete `docs/spec/spec.css` unless something still links it (`git grep -l 'spec/spec.css'`) — then keep it and say
+  that `as:health` relinks its reports on the next run.
+- New pages from the skeletons in [references/markdown-format.md](references/markdown-format.md).
 - Existing pages: minimal edits. Keep hand-written text, fix only false or missing facts, keep every existing ID.
-  New scenarios take the next free number for the prefix. Removed scenarios get `data-status="removed"` and stay.
-- Update the `<dl class="meta">` of each written page with the source path and the current commit (`git rev-parse --short HEAD`).
+  New scenarios take the next free number for the prefix. Removed scenarios get the removed status and stay.
+- Update the meta line of each written page with the source path and the current commit (`git rev-parse --short HEAD`).
+- Apply the readability rules of the format to every page you write, also to existing hand-written text you touch.
 - Keep navigation in sync: the system page lists apps/modules, each app page lists its modules, each module page links back.
 - Never delete pages (including `STALE` ones) without explicit approval. Do not touch application code, tests or
-  `AGENTS.md` files — links from `AGENTS.md` to the spec are maintained by `as:agent-docs`.
+  `AGENTS.md` files — links from `AGENTS.md` to the spec are maintained by `as:agent-docs`; a migration only rewrites
+  their `.html` link targets.
 
 ### 6. Verify
 
-- Every page links `spec.css` with a correct relative path.
-- `grep -rnE 'style=|<style|<script|<svg' docs/spec --include=*.html` finds nothing.
-- Every `id` is unique across `docs/spec/` outside `changes/`, and every scenario ID matches `<PREFIX>-NNN` of its module.
-- Every relative link between pages resolves; every source path in `meta` exists.
+- No `*.html` is left under `docs/spec/`, and `git grep -nE 'spec/[^ )"]*\.html'` finds no links to spec pages.
+- Raw HTML is limited to the marker and the anchors: `grep -rnE '<[a-z/!]' docs/spec --include=*.md | grep -vE '<a id="[A-Z0-9-]+"></a>|^[^:]+:1:<!-- as:'` finds nothing.
+- Every requirement and scenario heading carries its anchor; every scenario has a kind line and Given/When/Then.
+- Every anchor `id` is unique across `docs/spec/` outside `changes/`, and every scenario ID matches `<PREFIX>-NNN` of its module.
+- Every relative link between pages resolves; every source path in a meta line exists.
 
 Finish with a short summary (pages created / updated / left as is, scenarios added / removed, open questions) and
-suggest opening `docs/spec/index.html` in a browser and reviewing `git diff`. If pages were created or removed and the
+suggest reading `docs/spec/index.md` in the repository browser or the IDE's Markdown preview and reviewing `git diff`. If pages were created or removed and the
 repository has `AGENTS.md` files, suggest running `as:agent-docs` so the app docs link the new pages.
 
 ## Test coverage
@@ -127,7 +141,8 @@ repository has `AGENTS.md` files, suggest running `as:agent-docs` so the app doc
 `--tests` is read-only and requires an existing `docs/spec/`. It answers: does each promise in the contract have a test
 that checks it through the module's public entry points?
 
-1. Collect all active scenarios (`data-status` not `removed`) with their ID, module, kind and Given/When/Then text.
+1. Collect all active scenarios (status not `removed`) with their ID, module, kind and Given/When/Then text. Legacy
+   HTML pages are read as they are; suggest migrating them.
 2. **Cheap pass:** search test sources for each scenario ID (`git grep -n '<ID>'` over test directories) — in test names,
    tags/annotations or comments. A hit is a candidate match.
 3. **Semantic pass:** for scenarios without a hit, fan out one read-only subagent per module with the coverage brief

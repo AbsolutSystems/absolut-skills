@@ -10,7 +10,7 @@
 | `worktree-create` | `/as:worktree-create` | `$as:worktree-create` | New branch and git worktree in `../<repo>-worktrees/<name>`, from the current branch or `from <branch>`; optionally copies `.env*` |
 | `worktree-close` | `/as:worktree-close` | `$as:worktree-close` | Offers to commit leftovers, then removes the worktree folder; the branch stays |
 | `agent-docs` | `/as:agent-docs` | `$as:agent-docs` | Build and audit minimal `AGENTS.md`/`CLAUDE.md` docs and `.guidelines/` holding only what the code cannot tell; prunes the rest |
-| `spec-docs` | `/as:spec-docs` | `$as:spec-docs` | Human-readable HTML spec of module contracts (scenarios with stable IDs) in `docs/spec/`, plus scenario test coverage report |
+| `spec-docs` | `/as:spec-docs` | `$as:spec-docs` | Human-readable Markdown spec of module contracts (scenarios with stable IDs) in `docs/spec/`, plus scenario test coverage report |
 
 Every skill lives in `skills/<name>/`:
 

@@ -15,7 +15,7 @@ How to write and change skills, references and assets in `skills/` and `referenc
   Skill tool, Codex equivalents) in `references/claude-tools.md` / `references/codex-tools.md`.
 - Arguments: document them under "Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex)".
 - Links are relative to the file and must resolve (checked by the validator); refer to other skills by path, not by copying.
-- Assets that projects receive (e.g. `spec.css`) are copied with a shell copy by the skill, never retyped by the agent.
+- Assets that projects receive (e.g. `health.css`) are copied with a shell copy by the skill, never retyped by the agent.
 - Subagent briefs are fenced `text` blocks with `{placeholders}` and an exact list of sections to return.
 - Instructions and generated docs are in English.
 

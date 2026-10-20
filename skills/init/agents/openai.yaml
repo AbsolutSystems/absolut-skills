@@ -1,6 +1,6 @@
 interface:
   display_name: "Absolut Skills Init"
-  short_description: "Onboard a repo: AGENTS.md docs, then the HTML module spec, then links"
+  short_description: "Onboard a repo: AGENTS.md docs, then the Markdown module spec, then links"
   default_prompt: "Use $as:init to build the agent docs and the module specification for this repository."
 policy:
   allow_implicit_invocation: false

@@ -1,6 +1,6 @@
 ---
 name: init
-description: "Onboard a repository (greenfield or brownfield) in one run: build or update the AGENTS.md hierarchy with as:agent-docs, then the HTML module specification with as:spec-docs for a chosen scope, then link the spec from AGENTS.md, and finally check (and, with consent, install) the recommended Anthropic plugins. Shares one inventory and one round of questions between both, with an approval gate before each write. Use only when the user explicitly invokes as:init."
+description: "Onboard a repository (greenfield or brownfield) in one run: build or update the AGENTS.md hierarchy with as:agent-docs, then the Markdown module specification with as:spec-docs for a chosen scope, then link the spec from AGENTS.md, and finally check (and, with consent, install) the recommended Anthropic plugins. Shares one inventory and one round of questions between both, with an approval gate before each write. Use only when the user explicitly invokes as:init."
 disable-model-invocation: true
 argument-hint: "[path] [--spec <path>... | --spec all | --no-spec] [--check] [--no-principles] [--no-plugins] [--lang en|pl] [--depth N]"
 ---
@@ -83,7 +83,7 @@ next steps:
 
 - `as:spec-docs <path>` — extend the spec to further modules, then `as:agent-docs` to link them.
 - `as:spec-docs --tests` — scenario test coverage report for the specified modules.
-- Review `git diff` and open `docs/spec/index.html` in a browser.
+- Review `git diff` and read `docs/spec/index.md` in the repository browser or the IDE's Markdown preview.
 - `as:tech-lead` — starts on its own when you discuss a feature or a bug: design, decision, spec change, plan.
 - `as:finish` — after each feature: simplify, review, spec and contract tests, docs for what changed.
 - `as:health` — once a sprint or month: hotspots, coupling, tests, dead code, dependencies.

@@ -78,8 +78,9 @@ If a tool fails, record it in the report and continue with the remaining signals
 - In chat: the top 10 findings, and one paragraph on the trend (what improved, what got worse).
 - Write `docs/health/<YYYY-MM-DD>.html`, `docs/health/<YYYY-MM-DD>.json` and update `docs/health/index.html` as
   defined in [references/report-format.md](references/report-format.md). Same-day rerun overwrites that day's files.
-- Styling: pages link `../spec/spec.css`. If it does not exist, copy `../spec-docs/assets/spec.css` from this skill's
-  directory to `docs/spec/spec.css` with a shell copy, as `as:spec-docs` does.
+- Styling: pages link `health.css`. Copy `assets/health.css` from this skill's directory to `docs/health/health.css`
+  with a shell copy (do not read or retype it); if it exists and differs, ask before overwriting — compare the version
+  in its first line. Older reports linking `../spec/spec.css` (written before 1.1.0) are relinked to `health.css`.
 
 Check the written pages like spec pages: `grep -nE 'style=|<style|<script|<svg' docs/health/*.html` finds nothing, and
 every relative link resolves.

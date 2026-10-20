@@ -10,8 +10,10 @@ How to verify changes: the validator and its tests, and manual checks of skill o
   assert on the error message; `test_repository_is_valid` must stay green.
 - The validator stays standard-library only (no dependencies).
 - Optionally run `claude plugin validate .`; the root `CLAUDE.md` warning is expected.
-- Changing `spec.css` or an HTML skeleton: render the skeleton from the reference file with `spec.css` in a browser
-  (light mode at least) and check labels do not overlap; serve from a temporary directory, not the repository.
+- Changing `health.css` or a health HTML skeleton: render the skeleton from the reference file with `health.css` in a
+  browser (light mode at least) and check labels do not overlap; serve from a temporary directory, not the repository.
+- Changing a spec Markdown skeleton: preview it rendered (GitHub or an IDE preview) and check that anchors
+  (`page.md#ORD-001`) and `> [!NOTE]` alerts work.
 - Changing a procedure: dry-run it on a sample repository when possible and state in the change what was not run.
 
 ## Reference examples

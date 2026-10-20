@@ -26,7 +26,7 @@ Read-only: do not modify files.
 Directory: {dir}
 Level: {module | app | system}
 ID prefix: {PREFIX}
-Existing page content: {html body or "none"}
+Existing page content: {Markdown, or legacy HTML body, or "none"}
 Existing IDs and kinds: {list or "none"} — keep them; next free scenario number is {n}
 AGENTS.md content (if any): {content or "none"}
 Child reports (app/system level): {reports or "none"}

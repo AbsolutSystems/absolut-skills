@@ -1,6 +1,6 @@
 interface:
   display_name: "Absolut Skills Spec Docs"
-  short_description: "Build an HTML module-contract spec and check scenario test coverage"
-  default_prompt: "Use $as:spec-docs to build or update the HTML specification in docs/spec/ for this repository."
+  short_description: "Build a Markdown module-contract spec and check scenario test coverage"
+  default_prompt: "Use $as:spec-docs to build or update the Markdown specification in docs/spec/ for this repository."
 policy:
   allow_implicit_invocation: false

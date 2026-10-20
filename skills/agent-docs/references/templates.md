@@ -18,7 +18,7 @@ API, dependencies, framework conventions. Write the rule behind them only when t
 
 - `backend/` — <one line>. See `backend/AGENTS.md`.
 - `frontend/` — <one line>. See `frontend/AGENTS.md`.
-- `docs/spec/` — human-readable specification of module contracts; start at `docs/spec/index.html`.
+- `docs/spec/` — human-readable specification of module contracts; start at `docs/spec/index.md`.
 
 ## Commands
 
@@ -58,7 +58,7 @@ API, dependencies, framework conventions. Write the rule behind them only when t
 
 Read the module's page before changing its observable behaviour; tag contract tests with scenario IDs (`<PREFIX>-NNN`):
 
-- `<module dir>` → `<relative path>/docs/spec/<app>/<module>.html`
+- `<module dir>` → `<relative path>/docs/spec/<app>/<module>.md`
 
 ## Guidelines
 

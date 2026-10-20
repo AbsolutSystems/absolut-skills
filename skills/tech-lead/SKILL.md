@@ -22,7 +22,7 @@ Change proposal format: [references/change-format.md](references/change-format.m
   value, a hidden cost (migration, security, coupling). Say it once, plainly, then respect the decision.
 - Always give a recommendation with a reason; do not hand the user an unranked menu.
 - Prefer the least new code that fully solves the problem (see the working principles in the root `AGENTS.md` if present).
-- Converse in the user's language. Artifacts follow the spec language (`<html lang>` of `docs/spec/index.html`), else English.
+- Converse in the user's language. Artifacts follow the spec language (`lang` in the marker on the first line of `docs/spec/index.md`), else English.
 - Scale the process to the task: a small change in one well-understood module gets one recommended approach and a short
   plan; offer the full comparison only if the user wants it.
 
@@ -63,10 +63,11 @@ The user picks or adjusts an option. Record open points that remain undecided; d
 
 Draft the change proposal per [references/change-format.md](references/change-format.md): why, scope, decision (options
 considered, choice, rationale), affected modules, scenarios added / changed / removed with IDs, open questions. Show a
-short summary of the scenarios and ask before writing `docs/spec/changes/<slug>.html`.
+short summary of the scenarios and ask before writing `docs/spec/changes/<slug>.md`.
 
-If `docs/spec/` does not exist, offer to write the proposal anyway (it creates `docs/spec/changes/` and copies
-`spec.css` as `as:spec-docs` does) or keep the scenarios only in the plan.
+If `docs/spec/` does not exist, offer to write the proposal anyway (it creates `docs/spec/changes/`) or keep the
+scenarios only in the plan. If the spec still has legacy `*.html` pages, read them as they are, write the proposal in
+Markdown, and suggest `as:spec-docs` to migrate the rest.
 
 ### 6. Plan
 

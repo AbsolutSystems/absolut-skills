@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0
+
+- `spec-docs`: the specification is Markdown (`docs/spec/**/*.md`) formatted for people — breadcrumbs, table of
+  contents, quoted SHALL sentences, scenarios with kind markers and Given/When/Then lists, `> [!NOTE]` open questions,
+  stable `<a id>` anchors for scenario links. A legacy HTML spec is converted one to one on the next run (pages and
+  change proposals), links to it are rewritten and `spec.css` is removed when unused.
+- `tech-lead` writes change proposals and `finish` merges and archives them in Markdown; `agent-docs`, `init` and
+  `help` point to `.md` pages.
+- `health` keeps its HTML report and now owns the stylesheet: `docs/health/health.css` (from `assets/health.css`);
+  older reports linking `../spec/spec.css` are relinked.
+
 ## 1.0.0
 
 - `tech-lead`: large changes go to plan mode with milestones instead of `/feature-dev:feature-dev`, which cannot skip

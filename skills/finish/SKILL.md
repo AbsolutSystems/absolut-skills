@@ -1,6 +1,6 @@
 ---
 name: finish
-description: "Wrap up a delivered feature on the current branch: simplify the changed code, review it, check the touched modules against the HTML spec (intended change vs regression), write missing contract tests tagged with scenario IDs, and refresh AGENTS.md docs — only for what the branch changed, with tests after every code change and approval before each write. Does not commit. Use only when the user explicitly invokes as:finish."
+description: "Wrap up a delivered feature on the current branch: simplify the changed code, review it, check the touched modules against the Markdown spec (intended change vs regression), write missing contract tests tagged with scenario IDs, and refresh AGENTS.md docs — only for what the branch changed, with tests after every code change and approval before each write. Does not commit. Use only when the user explicitly invokes as:finish."
 disable-model-invocation: true
 argument-hint: "[base] [--no-simplify] [--no-review] [--no-tests] [--no-docs]"
 ---
@@ -54,25 +54,27 @@ grouped Must / Should / Nice, each with a concrete failure scenario. Ask which t
 
 Skip if `docs/spec/` does not exist; say once that `as:spec-docs` would make the contract checkable.
 
-**Change proposals first.** Find open proposals in `docs/spec/changes/*.html` that belong to this branch (slug in the
+If `docs/spec/` still has legacy `*.html` pages, propose the `spec-docs` migration (step 5 "Migrate first") for the
+whole spec before anything else, with approval; without it, read the pages as they are and write nothing to them.
+
+**Change proposals first.** Find open proposals in `docs/spec/changes/*.md` that belong to this branch (slug in the
 branch name or commit messages, or affected modules among the touched ones); confirm with the user. For each:
 
 - check every `added`/`changed`/`removed` scenario against the code: implemented, partly, or not;
 - merge the implemented ones into the module pages per `spec-docs` rules (keep the proposal's IDs; `removed` →
-  `data-status="removed"`), and ask what to do with the rest: keep the proposal open, or drop those scenarios;
-- when all is merged or dropped, set the proposal's status (`implemented` / `dropped`, body `data-status` and `meta`),
-  fix its relative links for the new depth, and move it to `docs/spec/changes/archive/<YYYY-MM-DD>-<slug>.html`.
+  removed status), and ask what to do with the rest: keep the proposal open, or drop those scenarios;
+- when all is merged or dropped, set the proposal's `**Status:**` (`implemented` / `dropped`), fix its relative links
+  for the new depth, and move it to `docs/spec/changes/archive/<YYYY-MM-DD>-<slug>.md`.
 
 Drift explained by a merged proposal is intended by definition. For the remaining drift in touched modules, run the
 `spec-docs` analysis and drift check for those modules only, and ask the user to classify each item:
 
 - **Intended** — part of this feature: update the page per `spec-docs` rules (new IDs for new scenarios, changed
-  scenarios keep their ID, removed ones get `data-status="removed"`).
+  scenarios keep their ID, removed ones get the removed status).
 - **Unintended** — a regression: report it as a bug and fix the code (then rerun the tests). Never adjust the spec to
   match a bug.
 
-Touched modules without a spec page that gained public behaviour: offer to create the page (`spec-docs` rules,
-including the shared `spec.css`).
+Touched modules without a spec page that gained public behaviour: offer to create the page (`spec-docs` rules).
 
 ### 6. Contract tests
 

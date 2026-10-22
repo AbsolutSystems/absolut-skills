@@ -23,6 +23,25 @@ SKILL_KEYS = {
 MAX_DESCRIPTION = 1024
 LINK_RE = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
 SKILL_MENTION_RE = re.compile(r"[$/]as:([a-z0-9-]+)")
+HEADING_RE = re.compile(r"^#{1,6}\s+(.+?)\s*#*\s*$", re.MULTILINE)
+ANCHOR_RE = re.compile(r'<a id="([^"]+)"></a>')
+FENCE_RE = re.compile(r"^(```|~~~).*?^\1[ \t]*$", re.MULTILINE | re.DOTALL)
+CODE_SPAN_RE = re.compile(r"`[^`\n]*`")
+
+
+def strip_fences(text: str) -> str:
+    """Drop fenced code blocks: their links and headings are examples, not real targets."""
+    return FENCE_RE.sub("", text)
+
+
+def anchors(text: str) -> set[str]:
+    """GitHub-style heading slugs plus explicit `<a id>` anchors of a Markdown text."""
+    text = strip_fences(text)
+    found = set(ANCHOR_RE.findall(text))
+    for heading in HEADING_RE.findall(text):
+        heading = ANCHOR_RE.sub("", heading).replace("`", "").strip().lower()
+        found.add(re.sub(r"[^\w\- ]", "", heading).replace(" ", "-"))
+    return found
 
 
 def parse_frontmatter(text: str) -> dict[str, str] | None:
@@ -117,12 +136,15 @@ def check_manifests(root: Path, errors: list[str]) -> None:
 
 
 def check_links(path: Path, text: str, errors: list[str]) -> None:
-    for target in LINK_RE.findall(text):
-        if re.match(r"^[a-z]+:", target) or target.startswith("#"):
+    for target in LINK_RE.findall(CODE_SPAN_RE.sub("", strip_fences(text))):
+        if re.match(r"^[a-z]+:", target):
             continue
-        rel = target.split("#", 1)[0]
-        if rel and not (path.parent / rel).exists():
+        rel, _, fragment = target.partition("#")
+        dest = path.parent / rel if rel else path
+        if not dest.exists():
             errors.append(f"{path}: broken link {target!r}")
+        elif fragment and dest.suffix == ".md" and fragment not in anchors(dest.read_text(encoding="utf-8")):
+            errors.append(f"{path}: broken anchor {target!r}")
 
 
 def check_skills(root: Path, errors: list[str]) -> None:
@@ -165,15 +187,24 @@ def check_skills(root: Path, errors: list[str]) -> None:
             errors.append(f"{skill}: missing agents/openai.yaml")
             continue
         yaml_text = openai.read_text(encoding="utf-8")
-        interface = parse_simple_yaml(yaml_text).get("interface", {})
+        yaml = parse_simple_yaml(yaml_text)
+        interface = yaml.get("interface", {})
         for key in ("display_name", "short_description"):
             if not interface.get(key):
                 errors.append(f"{openai}: interface.{key} is required")
+        implicit = yaml.get("policy", {}).get("allow_implicit_invocation", "true")
+        if (meta.get("disable-model-invocation") == "true") != (implicit == "false"):
+            errors.append(
+                f"{skill}: disable-model-invocation: true in SKILL.md requires "
+                "policy.allow_implicit_invocation: false in agents/openai.yaml, and vice versa"
+            )
         for mentioned in SKILL_MENTION_RE.findall(yaml_text):
             if mentioned not in known:
                 errors.append(f"{openai}: references unknown skill 'as:{mentioned}'")
 
-    for doc in [root / "README.md", skills_dir / "README.md", *sorted((root / "references").glob("*.md"))]:
+    docs = [root / "README.md", skills_dir / "README.md", *sorted((root / "references").glob("*.md"))]
+    docs += sorted(skills_dir.glob("*/references/*.md"))
+    for doc in docs:
         if doc.is_file():
             check_links(doc, doc.read_text(encoding="utf-8"), errors)
 

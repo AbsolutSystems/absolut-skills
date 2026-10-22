@@ -70,12 +70,14 @@ between technical options. It behaves like a tech lead:
 3. **Compares** 2–3 architectures from parallel subagents (minimal change / clean boundaries / scale) and recommends one.
 4. Records the **decision and proposed scenarios** in `docs/spec/changes/<slug>.md` — module pages keep describing
    current behaviour until `as:finish` merges the proposal and archives it in `docs/spec/changes/archive/` (decision log).
-5. Writes the **plan** (steps, tests per scenario ID, risks) and offers the **handoff**: implement directly (small),
+5. Writes the **plan** (steps, tests per scenario ID, risks), saves it as a checklist in the proposal's `## Plan`
+   section (ticked as steps are done; `as:finish` checks it), and offers the **handoff**: implement directly (small),
    or switch to plan mode (medium; large gets milestones). It does not hand off to `/feature-dev:feature-dev`, which
    would redo the exploration and architecture already done.
 
 Bugs follow their own path: reproduce, find the violated or missing scenario, verify hypotheses, root cause, then a
-failing test first. No production code is written before you approve the plan.
+failing test first; after you approve the plan it implements the fix and suggests `/as:finish`. No production code is
+written before you approve the plan.
 
 ```text
 /as:tech-lead I want customers to cancel single items of an order
@@ -117,12 +119,12 @@ The counterpart of `init`, run after delivering a feature and before the PR. Wor
 /as:finish --no-tests               # skip steps: --no-simplify, --no-review, --no-tests, --no-docs
 ```
 
-1. **Scope** — changed files → touched modules. 2. **Baseline tests** — stops if red.
+1. **Scope** — changed files → touched modules. 2. **Baseline checks** — tests, lint, type-check, build; stops if red.
 3. **Simplify**, then tests. 4. **Review** — findings Must / Should / Nice, you pick fixes, then tests.
 5. **Spec** — drift in touched modules: intended (spec updated) or regression (fixed as a bug).
 6. **Contract tests** — writes tests for uncovered scenarios, tagged with scenario IDs.
 7. **Agent docs** — refreshes `AGENTS.md` for touched directories. 8. **Summary** — nothing is committed; suggests
-`/commit-commands:commit-push-pr`.
+`/commit-commands:commit-push-pr`, and `/claude-security` when the diff touches security-sensitive code.
 
 Simplify runs before review so the review sees the code that ships. In Claude Code it uses the built-in `/simplify`
 and `/code-review` (local diff, not the `code-review` plugin's PR review) when the version has them; elsewhere the criteria in `skills/finish/references/review.md`.
@@ -159,7 +161,8 @@ Work on several branches at once, each in its own folder next to the repository 
 ```
 
 `worktree-create` stops if the branch is already checked out elsewhere, asks before reusing an existing branch, and
-offers to copy ignored `.env*` files from the main worktree. `worktree-close` offers to commit uncommitted changes,
+offers to copy ignored `.env*` files (also from app directories) from the main worktree and to install dependencies.
+`worktree-close` offers to commit uncommitted changes,
 shows unpushed commits and ignored files that will be deleted, and after your confirmation runs `git worktree remove`
 (never `--force`). The branch is never deleted.
 

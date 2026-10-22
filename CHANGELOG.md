@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.2.0
+
+- `tech-lead`: the approved implementation plan is saved as a `## Plan` checklist in the change proposal
+  (`docs/spec/changes/<slug>.md`), so it survives the session and is reviewed with the PR; steps are ticked during
+  implementation, and changes made during plan-mode approval are written back. `finish` verifies unticked steps
+  before archiving the proposal.
+- `agent-docs`: maps spec pages to directories by the Markdown `**Source:**` meta line (the `<dl class="meta">` of
+  legacy HTML pages only as a fallback).
+- `finish`: baseline and reruns include the documented lint, type-check and build commands; the summary suggests
+  `/claude-security` when the diff touches authentication, input handling, secrets or data access.
+- `tech-lead`: the bug path ends with a handoff — approval, failing test first, fix, `as:finish`.
+- `worktree-create`: copies ignored `.env*` files from any depth (monorepo apps) and offers to install dependencies;
+  the undocumented `z <branch>` alias is removed.
+- `finish`: lint and type errors only in unchanged files are recorded as pre-existing and do not stop the run.
+- Validator: `disable-model-invocation` must match `policy.allow_implicit_invocation`; `#fragment` links must point to
+  an existing heading or `<a id>` anchor; `skills/*/references/*.md` are link-checked too, ignoring examples in fenced
+  code blocks and code spans.
+
 ## 1.1.0
 
 - `spec-docs`: the specification is Markdown (`docs/spec/**/*.md`) formatted for people — breadcrumbs, table of

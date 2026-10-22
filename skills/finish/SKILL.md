@@ -33,11 +33,14 @@ spec and tests after the code is final; docs last.
   classification heuristics in [../agent-docs/references/analysis.md](../agent-docs/references/analysis.md).
 - Show the scope (base, files count, touched modules). Empty diff → stop.
 
-### 2. Baseline tests
+### 2. Baseline checks
 
 Run the test commands listed in the relevant `AGENTS.md` files — per module when a single-module command exists,
-otherwise the app's test command. If none is documented, ask for it. Failing tests → stop and report: do not polish
-code that does not work yet.
+otherwise the app's test command — plus the documented lint, type-check and build commands for the touched apps. If
+no test command is documented, ask for it. Failing tests, build, or lint and type errors in the changed files → stop
+and report: do not polish code that does not work yet. Lint and type errors only in unchanged files are pre-existing:
+record them, say so once, and continue. "Rerun the tests" below means rerunning these checks; only failures beyond
+the recorded ones count.
 
 ### 3. Simplify
 
@@ -60,6 +63,8 @@ whole spec before anything else, with approval; without it, read the pages as th
 **Change proposals first.** Find open proposals in `docs/spec/changes/*.md` that belong to this branch (slug in the
 branch name or commit messages, or affected modules among the touched ones); confirm with the user. For each:
 
+- check its `## Plan` (if present): every unticked step is verified against the code and the diff — ticked when done,
+  otherwise listed as an open item;
 - check every `added`/`changed`/`removed` scenario against the code: implemented, partly, or not;
 - merge the implemented ones into the module pages per `spec-docs` rules (keep the proposal's IDs; `removed` →
   removed status), and ask what to do with the rest: keep the proposal open, or drop those scenarios;
@@ -99,4 +104,5 @@ never add descriptions of the new code. This also links new spec pages.
 Short summary: code simplified, review fixes, proposals merged or kept open, spec scenarios added/changed/removed, tests added (with scenario IDs),
 docs updated, open items (unfixed findings, unclassified drift, failing tests). Do not commit. Next steps:
 `/commit-commands:commit-push-pr` (or `/commit-commands:commit`), then `/code-review:code-review` on the PR — Claude
-Code only, if installed.
+Code only, if installed. If the diff touches authentication, authorisation, input handling, secrets or data access,
+first suggest a security scan of the branch's changes with `/claude-security` (Claude Code only, if installed).

@@ -21,7 +21,7 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
   `agent-docs/references/analysis.md` and `finish/references/review.md`; `tech-lead` proposals use
   `spec-docs/references/markdown-format.md`.
 - Renaming or restructuring a step or reference in one skill means updating every skill that links to it — the
-  validator only checks that link targets exist, not that step numbers or section names still match.
+  validator checks link targets and `#anchors`, but not step numbers or section names quoted in prose.
 - `references/recommended-plugins.md` (repo root) is shared by `init` and `help`.
 
 ## Pitfalls

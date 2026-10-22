@@ -32,7 +32,7 @@ With a topic argument, show only that section of the guide. Without one, show:
 
 - **`as:tech-lead`** starts on its own when you describe a feature, a bug or a design question (or call
   `/as:tech-lead <topic>`): it reads the code and spec first, asks targeted questions, compares 2–3 architectures,
-  records the decision and proposed scenarios in `docs/spec/changes/<slug>.md`, writes the plan, and offers the
+  records the decision and proposed scenarios in `docs/spec/changes/<slug>.md`, saves the approved plan there as a checklist, and offers the
   next step — plan mode (large changes get milestones).
 - **Plan mode** (Claude Code): press Shift+Tab until the mode indicator shows plan mode. Claude reads code, asks
   questions and proposes a plan without editing; you approve it or ask for changes, then it implements.
@@ -59,9 +59,10 @@ With a topic argument, show only that section of the guide. Without one, show:
 
 ### finish — after delivering a feature
 
-- `/as:finish` — on the branch's changes only: baseline tests → simplify → review (you pick fixes) → spec check for
-  touched modules (intended change vs regression) → writes missing contract tests tagged with scenario IDs →
-  refreshes `AGENTS.md`. Tests rerun after every code change; nothing is committed.
+- `/as:finish` — on the branch's changes only: baseline tests, lint and build → simplify → review (you pick fixes) →
+  spec check for touched modules (intended change vs regression) → writes missing contract tests tagged with scenario
+  IDs → refreshes `AGENTS.md`. Checks rerun after every code change; nothing is committed. Suggests `/claude-security`
+  when the diff touches auth, input handling or data access.
 - `/as:finish <base>` to compare against another ref; `--no-simplify`, `--no-review`, `--no-tests`, `--no-docs` skip steps.
 
 ### commit — git workflow

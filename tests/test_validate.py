@@ -67,3 +67,26 @@ def test_plugin_name_must_be_as(tmp_path):
     data["name"] = "absolut-skills"
     path.write_text(json.dumps(data))
     assert any("name must be 'as'" in e for e in validate(repo))
+
+
+def test_invocation_policy_must_match(tmp_path):
+    repo = copy_repo(tmp_path)
+    path = repo / "skills/help/agents/openai.yaml"
+    path.write_text(path.read_text().replace("allow_implicit_invocation: false", "allow_implicit_invocation: true"))
+    assert any("allow_implicit_invocation: false" in e for e in validate(repo))
+
+
+def test_broken_anchor(tmp_path):
+    repo = copy_repo(tmp_path)
+    skill = repo / "skills/tech-lead/SKILL.md"
+    skill.write_text(skill.read_text().replace("](#bug)", "](#bugs)"))
+    assert any("broken anchor '#bugs'" in e for e in validate(repo))
+
+
+def test_reference_anchor_checked_and_fenced_examples_ignored(tmp_path):
+    repo = copy_repo(tmp_path)
+    ref = repo / "skills/tech-lead/references/change-format.md"
+    ref.write_text(ref.read_text() + "\n[a](#skeleton) [b](#nope)\n\n```markdown\n[x](missing.md#nope)\n```\n")
+    errors = validate(repo)
+    assert [e for e in errors if "broken" in e] == [f"{ref}: broken anchor '#nope'"]
+    assert not any("missing.md" in e for e in errors)

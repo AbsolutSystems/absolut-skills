@@ -82,7 +82,7 @@ If a tool fails, record it in the report and continue with the remaining signals
   with a shell copy (do not read or retype it); if it exists and differs, ask before overwriting — compare the version
   in its first line. Older reports linking `../spec/spec.css` (written before 1.1.0) are relinked to `health.css`.
 
-Check the written pages like spec pages: `grep -nE 'style=|<style|<script|<svg' docs/health/*.html` finds nothing, and
+Check the written pages: `grep -nE 'style=|<style|<script|<svg' docs/health/*.html` finds nothing, and
 every relative link resolves.
 
 With `--no-fix`, finish here with a short summary.

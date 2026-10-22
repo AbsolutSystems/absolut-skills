@@ -1,6 +1,6 @@
 ---
 name: worktree-create
-description: "Create a new git branch and a worktree for it next to the repository, in ../<repo>-worktrees/<name>, branched from the current branch or from a given branch; optionally copies ignored local .env files into it. Use only when the user explicitly invokes as:worktree-create."
+description: "Create a new git branch and a worktree for it next to the repository, in ../<repo>-worktrees/<name>, branched from the current branch or from a given branch; optionally copies ignored local .env files into it and installs dependencies. Use only when the user explicitly invokes as:worktree-create."
 disable-model-invocation: true
 argument-hint: "<name> [from <branch>]"
 ---
@@ -14,7 +14,7 @@ Answer in the user's language. Host mechanics (asking, switching the session to 
 ## Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex)
 
 - `<name>` — required: the new branch name. The folder name is `<name>` with `/` replaced by `-`.
-- `from <branch>` (also `z <branch>`) — optional base branch; default is the current branch.
+- `from <branch>` — optional base branch; default is the current branch.
 
 Examples: `feature-x`, `feature/login from develop`.
 
@@ -43,9 +43,15 @@ Examples: `feature-x`, `feature/login from develop`.
    - tracking `origin/<name>` (approved in step 3): `git worktree add --track -b <name> <path> origin/<name>`;
    - existing branch (approved in step 3): `git worktree add <path> <name>`.
    On error, show git's message and stop; do not retry with `--force`.
-5. **Local files** — list ignored `.env*` files at the top level of the main worktree:
-   `git -C <main> ls-files --others --ignored --exclude-standard --directory -- '.env*'` (top-level files only).
-   If any exist, ask which to copy (multi-select, default none). Copy each with `cp -n` into `<path>`; never overwrite.
-6. **Verify** — `git -C <path> branch --show-current` equals `<name>` and `git worktree list` shows `<path>`.
-7. **Summary** — path, branch, base (and commit), copied files, how to start working in the new folder (see the host
-   mapping), and that `as:worktree-close <name>` removes the folder later while keeping the branch.
+5. **Local files** — list ignored `.env*` files at any depth of the main worktree (app directories of a monorepo
+   included), excluding dependency directories in the pathspec:
+   `git -C <main> ls-files --others --ignored --exclude-standard -- ':(glob)**/.env*' ':(exclude,glob)**/node_modules/**' ':(exclude,glob)**/.venv/**' ':(exclude,glob)**/vendor/**'`.
+   If any exist, ask which to copy (multi-select, default none). Copy each to the same relative path in `<path>`
+   (`mkdir -p` its directory, then `cp -n`); never overwrite.
+6. **Setup** — find the dependency install commands of the repo and its apps: documented in `AGENTS.md`, else derived
+   from lockfiles (`package-lock.json` → `npm ci`, `pnpm-lock.yaml` → `pnpm install --frozen-lockfile`, `uv.lock` →
+   `uv sync`, …). If any exist, show them and ask whether to run them in `<path>` (default yes). On failure, show the
+   output and continue; the worktree stays.
+7. **Verify** — `git -C <path> branch --show-current` equals `<name>` and `git worktree list` shows `<path>`.
+8. **Summary** — path, branch, base (and commit), copied files, setup result, how to start working in the new folder
+   (see the host mapping), and that `as:worktree-close <name>` removes the folder later while keeping the branch.

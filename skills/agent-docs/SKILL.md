@@ -55,8 +55,9 @@ Work in the main thread and keep it cheap:
 - List tracked files (`git ls-files`, scoped to `[path]`) and derive the directory tree.
 - Find existing `AGENTS.md`, `CLAUDE.md` and `.guidelines/` directories. Check whether either file is a symlink
   (`ls -l`, `git ls-files -s` mode `120000`): an `AGENTS.md` ↔ `CLAUDE.md` symlink is reported as `MIGRATE`.
-- If `docs/spec/` exists, map each spec page to its directory using the `Source` entry of its `<dl class="meta">`
-  (grep for it; do not read the pages).
+- If `docs/spec/` exists, map each spec page to its directory using the `**Source:**` entry of its meta line
+  (`git grep -n '\*\*Source:\*\*' docs/spec`; legacy `*.html` pages: the `Source` entry of `<dl class="meta">`); do
+  not read the pages.
 - Classify directories into repo root / app root / module / skip using [references/analysis.md](references/analysis.md).
   Always include directories that already contain `AGENTS.md` or `CLAUDE.md`, so they get audited.
 - Show the user the planned tree (which directories get which level) in a compact form before spending effort on analysis.

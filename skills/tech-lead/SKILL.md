@@ -1,6 +1,6 @@
 ---
 name: tech-lead
-description: "Act as a tech lead when the user wants to discuss, design or plan a new feature, investigate a bug or unexpected behaviour, or weigh technical options (\"how should we…\", \"I want to add…\", \"why does X happen\", \"A or B?\"). Grounds the discussion in the code, AGENTS.md and the docs/spec contracts first, asks targeted questions, challenges the request, compares alternative architectures from parallel subagents, records the decision and the proposed spec scenarios in a change proposal (docs/spec/changes/), and produces an implementation plan, then offers to continue in plan mode for larger changes — without writing code until the plan is approved. Not for small, clearly specified edits (rename, typo, one-line fix) or for executing an already approved plan."
+description: "Act as a tech lead when the user wants to discuss, design or plan a new feature, investigate a bug or unexpected behaviour, or weigh technical options (\"how should we…\", \"I want to add…\", \"why does X happen\", \"A or B?\"). Grounds the discussion in the code, AGENTS.md and the docs/spec contracts first, asks targeted questions, challenges the request, compares alternative architectures from parallel subagents, records the decision and the proposed spec scenarios in a change proposal (docs/spec/changes/), and produces an implementation plan saved in that proposal, then offers to continue in plan mode for larger changes — without writing code until the plan is approved. Not for small, clearly specified edits (rename, typo, one-line fix) or for executing an already approved plan."
 argument-hint: "[feature, bug or question]"
 ---
 
@@ -78,6 +78,11 @@ An implementation plan the user approves before any code is written:
 - migrations, configuration, rollout or feature flags when needed;
 - risks and how each is mitigated; how to verify the whole change end to end.
 
+With a proposal, the approved plan goes to its `## Plan` section as defined in
+[references/change-format.md](references/change-format.md), so it survives the session and is reviewed with the PR:
+writing it is the first action after approval, on every handoff path in step 7, before any code. Without a proposal,
+the plan stays in the conversation or the plan file.
+
 ### 7. Handoff
 
 Recommend how to implement, by size, and offer to start it (switching modes and launching commands as described in
@@ -89,6 +94,10 @@ the host mapping — always with the user's consent):
 - **Large** (several modules, new components, or many unknowns in the implementation): plan mode as for medium, with
   the plan split into milestones that each end with passing tests. Do not hand off to `/feature-dev:feature-dev` — it
   has no way to skip its exploration and architecture phases, so it would redo steps 1–3 at full cost.
+
+With a proposal and plan mode, the plan file links `docs/spec/changes/<slug>.md` and repeats the plan; after approval,
+write the approved plan (with any changes made during approval) to the proposal's `## Plan`. During implementation,
+tick each finished step `- [x]` in the proposal.
 
 Say which path you recommend and why in one line, then ask. After implementation, suggest `as:finish` — it checks the
 code against the proposal and merges it into the spec.
@@ -106,3 +115,7 @@ code against the proposal and merges it into the spec.
 4. **Plan** — a failing test first (tagged with the scenario ID), the fix at the root cause, checks of the other
    callers, data repair if needed. A specification gap gets a small change proposal adding the missing `error`/`edge`
    scenario; a pure bug needs none.
+5. **Handoff** — ask for approval of the plan, then implement it: the failing test first, then the fix, then the
+   tests of the module and of the other callers. A fix that spans several modules or needs a data repair goes through
+   plan mode as in Feature step 7. A specification-gap proposal gets the approved plan in its `## Plan` section, as in
+   Feature step 6. After implementation, suggest `as:finish`.

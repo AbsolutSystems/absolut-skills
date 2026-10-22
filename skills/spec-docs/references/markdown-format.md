@@ -42,6 +42,7 @@ preview) and as plain text in a diff. Use only the constructs listed here, so ev
 | `**Status:** 🗑️ removed` + `~~ORD-005 — Short name~~` in the heading | Removed requirement or scenario: appended to the kind line, content kept |
 | `**Change:** 🆕 added`, `✏️ changed`, `🗑️ removed` | Change proposals only (`docs/spec/changes/`, from `as:tech-lead`), on requirements and scenarios |
 | Numbered list | Steps of a cross-module flow; steps link to scenarios |
+| Task list `- [ ] **1. Step** — …` | Change proposals only: steps of the `## Plan` section, ticked `- [x]` when done |
 | `> [!NOTE]` alert | Open question or caveat (renders as a callout on GitHub, a quote elsewhere) |
 | Definition list as `- **Term** — meaning` | Glossary |
 | ` ```mermaid ` `flowchart LR` | Optional, system and app pages only: map of apps/modules and their dependencies, at most ~15 nodes |

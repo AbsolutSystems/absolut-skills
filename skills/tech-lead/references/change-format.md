@@ -89,6 +89,17 @@ Support handles ~40 requests a week to remove one item; today the whole order mu
 - **When** its total is read
 - **Then** cancelled items are excluded (was: all items)
 
+## Plan
+
+- [ ] **1. Billing refunds cancelled items** — handle `OrderItemsCancelled` in `billing/`; tests first.
+- [ ] **2. `cancelItems` in Orders** — `orders/OrderFacade`, emits the event; tests [ORD-015](#ORD-015) first, then
+  [ORD-014](#ORD-014).
+- [ ] **3. Order total excludes cancelled items** — `orders/`; test [ORD-004](#ORD-004).
+
+**Risks:** Billing receives the event before it is deployed — deploy Billing first (step 1).
+
+**Verify:** place a two-item order, cancel one item, check the refund and the new total.
+
 ## Open questions
 
 > [!NOTE]
@@ -105,3 +116,8 @@ Support handles ~40 requests a week to remove one item; today the whole order mu
 - When the change touches several modules, put a `**Module:** [Orders](../backend/orders.md)` line before each module's
   requirements and scenarios, so heading levels stay the same as on module pages.
 - `**Status:**` in the meta line is `open`, then `implemented` or `dropped` when archived; `as:finish` updates it.
+- `## Plan` is added by `as:tech-lead` once the user approved the plan (absent until then). One task per independently
+  verifiable step: what it delivers, files or modules, scenario IDs it tests (test-first ones first). Large changes
+  group tasks under `### Milestone 1 — <name>` headings, each ending with passing tests. `**Risks:**` and
+  `**Verify:**` follow the list (also `**Rollout:**` for migrations, configuration or feature flags). Whoever
+  implements a step ticks it `- [x]`; a changed plan is edited here, not only in the conversation.

@@ -14,7 +14,7 @@ simplify and review criteria from [references/review.md](references/review.md) �
 Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex):
 
 - `[base]` — ref to compare against (default: merge-base with the default branch).
-- `--no-simplify`, `--no-review`, `--no-tests`, `--no-docs` — skip steps 3, 4, 6, 7.
+- `--no-simplify`, `--no-review`, `--no-tests`, `--no-docs` — skip steps 3, 4, 7, 8.
 
 Host-specific mechanics (subagents, asking questions, which simplify/review tools to use):
 [Claude Code](../../references/claude-tools.md), [Codex](../../references/codex-tools.md).
@@ -53,37 +53,58 @@ them and report it.
 Review the diff from base using the host tool or [references/review.md](references/review.md). Present the findings
 grouped Must / Should / Nice, each with a concrete failure scenario. Ask which to fix, fix only those, rerun the tests.
 
-### 5. Spec
+### 5. Analysis
+
+One read-only pass per touched module, anchored in the diff, feeds steps 6–8. First, in the main thread: find the
+branch's open proposals (step 6, "Change proposals first", confirmed with the user) and run the cheap pass of the
+`spec-docs` test coverage (`git grep -n '<ID>'` over test directories for the scenario IDs of the touched modules and
+the proposals). Then fan out one read-only subagent per touched module (batch tiny sibling modules), in parallel, with
+the brief in [references/analysis.md](references/analysis.md): base and module directory (the subagent runs the
+diff itself), spec page, proposal scenarios, cheap-pass hits and `AGENTS.md`. With `--no-tests` or `--no-docs`, drop the Tests or Docs section from the brief.
+
+Steps 6–8 use these reports and do not rerun the analysis; after a code fix in step 6, rerun it only for that module.
+Without subagents, run it sequentially.
+
+### 6. Spec
 
 Skip if `docs/spec/` does not exist; say once that `as:spec-docs` would make the contract checkable.
 
-If `docs/spec/` still has legacy `*.html` pages, propose the `spec-docs` migration (step 5 "Migrate first") for the
+If `docs/spec/` still has legacy `*.html` pages, propose the `spec-docs` migration (its step 5, "Migrate first") for the
 whole spec before anything else, with approval; without it, read the pages as they are and write nothing to them.
 
-**Change proposals first.** Find open proposals in `docs/spec/changes/*.md` that belong to this branch (slug in the
-branch name or commit messages, or affected modules among the touched ones); confirm with the user. For each:
+**Change proposals first.** Open proposals in `docs/spec/changes/*.md` that belong to this branch (slug in the branch
+name or commit messages, or affected modules among the touched ones), as confirmed in step 5. For each:
 
 - check its `## Plan` (if present): every unticked step is verified against the code and the diff — ticked when done,
   otherwise listed as an open item;
-- check every `added`/`changed`/`removed` scenario against the code: implemented, partly, or not;
+- take the status of every `added`/`changed`/`removed` scenario from the Proposal sections of step 5: implemented,
+  partly, or not;
+- run its `**Verify:**` check if it can be run locally, else ask the user to confirm it; carry its `**Rollout:**`
+  items to the summary as open items;
+- before merging, check that its added IDs are still free:
+  [spec_lint.py](../spec-docs/scripts/spec_lint.py) `--against origin/HEAD` (or the default branch), or by hand with
+  `git grep -hoE '<PREFIX>-R?[0-9]+' origin/HEAD -- docs/spec`. An ID taken meanwhile by another branch → stop,
+  propose the next free numbers, and after approval renumber them in the proposal and in the tests;
 - merge the implemented ones into the module pages per `spec-docs` rules (keep the proposal's IDs; `removed` →
   removed status), and ask what to do with the rest: keep the proposal open, or drop those scenarios;
 - when all is merged or dropped, set the proposal's `**Status:**` (`implemented` / `dropped`), fix its relative links
   for the new depth, and move it to `docs/spec/changes/archive/<YYYY-MM-DD>-<slug>.md`.
 
-Drift explained by a merged proposal is intended by definition. For the remaining drift in touched modules, run the
-`spec-docs` analysis and drift check for those modules only, and ask the user to classify each item:
+Drift explained by a merged proposal is intended by definition. For the remaining items of the Spec drift and New
+behaviour sections from step 5, ask the user to classify each:
 
-- **Intended** — part of this feature: update the page per `spec-docs` rules (new IDs for new scenarios, changed
-  scenarios keep their ID, removed ones get the removed status).
+- **Intended** — part of this feature: update the page per `spec-docs` rules (a new behaviour candidate becomes a
+  scenario with a new ID, changed scenarios keep their ID, removed ones get the removed status).
 - **Unintended** — a regression: report it as a bug and fix the code (then rerun the tests). Never adjust the spec to
   match a bug.
 
-Touched modules without a spec page that gained public behaviour: offer to create the page (`spec-docs` rules).
+Touched modules without a spec page whose New behaviour section is not empty: offer to create the page with the
+`spec-docs` procedure for that module.
 
-### 6. Contract tests
+### 7. Contract tests
 
-Run the `spec-docs` test coverage for the touched modules. For `MISSING` and `PARTIAL` scenarios — those from the
+Take the Tests sections from step 5 — the proposal scenarios and the new behaviour the diff added. Older gaps of the
+module are out of scope (`as:spec-docs --tests` reports them). For `MISSING` and `PARTIAL` scenarios — those from the
 merged proposals first, then `error` and `edge` — show the list and ask which to cover. Then write the tests:
 
 - through the module's public entry points, not internal classes;
@@ -93,16 +114,17 @@ merged proposals first, then `error` and `edge` — show the list and ask which 
 Run the new tests. A new test that fails points to a bug or a wrong scenario: report it and ask; never weaken the
 assertion to make it pass.
 
-### 7. Agent docs
+### 8. Agent docs
 
-Run `agent-docs` for the touched directories (and their parents when the map of apps or modules changed): report,
-approval, write. Only fix facts the branch made false and add facts it made necessary (a new command, rule or pitfall);
-never add descriptions of the new code. This also links new spec pages.
+Run `agent-docs` for the touched directories with the Docs sections from step 5 as its module analysis (its own
+analysis only for the parents, when the map of apps or modules changed), then its questions, report, approval and
+write. Only fix facts the branch made false and add facts it made necessary (a new command, rule or pitfall); never add
+descriptions of the new code. This also links new spec pages.
 
-### 8. Summary
+### 9. Summary
 
 Short summary: code simplified, review fixes, proposals merged or kept open, spec scenarios added/changed/removed, tests added (with scenario IDs),
-docs updated, open items (unfixed findings, unclassified drift, failing tests). Do not commit. Next steps:
+docs updated, open items (unfixed findings, unclassified drift, failing tests, proposal `**Rollout:**` items). Do not commit. Next steps:
 `/commit-commands:commit-push-pr` (or `/commit-commands:commit`), then `/code-review:code-review` on the PR — Claude
 Code only, if installed. If the diff touches authentication, authorisation, input handling, secrets or data access,
 first suggest a security scan of the branch's changes with `/claude-security` (Claude Code only, if installed).

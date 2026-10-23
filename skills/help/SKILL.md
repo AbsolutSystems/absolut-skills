@@ -1,6 +1,6 @@
 ---
 name: help
-description: "Show how to work with Claude Code (or Codex) using the as: commands, the recommended Anthropic plugins and plan mode: confirms the plugin is installed, lists as: skills, reports which recommended plugins are installed, and walks through the task workflow from onboarding to planning, building, review, finishing a feature, commit, docs upkeep and periodic health checks. Use only when the user explicitly invokes as:help."
+description: "Show how to work with Claude Code (or Codex) using the as: commands, the recommended Anthropic plugins and plan mode: confirms the plugin is installed, lists as: skills, reports which recommended plugins are installed, and walks through the task workflow from onboarding to planning, building (implementing an approved plan), review, finishing a feature, commit, docs upkeep and periodic health checks. Use only when the user explicitly invokes as:help."
 disable-model-invocation: true
 argument-hint: "[onboarding|plan|build|review|finish|commit|worktree|docs|health]"
 ---
@@ -33,7 +33,8 @@ With a topic argument, show only that section of the guide. Without one, show:
 - **`as:tech-lead`** starts on its own when you describe a feature, a bug or a design question (or call
   `/as:tech-lead <topic>`): it reads the code and spec first, asks targeted questions, compares 2–3 architectures,
   records the decision and proposed scenarios in `docs/spec/changes/<slug>.md`, saves the approved plan there as a checklist, and offers the
-  next step — plan mode (large changes get milestones).
+  next step — plan mode (large changes get milestones), or `/as:implement` in a new session. Small changes get a short
+  plan without subagents or a proposal.
 - **Plan mode** (Claude Code): press Shift+Tab until the mode indicator shows plan mode. Claude reads code, asks
   questions and proposes a plan without editing; you approve it or ask for changes, then it implements.
   Use it for multi-file changes, unclear requirements, and anything that changes a module's contract — ask Claude to
@@ -44,6 +45,8 @@ With a topic argument, show only that section of the guide. Without one, show:
 
 ### build — implementing
 
+- `/as:implement` — continues the approved plan of the branch's change proposal, in this or a new session: tests
+  first, ticks each step in `## Plan`, stops to ask when the plan does not fit the code.
 - Claude follows `AGENTS.md` and reads `.guidelines/` when the task touches their area — keep them current.
 - UI work: `frontend-design` triggers on its own.
 - Changing a module's observable behaviour: update its spec with `/as:spec-docs <module path>` and tag contract tests
@@ -60,7 +63,7 @@ With a topic argument, show only that section of the guide. Without one, show:
 ### finish — after delivering a feature
 
 - `/as:finish` — on the branch's changes only: baseline tests, lint and build → simplify → review (you pick fixes) →
-  spec check for touched modules (intended change vs regression) → writes missing contract tests tagged with scenario
+  one analysis per touched module → merge of the change proposal and spec check (intended change vs regression) → writes missing contract tests tagged with scenario
   IDs → refreshes `AGENTS.md`. Checks rerun after every code change; nothing is committed. Suggests `/claude-security`
   when the diff touches auth, input handling or data access.
 - `/as:finish <base>` to compare against another ref; `--no-simplify`, `--no-review`, `--no-tests`, `--no-docs` skip steps.

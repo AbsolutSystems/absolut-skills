@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.3.0
+
+- New `implement` skill: executes the approved `## Plan` of the branch's change proposal step by step in any session
+  (tests first for `error`/`edge` scenarios, ticks each step, stops and proposes a plan edit on deviations), so a new
+  session or a cheaper model continues from the file, not the conversation. `tech-lead` points to it.
+- `tech-lead`: sizes the task first — small changes skip subagents, the options step and the change proposal; the
+  description no longer triggers on questions about how existing code works.
+- Scenario IDs across branches: `tech-lead` reserves IDs counting other local and remote branches, and `finish`
+  checks that a proposal's added IDs are still free on the default branch before merging it.
+- `finish`: one read-only subagent per touched module with a short diff-anchored brief (`finish/references/analysis.md`:
+  proposal status, spec drift, new behaviour, tests, docs — only what the diff changed) feeds the spec, test and docs
+  steps instead of three full `spec-docs`/`agent-docs` fan-outs; contract tests cover the proposal and the new
+  behaviour, older gaps are left to `spec-docs --tests`; steps renumbered (`--no-tests`, `--no-docs` now skip 7 and 8). It
+  runs the proposal's `**Verify:**` and lists `**Rollout:**` items in the summary.
+- Scripts (Python, stdlib only): `health/scripts/git_signals.py` computes churn, change coupling and frequently fixed
+  tests (and recognises `test_*.py` files); `spec-docs/scripts/spec_lint.py` checks IDs, anchors, links, leftover
+  HTML and IDs reserved twice by parallel proposals — used by `spec-docs` verify and `finish`, and usable in CI.
+- Host mappings: on Claude Code read-only subagents run on a smaller model; on Codex without subagents `tech-lead`
+  gives one recommended architecture and compares options only on request.
+- `skills/AGENTS.md`: language rule corrected — health reports follow the spec language; `health` has no `--lang`.
+
 ## 1.2.0
 
 - `tech-lead`: the approved implementation plan is saved as a `## Plan` checklist in the change proposal

@@ -126,11 +126,17 @@ With `--check`, stop here. Otherwise ask for approval: all, a selected subset, o
 
 ### 6. Verify
 
-- No `*.html` is left under `docs/spec/`, and `git grep -nE 'spec/[^ )"]*\.html'` finds no links to spec pages.
-- Raw HTML is limited to the marker and the anchors: `grep -rnE '<[a-z/!]' docs/spec --include=*.md | grep -vE '<a id="[A-Z0-9-]+"></a>|^[^:]+:1:<!-- as:'` finds nothing.
+- Run [scripts/spec_lint.py](scripts/spec_lint.py) from the repository root (`python3 <this skill's
+  directory>/scripts/spec_lint.py`); it must print `OK`. It checks: no `*.html` under `docs/spec/`; raw HTML only in
+  the marker and the anchors; IDs well-formed (`<PREFIX>-NNN`, `<PREFIX>-R<n>`), unique outside `changes/`, one prefix
+  per module page; IDs added by open proposals not used elsewhere; relative links and `#anchors` resolve. Without
+  `python3`, check the same by hand.
+- `git grep -nE 'spec/[^ )"]*\.html'` finds no links to spec pages outside `docs/spec/`.
 - Every requirement and scenario heading carries its anchor; every scenario has a kind line and Given/When/Then.
-- Every anchor `id` is unique across `docs/spec/` outside `changes/`, and every scenario ID matches `<PREFIX>-NNN` of its module.
-- Every relative link between pages resolves; every source path in a meta line exists.
+- Every source path in a meta line exists.
+
+The script has no dependencies; suggest the user add it to CI (copied into the repository) so the spec stays
+checkable without an agent.
 
 Finish with a short summary (pages created / updated / left as is, scenarios added / removed, open questions) and
 suggest reading `docs/spec/index.md` in the repository browser or the IDE's Markdown preview and reviewing `git diff`. If pages were created or removed and the

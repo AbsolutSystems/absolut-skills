@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills Implement"
+  short_description: "Implement the approved plan of a change proposal step by step, ticking it off"
+  default_prompt: "Use $as:implement to continue the approved plan of this branch's change proposal."
+policy:
+  allow_implicit_invocation: false

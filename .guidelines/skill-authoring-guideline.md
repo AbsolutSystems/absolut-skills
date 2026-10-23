@@ -16,6 +16,10 @@ How to write and change skills, references and assets in `skills/` and `referenc
 - Arguments: document them under "Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex)".
 - Links are relative to the file and must resolve (checked by the validator); refer to other skills by path, not by copying.
 - Assets that projects receive (e.g. `health.css`) are copied with a shell copy by the skill, never retyped by the agent.
+- Deterministic work the agent would otherwise redo in every run (counting, parsing, linting) goes to
+  `scripts/<name>.py`: standard library only, run from the project root with a path relative to the skill's
+  directory, output the agent can read (JSON or `ERROR …` lines), linked from the skill, with a manual fallback when
+  `python3` is missing. Judgement (mapping files to modules, classifying drift) stays in the procedure.
 - Subagent briefs are fenced `text` blocks with `{placeholders}` and an exact list of sections to return.
 - Instructions and generated docs are in English.
 

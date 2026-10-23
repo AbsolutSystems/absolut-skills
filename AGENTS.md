@@ -1,14 +1,15 @@
 # Absolut Skills maintainer guidance
 
 Plugin `as` (marketplace `absolut-skills`) for Claude Code and Codex. Commands: `/as:<skill>` (Claude), `$as:<skill>` (Codex).
-Skills are Markdown instructions executed by the coding agent; the only executable code is the validator.
+Skills are Markdown instructions executed by the coding agent; the only executable code is the validator and the
+stdlib-only helper scripts in `skills/<name>/scripts/` for deterministic work (git statistics, spec lint).
 
 ## Repository map
 
 - `skills/` — one directory per skill (the plugin's content). See `skills/AGENTS.md`.
 - `references/` — host mappings (`claude-tools.md`, `codex-tools.md`) and `recommended-plugins.md`, shared by skills.
 - `tools/validate.py` — stdlib-only validator for manifests, skill frontmatter, `openai.yaml` and Markdown links.
-- `tests/` — pytest tests of the validator.
+- `tests/` — pytest tests of the validator and the skill scripts.
 - `.claude-plugin/` (manifest + marketplace), `.codex-plugin/plugin.json`, `.agents/plugins/marketplace.json` — host manifests.
 - `README.md` (user docs), `skills/README.md` (catalogue), `CHANGELOG.md`.
 
@@ -23,7 +24,7 @@ Skills are Markdown instructions executed by the coding agent; the only executab
 ## Commands
 
 - `python3 tools/validate.py` — run after every change.
-- `uv run --with pytest pytest tests` — validator tests.
+- `uv run --with pytest pytest tests` — validator and script tests.
 - `claude plugin validate .` — official Claude Code check (one expected warning: root `CLAUDE.md` is not shipped as context).
 
 ## Guidelines

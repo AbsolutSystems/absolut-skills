@@ -20,8 +20,11 @@ links (`../`; `../../` in `archive/`).
 
 - **Added** scenarios reserve the next free number of the module's prefix, counting IDs on the module page **and** in
   every open proposal. Added requirements likewise (`<PREFIX>-R<n>`).
+- Count the IDs on other branches too — parallel branches (worktrees) reserve numbers without seeing each other:
+  `grep -rhoE '<PREFIX>-R?[0-9]+' docs/spec` plus
+  `git grep -hoE '<PREFIX>-R?[0-9]+' $(git for-each-ref --format='%(refname)' refs/heads refs/remotes) -- docs/spec`.
 - **Changed** and **removed** scenarios use their existing ID.
-- A new module gets a new prefix, unique across the spec and open proposals.
+- A new module gets a new prefix, unique across the spec, open proposals and other branches.
 
 ## Skeleton
 

@@ -57,7 +57,7 @@ planning in plan mode, building, review, commit, keeping docs true.
 
 ```text
 /as:help                            # everything
-/as:help plan                       # one topic: onboarding | plan | build | review | commit | worktree | docs
+/as:help plan                       # one topic: onboarding | plan | build | review | finish | commit | worktree | docs | health
 ```
 
 ### `tech-lead` — design partner (starts on its own)
@@ -75,6 +75,9 @@ between technical options. It behaves like a tech lead:
    or switch to plan mode (medium; large gets milestones). It does not hand off to `/feature-dev:feature-dev`, which
    would redo the exploration and architecture already done.
 
+It sizes the task first: a small change in one module gets one recommendation and a short plan, without subagents or
+a change proposal.
+
 Bugs follow their own path: reproduce, find the violated or missing scenario, verify hypotheses, root cause, then a
 failing test first; after you approve the plan it implements the fix and suggests `/as:finish`. No production code is
 written before you approve the plan.
@@ -82,6 +85,18 @@ written before you approve the plan.
 ```text
 /as:tech-lead I want customers to cancel single items of an order
 /as:tech-lead why are refunds sometimes doubled?
+```
+
+### `implement` — execute the approved plan
+
+Continues the `## Plan` of the branch's change proposal in any session — also a new one, or with a cheaper model,
+because the plan and scenarios live in the file, not in the conversation. For each unticked step: tests first for
+`error` and `edge` scenarios (tagged with scenario IDs), code, checks, tick `- [x]`. When the plan turns out wrong, it
+stops and proposes an edit to `## Plan` instead of improvising. Nothing is committed; then `/as:finish`.
+
+```text
+/as:implement                       # the proposal of this branch, first unticked step
+/as:implement cancel-items --step 3
 ```
 
 ### `init` — onboard a repository
@@ -121,9 +136,12 @@ The counterpart of `init`, run after delivering a feature and before the PR. Wor
 
 1. **Scope** — changed files → touched modules. 2. **Baseline checks** — tests, lint, type-check, build; stops if red.
 3. **Simplify**, then tests. 4. **Review** — findings Must / Should / Nice, you pick fixes, then tests.
-5. **Spec** — drift in touched modules: intended (spec updated) or regression (fixed as a bug).
-6. **Contract tests** — writes tests for uncovered scenarios, tagged with scenario IDs.
-7. **Agent docs** — refreshes `AGENTS.md` for touched directories. 8. **Summary** — nothing is committed; suggests
+5. **Analysis** — one read-only subagent per touched module reports only what the diff changed: proposal status, spec
+drift, new behaviour, its tests, stale docs.
+6. **Spec** — merges the branch's change proposal (plan, scenarios, `Verify`, IDs still free on the default branch),
+then drift in touched modules: intended (spec updated) or regression (fixed as a bug).
+7. **Contract tests** — writes tests for uncovered scenarios, tagged with scenario IDs.
+8. **Agent docs** — refreshes `AGENTS.md` for touched directories. 9. **Summary** — nothing is committed; suggests
 `/commit-commands:commit-push-pr`, and `/claude-security` when the diff touches security-sensitive code.
 
 Simplify runs before review so the review sees the code that ships. In Claude Code it uses the built-in `/simplify`
@@ -145,7 +163,8 @@ dependencies, and docs drift.
 
 Tools: first what the project already has (JaCoCo, ArchUnit, dependency-cruiser, knip, …); missing ones run once
 without being added to the project (`uvx lizard`, `npx madge`, `npx jscpd`, osv-scanner, …) only with your consent;
-git history and code reading always. The report goes to `docs/health/<date>.html` with a `<date>.json` snapshot, so
+git history and code reading always (churn, change coupling and frequently fixed tests are computed by
+`skills/health/scripts/git_signals.py`). The report goes to `docs/health/<date>.html` with a `<date>.json` snapshot, so
 the next run shows what improved or got worse. Small findings are fixed with tests before and after; tests are
 removed only with per-test consent; larger findings become task briefs for plan mode or `/feature-dev:feature-dev`.
 
@@ -244,6 +263,10 @@ They read well on GitHub/GitLab, in an IDE preview and in a diff. A spec written
 converted to Markdown on the next run (content and IDs unchanged, links from `AGENTS.md` updated). To make `--tests` mapping deterministic, put the
 scenario ID in contract test names or tags (e.g. `@Tag("ORD-003")`, `it("ORD-003 rejects out-of-stock order")`).
 
+`skills/spec-docs/scripts/spec_lint.py` (Python, no dependencies) checks the spec mechanically: unique and well-formed
+IDs, no ID reserved twice by parallel branches (`--against origin/HEAD`), resolving links and anchors, no leftover
+HTML. Copy it into the repository and run it in CI to keep the spec consistent without an agent.
+
 When `docs/spec/` exists, `agent-docs` links it from the repo `AGENTS.md` and lists the module pages in each app
 `AGENTS.md` (links, not `@` imports), so an agent knows a module's contract before changing its behaviour. Run
 `agent-docs` after `spec-docs` creates new pages.
@@ -257,8 +280,10 @@ When `docs/spec/` exists, `agent-docs` links it from the repo `AGENTS.md` and li
 .agents/plugins/marketplace.json  # Codex marketplace "absolut-skills"
 skills/<name>/SKILL.md            # skill (= command) — shared by both hosts
 skills/<name>/agents/openai.yaml  # Codex metadata for the skill
+skills/<name>/scripts/            # stdlib-only helpers for deterministic work (optional)
 references/                       # host-specific notes
 tools/validate.py                 # format validation
+tests/                            # tests of the validator and the scripts
 ```
 
 ## Adding a skill / command
@@ -275,6 +300,6 @@ tools/validate.py                 # format validation
 
 ```bash
 python3 tools/validate.py              # manifests, frontmatter, openai.yaml, links
-uv run --with pytest pytest tests      # validator tests
+uv run --with pytest pytest tests      # validator and script tests
 claude plugin validate .               # optional: official Claude Code check
 ```

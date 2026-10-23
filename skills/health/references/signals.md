@@ -9,6 +9,12 @@ always change together by design (i18n/locale bundles, snapshots). Mention the e
 
 ## Git signals
 
+Run [../scripts/git_signals.py](../scripts/git_signals.py) from the repository root (`python3 <this skill's
+directory>/scripts/git_signals.py --since "$SINCE" --path "$P"`, plus `--exclude '<glob>'` for project-specific
+exclusions). It prints JSON with churn (commits and lines per file), change coupling pairs and frequently fixed tests,
+computed as defined below, and calls git directly, so shell proxies do not affect it. Without `python3`, use the
+commands below.
+
 **Churn** — commits touching each file:
 
 ```bash
@@ -25,8 +31,8 @@ git log --since="$SINCE" --format= --numstat --no-renames -- "$P" | awk 'NF==3 &
 complexity tool; fallback: non-blank lines of code). Score = churn rank × complexity rank. Hotspots are the primary
 candidates for review and refactoring, and where missing tests matter most.
 
-**Change coupling** — files in *different modules* that change in the same commits. Feed this to a short script
-(skip commits touching more than 30 files — mass renames and formatting):
+**Change coupling** — files in *different modules* that change in the same commits (skip commits touching more than
+30 files — mass renames and formatting):
 
 ```bash
 git log --since="$SINCE" --format='--%h' --name-only --no-renames -- "$P"

@@ -5,6 +5,9 @@
 - `disable-model-invocation: true` in `SKILL.md` makes a skill a slash command only (the model will not invoke it on its own).
 - Arguments after the command are available in the skill body as `$ARGUMENTS`.
 - Subagents: use the Agent tool with `subagent_type: "Explore"` for read-only analysis; several Agent calls in one message run in parallel.
+- Subagent model: read-only briefs that find and classify (Explore, Investigate, `spec-docs`/`agent-docs` analysis,
+  coverage, test quality, `finish` analysis) pass a smaller model in the Agent tool's `model` parameter (e.g. `sonnet`, or `haiku` for
+  plain searches); Architecture briefs and review keep the session model.
 - Asking the user: use AskUserQuestion (up to 4 questions per call; ask further batches if needed), with concrete options.
 - Simplify (`as:finish`): the built-in `simplify` skill via the Skill tool, or the `code-simplifier` agent if that plugin
   is installed; otherwise follow `skills/finish/references/review.md`.

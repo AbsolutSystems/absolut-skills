@@ -9,6 +9,8 @@ How to verify changes: the validator and its tests, and manual checks of skill o
   `uv run --with pytest pytest tests`. Tests copy the repository to `tmp_path` (`copy_repo`) and break one thing, then
   assert on the error message; `test_repository_is_valid` must stay green.
 - The validator stays standard-library only (no dependencies).
+- Changing a skill script (`skills/<name>/scripts/*.py`): add or adjust a test in `tests/test_scripts.py` — pure
+  functions on in-memory input where possible, a throwaway git repository in `tmp_path` when git is involved.
 - Optionally run `claude plugin validate .`; the root `CLAUDE.md` warning is expected.
 - Changing `health.css` or a health HTML skeleton: render the skeleton from the reference file with `health.css` in a
   browser (light mode at least) and check labels do not overlap; serve from a temporary directory, not the repository.
@@ -19,3 +21,4 @@ How to verify changes: the validator and its tests, and manual checks of skill o
 ## Reference examples
 
 - `tests/test_validate.py` — `test_skill_name_must_match_directory` (copy, break, assert pattern).
+- `tests/test_scripts.py` — `test_spec_lint_against_ref_finds_id_taken_on_other_branch` (git repository fixture).

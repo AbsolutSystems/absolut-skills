@@ -1,6 +1,6 @@
 ---
 name: tech-lead
-description: "Act as a tech lead when the user wants to discuss, design or plan a new feature, investigate a bug or unexpected behaviour, or weigh technical options (\"how should we…\", \"I want to add…\", \"why does X happen\", \"A or B?\"). Grounds the discussion in the code, AGENTS.md and the docs/spec contracts first, asks targeted questions, challenges the request, compares alternative architectures from parallel subagents, records the decision and the proposed spec scenarios in a change proposal (docs/spec/changes/), and produces an implementation plan saved in that proposal, then offers to continue in plan mode for larger changes — without writing code until the plan is approved. Not for small, clearly specified edits (rename, typo, one-line fix) or for executing an already approved plan."
+description: "Act as a tech lead when the user wants to discuss, design or plan a new feature, investigate a bug or unexpected behaviour, or weigh technical options (\"how should we…\", \"I want to add…\", \"why does X break\", \"A or B?\"). Grounds the discussion in the code, AGENTS.md and the docs/spec contracts first, asks targeted questions, challenges the request, compares alternative architectures from parallel subagents, records the decision and the proposed spec scenarios in a change proposal (docs/spec/changes/), and produces an implementation plan saved in that proposal, then offers to continue in plan mode for larger changes — without writing code until the plan is approved. Not for small, clearly specified edits (rename, typo, one-line fix), questions about how existing code works, or executing an already approved plan (as:implement)."
 argument-hint: "[feature, bug or question]"
 ---
 
@@ -23,8 +23,16 @@ Change proposal format: [references/change-format.md](references/change-format.m
 - Always give a recommendation with a reason; do not hand the user an unranked menu.
 - Prefer the least new code that fully solves the problem (see the working principles in the root `AGENTS.md` if present).
 - Converse in the user's language. Artifacts follow the spec language (`lang` in the marker on the first line of `docs/spec/index.md`), else English.
-- Scale the process to the task: a small change in one well-understood module gets one recommended approach and a short
-  plan; offer the full comparison only if the user wants it.
+
+## Size first
+
+Before any exploration, size the task from the request and one or two searches:
+
+- **S** — one module, a few files, no contract change: read only that module's `AGENTS.md` and code, no subagents,
+  no options step, no change proposal; one recommendation and a short plan. Offer the full process if the user wants it.
+- **M** / **L** — several files or modules, a contract change, or unknowns: the full path below.
+
+Say the size in one line; the user may override it.
 
 ## Choose the path
 
@@ -99,8 +107,9 @@ With a proposal and plan mode, the plan file links `docs/spec/changes/<slug>.md`
 write the approved plan (with any changes made during approval) to the proposal's `## Plan`. During implementation,
 tick each finished step `- [x]` in the proposal.
 
-Say which path you recommend and why in one line, then ask. After implementation, suggest `as:finish` — it checks the
-code against the proposal and merges it into the spec.
+Say which path you recommend and why in one line, then ask. If implementation continues in another session (or with
+another model), suggest `as:implement` there — it resumes from the proposal's `## Plan`. After implementation, suggest
+`as:finish` — it checks the code against the proposal and merges it into the spec.
 
 ## Bug
 

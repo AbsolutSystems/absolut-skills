@@ -1,6 +1,6 @@
 ---
 name: health
-description: "Periodic health check of the whole project (or a subtree): hotspots (churn x complexity), structural and change coupling, test coverage and test quality (missing, excessive or weak tests), dead code, duplication, dependencies and docs drift. Uses tools the project already has, runs missing ones ephemerally with consent, falls back to git history and code reading. Writes a dated HTML report and metrics snapshot to docs/health/ with trends, then fixes the small items the user picks. Use only when the user explicitly invokes as:health."
+description: "Periodic health check of the whole project (or a subtree): hotspots (churn x complexity), structural and change coupling, test coverage and test quality (missing, excessive or weak tests), dead code, duplication, dependencies and docs drift. Uses tools the project already has, runs missing ones ephemerally with consent, falls back to git history and code reading. Writes a dated HTML report and metrics snapshot to docs/health/ with trends, then fixes the small items the user picks; larger ones are planned later with as:tech-lead health / H-NNN. Use only when the user explicitly invokes as:health."
 disable-model-invocation: true
 argument-hint: "[path] [--quick] [--since <period>] [--no-fix]"
 ---
@@ -72,6 +72,8 @@ If a tool fails, record it in the report and continue with the remaining signals
   severity (`high | medium | low`), effort (`S | M | L`), evidence, suggested action. Order as described in
   [references/signals.md](references/signals.md) ("Prioritising").
 - Compare with the baseline findings: mark which earlier findings are resolved and which persist.
+- A finding whose `key` appears in an open proposal in `docs/spec/changes/` (`**Health:**` meta line, written by
+  `as:tech-lead`) is in progress: link the proposal in its suggested action.
 
 ### 5. Report
 
@@ -96,8 +98,9 @@ Ask which findings to handle (multi-select; `S` effort preselected).
   `.guidelines/testing-guideline.md`.
 - **Removing tests** — only with explicit consent per test, with the reason shown, and never a test that is the only
   one covering a spec scenario or an error path.
-- **`M` and `L` findings** — do not implement. Write a task brief for each (problem, evidence, proposed approach, risks,
-  how to verify) for plan mode or `/feature-dev:feature-dev`.
+- **`M` and `L` findings** — do not implement here. The snapshot keeps them; list each with its next command,
+  `as:tech-lead H-NNN` (plan, change proposal), then `as:implement` and `as:finish`. `as:tech-lead health` later picks
+  the next finding from the newest snapshot.
 
-Finish with a summary: findings fixed, briefs produced, files changed. Do not commit; suggest `as:finish` on the
+Finish with a summary: findings fixed, findings left for `as:tech-lead`, files changed. Do not commit; suggest `as:finish` on the
 changes, then committing.

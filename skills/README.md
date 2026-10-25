@@ -2,12 +2,12 @@
 
 | Skill | Claude Code | Codex | Purpose |
 |-------|-------------|-------|---------|
-| `help` | `/as:help` | `$as:help` | Installation check, recommended plugins status, and how to work with `as`, Anthropic plugins and plan mode |
-| `tech-lead` | `/as:tech-lead` | `$as:tech-lead` | Design partner (auto-invoked): grounds features and bugs in code and spec, compares architectures, writes a change proposal with the plan as a checklist, hands off to plan mode |
+| `help` | `/as:help` | `$as:help` | Installation check, recommended plugins status, the flows (feature, bug, health fixes), and how to work with `as`, Anthropic plugins and plan mode |
+| `tech-lead` | `/as:tech-lead` | `$as:tech-lead` | Design partner (auto-invoked): grounds features and bugs in code and spec, compares architectures, writes a change proposal with the plan as a checklist, hands off to plan mode; `health` / `H-NNN` plans the next fix from the health snapshot |
 | `implement` | `/as:implement` | `$as:implement` | Executes the approved `## Plan` of the branch's change proposal step by step in any session: tests first, tick, stop on deviations |
 | `init` | `/as:init` | `$as:init` | Onboard a repo: `agent-docs`, then `spec-docs` for a chosen scope, then links between them |
 | `finish` | `/as:finish` | `$as:finish` | Wrap up a feature: simplify, review, spec drift check, missing contract tests, docs refresh — for the branch's changes |
-| `health` | `/as:health` | `$as:health` | Periodic project health: hotspots, coupling, coverage and test quality, dead code, deps, docs drift; report with trends in `docs/health/` |
+| `health` | `/as:health` | `$as:health` | Periodic project health: hotspots, coupling, coverage and test quality, dead code, deps, docs drift; report with trends in `docs/health/`; larger findings go to `tech-lead health` |
 | `worktree-create` | `/as:worktree-create` | `$as:worktree-create` | New branch and git worktree in `../<repo>-worktrees/<name>`, from the current branch or `from <branch>`; optionally copies `.env*` and installs dependencies |
 | `worktree-close` | `/as:worktree-close` | `$as:worktree-close` | Offers to commit leftovers, then removes the worktree folder; the branch stays |
 | `agent-docs` | `/as:agent-docs` | `$as:agent-docs` | Build and audit minimal `AGENTS.md`/`CLAUDE.md` docs and `.guidelines/` holding only what the code cannot tell; prunes the rest |

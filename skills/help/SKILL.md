@@ -1,8 +1,8 @@
 ---
 name: help
-description: "Show how to work with Claude Code (or Codex) using the as: commands, the recommended Anthropic plugins and plan mode: confirms the plugin is installed, lists as: skills, reports which recommended plugins are installed, and walks through the task workflow from onboarding to planning, building (implementing an approved plan), review, finishing a feature, commit, docs upkeep and periodic health checks. Use only when the user explicitly invokes as:help."
+description: "Show how to work with Claude Code (or Codex) using the as: commands, the recommended Anthropic plugins and plan mode: confirms the plugin is installed, lists as: skills, reports which recommended plugins are installed, and walks through the task workflow from onboarding to planning, building (implementing an approved plan), review, finishing a feature, commit, docs upkeep and periodic health checks, and how the commands chain into flows (feature, bug, health fixes). Use only when the user explicitly invokes as:help."
 disable-model-invocation: true
-argument-hint: "[onboarding|plan|build|review|finish|commit|worktree|docs|health]"
+argument-hint: "[flows|onboarding|plan|build|review|finish|commit|worktree|docs|health]"
 ---
 
 # Help
@@ -22,6 +22,22 @@ With a topic argument, show only that section of the guide. Without one, show:
    marked "(not installed)".
 
 ## Guide
+
+### flows — how the commands chain
+
+Show these as short chains, then point to the sections below for details:
+
+- **Feature**: `as:tech-lead <feature>` (proposal + plan in `docs/spec/changes/<slug>.md`) → implement now or
+  `as:implement` in a new session → `as:finish` → `/commit-commands:commit-push-pr`.
+- **Bug**: `as:tech-lead <symptom>` (root cause, failing test, fix after approval) → `as:finish` → commit.
+- **Health fixes**: `as:health` (report and snapshot in `docs/health/`, fixes small items you pick) →
+  `as:tech-lead health` (proposes the next findings, plans the one you choose) or `as:tech-lead H-007` →
+  `as:implement` → `as:finish` → commit; the next `as:health` marks it resolved.
+- **Parallel work**: `as:worktree-create <name>`, run any flow there in a new session, `as:worktree-close`.
+- **Upkeep**: `as:agent-docs --check`, `as:spec-docs --check`, `as:spec-docs --tests`.
+
+Every step writes its state to files (proposal `## Plan` checklist, `docs/health/*.json`), so each can start in a new
+session.
 
 ### onboarding — once per repository
 
@@ -89,6 +105,8 @@ With a topic argument, show only that section of the guide. Without one, show:
 
 - `/as:health` — whole-project check: hotspots (often changed and complex code), coupling and cycles, coverage and
   test quality (missing, excessive or weak tests), dead code, duplication, dependencies, docs drift. Writes
-  `docs/health/<date>.html` with trends against the previous run, then fixes the small items you pick and turns larger
-  ones into task briefs for plan mode.
+  `docs/health/<date>.html` and a `<date>.json` snapshot with trends against the previous run, then fixes the small
+  items you pick.
+- Larger findings stay in the snapshot: `/as:tech-lead health` proposes what to fix next and plans the finding you
+  choose (or `/as:tech-lead H-007` for one finding), then `/as:implement` and `/as:finish`.
 - `/as:health --quick` for a fast pass (git and configured tools only); `--no-fix` for the report only.

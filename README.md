@@ -1,14 +1,17 @@
 # Absolut Skills
 
-A set of commands and skills for **Claude Code** and **Codex**, shipped as a single plugin `as`
-from the `absolut-skills` marketplace.
+A workflow for **Claude Code** and **Codex**: commands that take a change from idea to merged PR — design with a
+tech lead, a plan saved in the repository, step-by-step implementation, a finishing pass that keeps the spec and docs
+true — plus periodic health checks that feed the next round of fixes. Shipped as one plugin, `as`, from the
+`absolut-skills` marketplace.
 
 | Host | Invocation |
 |------|------------|
 | Claude Code | `/as:<skill>` |
 | Codex | `$as:<skill>` |
 
-The skill catalogue lives in [`skills/README.md`](skills/README.md).
+Examples below use the Claude Code syntax; in Codex replace `/as:` with `$as:`. Not sure where to start? Run
+`/as:help` (or `/as:help flows`).
 
 ## Installation
 
@@ -46,18 +49,117 @@ Then check: `$as:help`. Update later with `codex plugin marketplace upgrade`.
 Point either host at a local clone instead of `AbsolutSystems/absolut-skills`, e.g.
 `claude plugin marketplace add ./absolut-skills` or `codex plugin marketplace add ./absolut-skills`.
 
-## Skills
+## How to work with `as`
+
+Three ideas run through every command:
+
+- **State lives in files, not in the conversation.** A plan is a checklist in `docs/spec/changes/<slug>.md`, a health
+  check is a snapshot in `docs/health/<date>.json`. Any step can continue in a new session or with a cheaper model.
+- **Nothing is written to code before you approve a plan**, and nothing is committed by `as` — you commit at the end.
+- **Docs follow the code.** `AGENTS.md` tells agents what the code cannot; `docs/spec/` describes module contracts as
+  scenarios with stable IDs (`ORD-003`) that tests refer to. `as:finish` keeps both current.
+
+### 1. Onboard a repository (once)
+
+```text
+/as:init                            # AGENTS.md tree, spec for chosen modules, links, recommended plugins
+```
+
+On a large project specify 2–3 central modules first and add more later with `/as:spec-docs <path>`.
+
+### 2. Feature or change
+
+```text
+/as:tech-lead I want customers to cancel single items of an order
+    → grounds in code and spec, asks, compares options, writes docs/spec/changes/cancel-items.md with ## Plan
+    → implements a small change after approval, or hands off to plan mode
+/as:implement                       # (new session) continues the first unticked step of the plan
+/as:finish                          # simplify, review, merge the proposal into the spec, missing tests, docs
+/commit-commands:commit-push-pr     # commit, push, open the PR
+```
+
+`as:tech-lead` also starts on its own when you describe a feature or ask "how should we…". A small change in one
+module gets a short plan without a proposal.
+
+### 3. Bug
+
+```text
+/as:tech-lead why are refunds sometimes doubled?
+    → reproduces, finds the violated or missing scenario, verifies hypotheses, root cause
+    → failing test first, then the fix after you approve the plan
+/as:finish
+```
+
+### 4. Health check and fixes (once a sprint or month)
+
+```text
+/as:health                          # report + snapshot in docs/health/, then fixes the small (S) items you pick
+/as:tech-lead health                # later: proposes the next findings from the snapshot, plans the one you choose
+/as:tech-lead H-007                 # ... or plan one finding directly
+/as:implement                       # execute the plan, then /as:finish and commit
+```
+
+The proposal records the finding's key, so the next `/as:health` shows it as in progress and, once merged, as resolved.
+
+### 5. Parallel work
+
+```text
+/as:worktree-create feature-x       # new branch + folder ../<repo>-worktrees/feature-x; open a new session there
+/as:worktree-close feature-x        # offers to commit leftovers, removes the folder, keeps the branch
+```
+
+### 6. Keeping docs true
+
+```text
+/as:agent-docs --check              # audit AGENTS.md / .guidelines (drop --check to apply)
+/as:spec-docs --check               # spec drift against code (drop --check to apply)
+/as:spec-docs --tests               # which scenarios have no tests
+```
+
+### Plan mode and other plugins
+
+In Claude Code, `as:tech-lead` hands medium and large changes to **plan mode** (Shift+Tab): Claude plans without
+editing and implements after you approve. In Codex, ask for a plan and say not to edit until you approve it.
+`as` works with the recommended Anthropic plugins (`/as:help` shows which are installed): `commit-commands` for commits
+and PRs, `code-review` on an open PR, `claude-security` for security-sensitive changes, `frontend-design` for UI.
+
+### What gets written where
+
+| Path | Written by | Contents |
+|------|------------|----------|
+| `AGENTS.md`, `CLAUDE.md`, `.guidelines/` | `init`, `agent-docs`, `finish` | What agents must know that the code does not say |
+| `docs/spec/**/*.md` | `init`, `spec-docs`, `finish` | Module contracts: requirements and scenarios with IDs |
+| `docs/spec/changes/<slug>.md` | `tech-lead`, `implement` (ticks) | Open change proposal: decision, scenarios, `## Plan` |
+| `docs/spec/changes/archive/` | `finish` | Merged proposals — the decision log |
+| `docs/health/` | `health` | Dated HTML reports, JSON snapshots, index with trends |
+
+## Commands
+
+| Command | Arguments | When |
+|---------|-----------|------|
+| `/as:help` | `[flows\|onboarding\|plan\|build\|review\|finish\|commit\|worktree\|docs\|health]` | How to work with `as`, installed plugins |
+| `/as:init` | `[path] [--spec <path>… \| all] [--no-spec] [--check] [--no-principles] [--no-plugins] [--lang en\|pl]` | Once per repository |
+| `/as:tech-lead` | `<feature, bug or question>` \| `health` \| `H-NNN` | Before any non-trivial change; next health fix |
+| `/as:implement` | `[slug] [--step <n>]` | Execute an approved plan, in any session |
+| `/as:finish` | `[base] [--no-simplify] [--no-review] [--no-tests] [--no-docs]` | Feature done, before the PR |
+| `/as:health` | `[path] [--quick] [--since <period>] [--no-fix]` | Once a sprint or month |
+| `/as:worktree-create` | `<name> [from <branch>]` | Start parallel work |
+| `/as:worktree-close` | `[<name>]` | Parallel work done |
+| `/as:agent-docs` | `[path] [--check] [--depth <n>]` | Agent docs audit or refresh |
+| `/as:spec-docs` | `[path] [--check] [--tests] [--lang en\|pl]` | Spec audit, refresh, scenario test coverage |
+
+## Skills in detail
 
 ### `help` — how to work with `as`
 
 Confirms the plugin is installed, lists `as` skills, shows which recommended Anthropic plugins are installed
 ([`references/recommended-plugins.md`](references/recommended-plugins.md): `feature-dev`, `frontend-design`,
 `code-simplifier`, `code-review`, `commit-commands`, `claude-security`), and walks through the workflow: onboarding,
-planning in plan mode, building, review, commit, keeping docs true.
+planning in plan mode, building, review, commit, keeping docs true, and how the commands chain into flows.
 
 ```text
 /as:help                            # everything
-/as:help plan                       # one topic: onboarding | plan | build | review | finish | commit | worktree | docs | health
+/as:help flows                      # one topic: flows | onboarding | plan | build | review | finish | commit | worktree | docs | health
 ```
 
 ### `tech-lead` — design partner (starts on its own)
@@ -82,9 +184,15 @@ Bugs follow their own path: reproduce, find the violated or missing scenario, ve
 failing test first; after you approve the plan it implements the fix and suggests `/as:finish`. No production code is
 written before you approve the plan.
 
+It also plans fixes from the latest `as:health` snapshot: `health` lists the top findings that are not planned yet and
+recommends one; `H-NNN` takes one finding. It starts from the finding's evidence, keeps behaviour unchanged for
+refactors (tests pin it first), asks per test before removing any, and records the finding's key in the proposal.
+
 ```text
 /as:tech-lead I want customers to cancel single items of an order
 /as:tech-lead why are refunds sometimes doubled?
+/as:tech-lead health                # what to fix next from docs/health/
+/as:tech-lead H-007
 ```
 
 ### `implement` — execute the approved plan
@@ -166,7 +274,8 @@ without being added to the project (`uvx lizard`, `npx madge`, `npx jscpd`, osv-
 git history and code reading always (churn, change coupling and frequently fixed tests are computed by
 `skills/health/scripts/git_signals.py`). The report goes to `docs/health/<date>.html` with a `<date>.json` snapshot, so
 the next run shows what improved or got worse. Small findings are fixed with tests before and after; tests are
-removed only with per-test consent; larger findings become task briefs for plan mode or `/feature-dev:feature-dev`.
+removed only with per-test consent; larger findings stay in the snapshot for `/as:tech-lead health` or
+`/as:tech-lead H-NNN`, which plans them for `/as:implement`.
 
 ### `worktree-create` / `worktree-close` — parallel branches in git worktrees
 
@@ -271,7 +380,9 @@ When `docs/spec/` exists, `agent-docs` links it from the repo `AGENTS.md` and li
 `AGENTS.md` (links, not `@` imports), so an agent knows a module's contract before changing its behaviour. Run
 `agent-docs` after `spec-docs` creates new pages.
 
-## Structure
+## Development
+
+### Structure
 
 ```text
 .claude-plugin/plugin.json        # Claude Code manifest (name "as")
@@ -286,7 +397,7 @@ tools/validate.py                 # format validation
 tests/                            # tests of the validator and the scripts
 ```
 
-## Adding a skill / command
+### Adding a skill / command
 
 1. Copy `skills/help/` to `skills/<new-name>/` (lowercase kebab-case) and replace its body.
 2. In `SKILL.md`, set `name: <new-name>` and a specific `description` (when to use it, ≤1024 characters).
@@ -296,7 +407,7 @@ tests/                            # tests of the validator and the scripts
 4. Add a row to [`skills/README.md`](skills/README.md).
 5. Run the validation.
 
-## Validation
+### Validation
 
 ```bash
 python3 tools/validate.py              # manifests, frontmatter, openai.yaml, links

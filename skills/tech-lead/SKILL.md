@@ -1,7 +1,7 @@
 ---
 name: tech-lead
-description: "Act as a tech lead when the user wants to discuss, design or plan a new feature, investigate a bug or unexpected behaviour, or weigh technical options (\"how should we…\", \"I want to add…\", \"why does X break\", \"A or B?\"). Grounds the discussion in the code, AGENTS.md and the docs/spec contracts first, asks targeted questions, challenges the request, compares alternative architectures from parallel subagents, records the decision and the proposed spec scenarios in a change proposal (docs/spec/changes/), and produces an implementation plan saved in that proposal, then offers to continue in plan mode for larger changes — without writing code until the plan is approved. Not for small, clearly specified edits (rename, typo, one-line fix), questions about how existing code works, or executing an already approved plan (as:implement)."
-argument-hint: "[feature, bug or question]"
+description: "Act as a tech lead when the user wants to discuss, design or plan a new feature, investigate a bug or unexpected behaviour, weigh technical options (\"how should we…\", \"I want to add…\", \"why does X break\", \"A or B?\"), or pick what to fix next from the as:health report (as:tech-lead health, as:tech-lead H-007). Grounds the discussion in the code, AGENTS.md and the docs/spec contracts first, asks targeted questions, challenges the request, compares alternative architectures from parallel subagents, records the decision and the proposed spec scenarios in a change proposal (docs/spec/changes/), and produces an implementation plan saved in that proposal, then offers to continue in plan mode for larger changes — without writing code until the plan is approved. Not for small, clearly specified edits (rename, typo, one-line fix), questions about how existing code works, or executing an already approved plan (as:implement)."
+argument-hint: "[feature, bug or question | health | H-NNN]"
 ---
 
 # Tech lead
@@ -39,6 +39,8 @@ Say the size in one line; the user may override it.
 - **Feature or change** — new or changed behaviour → [Feature](#feature).
 - **Bug** — behaviour differs from what someone expects → [Bug](#bug).
 - **Question** — "A or B?", "is this a good idea?" → ground, compare, recommend; produce no artifacts unless asked.
+- **Health finding** — argument `health` or a finding ID (`H-007`), or "what should we fix next" after `as:health` →
+  [From health](#from-health).
 
 ## Feature
 
@@ -110,6 +112,36 @@ tick each finished step `- [x]` in the proposal.
 Say which path you recommend and why in one line, then ask. If implementation continues in another session (or with
 another model), suggest `as:implement` there — it resumes from the proposal's `## Plan`. After implementation, suggest
 `as:finish` — it checks the code against the proposal and merges it into the spec.
+
+## From health
+
+`as:health` leaves its findings in `docs/health/<YYYY-MM-DD>.json` (format:
+[../health/references/report-format.md](../health/references/report-format.md)). Pick one, then plan it like a feature.
+
+1. **Load** the newest snapshot (latest date in the file name); none → stop and suggest `as:health`. Say its date and
+   how many commits landed since its `commit`.
+2. **Filter** — drop findings whose `key` appears in an open proposal in `docs/spec/changes/` (already planned), and
+   findings whose files no longer exist (say so: the next `as:health` run will confirm they are resolved).
+3. **Choose** — with `H-NNN`, take that finding (missing → list the IDs). With `health`, show the top 5 in snapshot
+   order (it is already prioritised): ID, severity, effort, summary, files. Recommend one with a reason — usually the
+   first, unless a later one unblocks it or several `S` findings in one module are cheaper together — and ask
+   (multi-select only for `S` findings of one module, which become one plan).
+4. **Ground** from the finding's `files`, `module` and evidence instead of searching from scratch: re-check the evidence
+   against the current code first. Evidence gone → say it is resolved and offer the next finding.
+5. **Plan** — size from the finding's `effort` (`S` → S, `M`/`L` → M/L; the user may override), then the
+   [Feature](#feature) path from step 2, with these differences:
+   - `refactor`, `review`, `delete`, `deps`: observable behaviour stays — the proposal lists no scenario changes
+     (write "No contract change"), and the plan starts by running or adding tests that pin the current behaviour.
+   - `add-tests`: the plan is tests only, tagged with the scenario IDs they verify; a missing scenario is a
+     specification gap — propose it in the proposal.
+   - `remove-tests`: list each test with the reason and get explicit consent per test; never one that is the only test
+     of a spec scenario or an error path.
+   - `docs`: hand over to `as:agent-docs` or `as:spec-docs` for the affected path, or `as:finish` / drop for a stale
+     change proposal; no plan here.
+6. With a proposal, add `` **Health:** H-007 · `<key>` `` to its meta line (see
+   [references/change-format.md](references/change-format.md)), so later runs see the finding is in progress. Then the
+   handoff of Feature step 7: implement now, or `as:implement` in a new session; afterwards `as:finish`. The next
+   `as:health` run marks the finding resolved.
 
 ## Bug
 

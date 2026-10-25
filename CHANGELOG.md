@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.4.0
+
+- Health fixes flow: `tech-lead` takes `health` (proposes the next findings from the newest `docs/health/*.json`,
+  skipping planned ones, and plans the one you choose) or `H-NNN` (one finding), starting from the finding's evidence;
+  refactors keep behaviour (tests pin it first), removing tests needs per-test consent. The proposal records the
+  finding in a `**Health:**` meta line.
+- `health`: `M`/`L` findings are no longer turned into task briefs in the conversation — the summary points to
+  `as:tech-lead H-NNN`, then `as:implement` and `as:finish`; findings with an open proposal are shown as in progress.
+- `help`: new `flows` topic — how the commands chain for a feature, a bug, health fixes, parallel work and upkeep.
+- README reorganised around the workflow: how to work with `as`, the flows, a command table and what gets written
+  where; skill details and development notes follow.
+
 ## 1.3.0
 
 - New `implement` skill: executes the approved `## Plan` of the branch's change proposal step by step in any session

@@ -86,7 +86,10 @@ may follow `Max`.
   accepted it), `rejected`.
 - `## Totals` is the script's last output (blocks of `## Estimate` and the total); `as:tech-lead` compares its plan
   with each block's `max`.
-- Before a revision rewrites a `client.md` that was sent, the sent version is kept as `client-r<revision>.md`.
+- Before a revision rewrites a `client.md` the client has seen (status not `draft`), it is kept as
+  `client-r<revision>.md`.
+- Accepted suggestions are moved to `## Estimate` by a revision, so `## Estimate` is always the work the client
+  agreed to.
 - Steps are numbered per block (`1.1`, `2.1`), options `S<n>`; findings `F<n>`, assumptions `A<n>`, questions `Q<n>`
   keep their numbers across revisions (a resolved one is marked, not renumbered).
 
@@ -143,7 +146,8 @@ automatyczne i komunikację. Nie obejmuje: testów manualnych/QA, wdrożenia na 
 ```
 
 - Each block of `## Estimate` is one row of the estimate table, each option one row of the suggestions table; the
-  first cell is the block name, the row shows its min, max and expected hours (an amount
-  column may follow when the user gave a rate). The total row shows the script's total.
+  first cell is the block name, the row shows the range `min–max h`, then the expected value `x h`, in this order
+  (an amount column may follow when the user gave a rate). Hours cells end in `h` in every language — the script
+  ignores other cells. The total row is in the same table as the blocks.
 - "Not included" lists the items of [estimation.md](estimation.md#not-included-unless-the-user-prices-it) the user did
   not price.

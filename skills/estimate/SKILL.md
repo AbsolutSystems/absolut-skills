@@ -74,7 +74,8 @@ Break the work into steps per functional block, following [references/estimation
 - `addition` and `alternative` findings priced as optional rows — never in the total;
 - risks with their effect on `max`.
 
-Write this as a draft `docs/estimates/<slug>/analysis.md` (`**Status:** draft`; a new file, nothing is overwritten)
+Write this as a draft `docs/estimates/<slug>/analysis.md` (`**Status:** draft`, today's date and the current commit in
+the meta line; a new file, nothing is overwritten)
 and compute the totals from the repository root with
 `python3 <this skill's directory>/scripts/estimate_totals.py docs/estimates/<slug>` — never add hours by hand; copy
 its blocks and total into `## Totals`. Without
@@ -95,12 +96,18 @@ Never overwrite an existing estimate without consent — a changed estimate is a
 
 ### 8. Revision
 
-With `docs/estimates/<slug>`: read both files and the client's answers. If `**Status:**` is `sent`, keep the sent
-document as `client-r<revision>.md` before changing anything. Turn answered questions into requirements or
-resolved assumptions, drop or re-price findings the client rejected, re-estimate only the affected steps, bump
-`**Revision:**`, add a line to `## History` (date, what changed, total before → after), rerun the script and
-update `## Totals`, then steps 6–7. Set
-`**Status:**` to `sent`, `accepted` or `rejected` when the user says so.
+With `docs/estimates/<slug>`: read both files and the client's answers. If `**Status:**` is not `draft`, the client
+has seen `client.md` — keep it as `client-r<revision>.md` before changing anything. Then:
+
+- turn answered questions into requirements or resolved assumptions;
+- move suggestions the client accepted from `## Optional additions` into `## Estimate` (as steps of their block),
+  drop the rejected ones, re-price the rest;
+- re-estimate only the affected steps, re-checking their code;
+- bump `**Revision:**`, set the meta line's date and commit to today and the current commit, add a line to
+  `## History` (date, what changed, total before → after), rerun the script and update `## Totals`;
+- then steps 6–7, and set `**Status:**` back to `draft` until the user says it was sent.
+
+Set `**Status:**` to `sent`, `accepted` or `rejected` whenever the user says so.
 
 ### 9. Summary
 

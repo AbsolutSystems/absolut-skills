@@ -5,7 +5,8 @@ Usage: estimate_totals.py docs/estimates/<slug> [--check]
 Reads the tables under `## Estimate` and `## Optional additions` in analysis.md (columns Step, Block, Min, Likely,
 Max), prints JSON with min / likely / max and the expected value (PERT (min + 4·likely + max) / 6, rounded up to
 0.5 h) per block and in total; options are summed per block and never added to the total. With --check, every block
-row and a separate total row of client.md must show the numbers printed here in their hours cells ("3–9 h", "5,5 h"). Errors are printed as `ERROR …` lines and
+row and a total row in the same table of client.md must show these numbers in order in cells ending in "h"
+("3–9 h", "5,5 h"; in every language). Errors are printed as `ERROR …` lines and
 exit with code 1. Format: ../references/estimate-format.md.
 """
 
@@ -65,14 +66,22 @@ def totals(text: str) -> tuple[dict, list[str]]:
         blocks: dict[str, dict] = {}
         for row in table:
             step = row.get("step", "?")
+            missing = [c for c in ("block", *COLUMNS) if c not in row]
+            if missing:
+                header = "Step | Block | Min | Likely | Max"
+                errors.append(f"step {step!r}: no column {', '.join(missing)} (header must be {header})")
+                continue
             try:
                 values = [hours(row[c]) for c in COLUMNS]
-            except (KeyError, ValueError):
+            except ValueError:
                 errors.append(f"step {step!r}: min, likely and max must be numbers")
                 continue
             if values != sorted(values):
                 errors.append(f"step {step!r}: expected min <= likely <= max")
-            name = row.get("block") or "?"
+            name = row["block"]
+            if not name:
+                errors.append(f"step {step!r}: empty block")
+                continue
             block = blocks.setdefault(name, {"block": name, "min": 0, "likely": 0, "max": 0, "expected": 0})
             for column, value in zip(COLUMNS, values):
                 block[column] += value
@@ -87,28 +96,34 @@ def totals(text: str) -> tuple[dict, list[str]]:
     return result, errors
 
 
+def shows(item: dict, numbers: list[float]) -> bool:
+    """Hour cells in order: the range min–max (one number when equal), then the expected value."""
+    low, high, expected = item["min"], item["max"], item["expected"]
+    return numbers == [low, high, expected] or (low == high and numbers == [low, expected])
+
+
 def check(result: dict, client: str) -> list[str]:
-    """Each block row and a separate total row of client.md must show its min, max and expected hours."""
-    table = []
+    """Each block row, and a total row in the table of the blocks, must show the hours in order."""
+    tables: list[list[tuple[str, list[float]]]] = [[]]
     for line in client.splitlines():
-        if line.lstrip().startswith("|"):
-            row = [c.strip("*").strip() for c in cells(line)]
-            hour_cells = " ".join(c for c in row[1:] if HOURS_CELL_RE.match(c))
-            table.append((row[0], {hours(n) for n in NUMBER_RE.findall(hour_cells)}))
-    labels = {item["block"] for item in result["blocks"] + result["options"]}
-
-    def shows(item: dict, numbers: set[float]) -> bool:
-        return {item["min"], item["max"], item["expected"]} <= numbers
-
+        if not line.lstrip().startswith("|"):
+            if tables[-1]:
+                tables.append([])
+            continue
+        row = [c.strip("*").strip() for c in cells(line)]
+        hour_cells = " ".join(c for c in row[1:] if HOURS_CELL_RE.match(c))
+        tables[-1].append((row[0], [hours(n) for n in NUMBER_RE.findall(hour_cells)]))
     errors = []
     for item in result["blocks"] + result["options"]:
-        found = [numbers for label, numbers in table if label == item["block"]]
+        found = [numbers for table in tables for label, numbers in table if label == item["block"]]
         if not found:
             errors.append(f"client.md: no table row for block {item['block']!r}")
         elif not any(shows(item, numbers) for numbers in found):
             errors.append(f"client.md: block {item['block']!r} should show {fmt(item)}")
-    if not any(shows(result["total"], numbers) for label, numbers in table if label not in labels):
-        errors.append(f"client.md: no total row showing {fmt(result['total'])}")
+    blocks = {item["block"] for item in result["blocks"]}
+    estimate = [row for table in tables if any(label in blocks for label, _ in table) for row in table]
+    if not any(shows(result["total"], numbers) for label, numbers in estimate if label not in blocks):
+        errors.append(f"client.md: no total row showing {fmt(result['total'])} in the table of the blocks")
     return errors
 
 

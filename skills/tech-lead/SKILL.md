@@ -151,8 +151,10 @@ another model), suggest `as:implement` there — it resumes from the proposal's 
 today with paths, findings, assumptions, client questions and a step plan with hours. Plan from it instead of
 exploring from scratch.
 
-1. **Load** `analysis.md` and say its revision, status and how many commits landed since its `commit`. Set
-   `**Status:**` to `accepted` if the user confirms the client accepted it.
+1. **Load** `analysis.md` and say its revision, status and how many commits landed since its `commit`. Status not
+   `accepted` → ask whether the client accepted it: yes → set `**Status:** accepted`; no → stop and suggest
+   `as:estimate docs/estimates/<slug>` (for a revision) unless the user wants to plan anyway. Accepted suggestions still
+   under `## Optional additions` → ask which, and plan them with the estimate (their `max` from the script's options).
 2. **Ground** from "What exists today": re-check the listed paths against the current code (exploration subagents only
    for areas that changed since the estimate's commit or that it did not cover).
 3. **Clarify** only the client questions still open and the assumptions the user wants to revisit; answered ones are

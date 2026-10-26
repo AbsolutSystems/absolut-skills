@@ -120,6 +120,8 @@ Support handles ~40 requests a week to remove one item; today the whole order mu
   requirements and scenarios, so heading levels stay the same as on module pages.
 - A proposal that comes from an `as:health` finding adds `` · **Health:** H-007 · `<key>` `` to the meta line; the
   `key` is the finding's key from the snapshot, so `as:health` and `as:tech-lead` see the finding is planned.
+- A proposal planned from an `as:estimate` analysis adds `· **Estimate:**` and a link to
+  `../../estimates/<slug>/analysis.md` to the meta line.
 - `**Status:**` in the meta line is `open`, then `implemented` or `dropped` when archived; `as:finish` updates it.
 - `## Plan` is added by `as:tech-lead` once the user approved the plan (absent until then). One task per independently
   verifiable step: what it delivers, files or modules, scenario IDs it tests (test-first ones first). Large changes

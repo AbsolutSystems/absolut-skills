@@ -81,7 +81,18 @@ On a large project specify 2–3 central modules first and add more later with `
 `as:tech-lead` also starts on its own when you describe a feature or ask "how should we…". A small change in one
 module gets a short plan without a proposal.
 
-### 3. Bug
+### 3. Client feature request to estimate
+
+```text
+/as:estimate docs/requests/cancel-items.md     # or paste the client's e-mail after the command
+    → reads the request, grounds it in code and spec, flags gaps, conflicts and better alternatives
+    → step plan priced min / likely / max h (developer who knows the code + AI agent)
+    → docs/estimates/cancel-items/analysis.md (internal) and client.md (PRD, estimate, questions, suggestions)
+/as:estimate docs/estimates/cancel-items       # revision with the client's answers
+/as:tech-lead docs/estimates/cancel-items      # accepted: plan from the analysis, then the feature flow
+```
+
+### 4. Bug
 
 ```text
 /as:tech-lead why are refunds sometimes doubled?
@@ -90,7 +101,7 @@ module gets a short plan without a proposal.
 /as:finish
 ```
 
-### 4. Health check and fixes (once a sprint or month)
+### 5. Health check and fixes (once a sprint or month)
 
 ```text
 /as:health                          # report + snapshot in docs/health/, then fixes the small (S) items you pick
@@ -101,14 +112,14 @@ module gets a short plan without a proposal.
 
 The proposal records the finding's key, so the next `/as:health` shows it as in progress and, once merged, as resolved.
 
-### 5. Parallel work
+### 6. Parallel work
 
 ```text
 /as:worktree-create feature-x       # new branch + folder ../<repo>-worktrees/feature-x; open a new session there
 /as:worktree-close feature-x        # offers to commit leftovers, removes the folder, keeps the branch
 ```
 
-### 6. Keeping docs true
+### 7. Keeping docs true
 
 ```text
 /as:agent-docs --check              # audit AGENTS.md / .guidelines (drop --check to apply)
@@ -131,6 +142,7 @@ and PRs, `code-review` on an open PR, `claude-security` for security-sensitive c
 | `docs/spec/**/*.md` | `init`, `spec-docs`, `finish` | Module contracts: requirements and scenarios with IDs |
 | `docs/spec/changes/<slug>.md` | `tech-lead`, `implement` (ticks) | Open change proposal: decision, scenarios, `## Plan` |
 | `docs/spec/changes/archive/` | `finish` | Merged proposals — the decision log |
+| `docs/estimates/<slug>/` | `estimate` | Client request analysis and hour estimate: `analysis.md` (internal), `client.md` (to send) |
 | `docs/health/` | `health` | Dated HTML reports, JSON snapshots, index with trends |
 
 ## Commands
@@ -139,7 +151,8 @@ and PRs, `code-review` on an open PR, `claude-security` for security-sensitive c
 |---------|-----------|------|
 | `/as:help` | `[flows\|onboarding\|plan\|build\|review\|finish\|commit\|worktree\|docs\|health]` | How to work with `as`, installed plugins |
 | `/as:init` | `[path] [--spec <path>… \| all] [--no-spec] [--check] [--no-principles] [--no-plugins] [--lang en\|pl]` | Once per repository |
-| `/as:tech-lead` | `<feature, bug or question>` \| `health` \| `H-NNN` | Before any non-trivial change; next health fix |
+| `/as:tech-lead` | `<feature, bug or question>` \| `health` \| `H-NNN` \| `docs/estimates/<slug>` | Before any non-trivial change; next health fix |
+| `/as:estimate` | `<request text or file> [--lang en\|pl]` \| `docs/estimates/<slug>` | Client asks for a feature quote; revision after answers |
 | `/as:implement` | `[slug] [--step <n>]` | Execute an approved plan, in any session |
 | `/as:finish` | `[base] [--no-simplify] [--no-review] [--no-tests] [--no-docs]` | Feature done, before the PR |
 | `/as:health` | `[path] [--quick] [--since <period>] [--no-fix]` | Once a sprint or month |
@@ -184,6 +197,9 @@ Bugs follow their own path: reproduce, find the violated or missing scenario, ve
 failing test first; after you approve the plan it implements the fix and suggests `/as:finish`. No production code is
 written before you approve the plan.
 
+With `docs/estimates/<slug>` it plans a client-accepted `as:estimate` from its analysis: re-checks the listed code,
+asks only the open client questions, and starts from the estimate's steps, warning when the plan exceeds its `max`.
+
 It also plans fixes from the latest `as:health` snapshot: `health` lists the top findings that are not planned yet and
 recommends one; `H-NNN` takes one finding. It starts from the finding's evidence, keeps behaviour unchanged for
 refactors (tests pin it first), asks per test before removing any, and records the finding's key in the proposal.
@@ -193,6 +209,26 @@ refactors (tests pin it first), asks per test before removing any, and records t
 /as:tech-lead why are refunds sometimes doubled?
 /as:tech-lead health                # what to fix next from docs/health/
 /as:tech-lead H-007
+```
+
+### `estimate` — client feature request analysis and hour estimate
+
+Your analyst partner for a client's feature request. It reads the request (text, e-mail or file), grounds each
+requirement in the code and spec, and reviews the request for gaps (error cases, permissions, existing data,
+notifications…), conflicts with current behaviour, smaller or better alternatives and worthwhile additions. Then it
+breaks the work into steps — a plan, not code — priced `min / likely / max` hours for a developer who knows the code
+and works with an AI coding agent, including tests and communication. Totals and expected values (PERT, rounded up to
+0.5 h) come from a script, not the model's arithmetic.
+
+It writes two files after your approval: `docs/estimates/<slug>/analysis.md` (requirements, impact with paths,
+findings, assumptions, step estimate, risks) and `client.md` in the client's language (PRD, estimate per block,
+assumptions, questions, suggestions priced separately, what is not included). Run it again on the folder with the
+client's answers for a new revision; after acceptance, `as:tech-lead docs/estimates/<slug>` plans the implementation
+from the analysis instead of exploring again.
+
+```text
+/as:estimate <pasted request or path>
+/as:estimate docs/estimates/cancel-items       # revision after the client's answers
 ```
 
 ### `implement` — execute the approved plan

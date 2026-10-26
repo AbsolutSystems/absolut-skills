@@ -5,7 +5,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "skills/health/scripts"))
 sys.path.insert(0, str(ROOT / "skills/spec-docs/scripts"))
+sys.path.insert(0, str(ROOT / "skills/estimate/scripts"))
 
+from estimate_totals import check, totals  # noqa: E402
 from git_signals import signals  # noqa: E402
 from spec_lint import lint  # noqa: E402
 
@@ -100,3 +102,75 @@ def test_spec_lint_against_ref_finds_id_taken_on_other_branch(tmp_path):
     finally:
         os.chdir(cwd)
     assert errors == ["docs/spec/changes/cancel.md: added ID 'ORD-002' already used on other"]
+
+
+ANALYSIS = """# Cancel items
+
+## Estimate
+
+| Step | Block | Min | Likely | Max |
+|------|-------|-----|--------|-----|
+| 1.1 Cancel operation | Item cancellation | 2 | 3 | 6 |
+| 1.2 Refund | Item cancellation | 1 | 2 | 3 |
+| 2.1 Questions, demo | Communication | 1,1 | 1,5 | 2 |
+
+Second table after text:
+
+| Step | Block | Min | Likely | Max |
+|------|-------|-----|--------|-----|
+| 2.2 Docs | Communication | 2.2 | 2.2 | 2.2 |
+
+## Optional additions
+
+| Step | Block | Min | Likely | Max |
+|------|-------|-----|--------|-----|
+| O1 Email to customer | Cancellation email | 1 | 2 | 4 |
+"""
+
+CLIENT = """| Zakres | Godziny | Oczekiwane |
+|--------|---------|------------|
+| Item cancellation | 3–9 h | 5,5 h |
+| **Communication** | 3,3–4,2 h | 4 h |
+| **Razem** | 6,3–13,2 h | 9,5 h |
+
+| Opcja | Godziny | Oczekiwane |
+|-------|---------|------------|
+| Cancellation email | 1–4 h | 2,5 h |
+"""
+
+CLIENT_TEXT_NUMBERS = """| Zakres | Opis | Godziny | Oczekiwane |
+|--------|------|---------|------------|
+| Item cancellation | 3 or 9 h, 5.5 h | 1–2 h | 1 h |
+| Communication | | 3,3–4,2 h | 4 h |
+| Cancellation email | | 1–4 h | 2,5 h |
+"""
+
+
+def test_estimate_totals_blocks_options_and_pert():
+    result, errors = totals(ANALYSIS)
+    assert errors == []
+    assert result["blocks"] == [
+        {"block": "Item cancellation", "min": 3, "likely": 5, "max": 9, "expected": 5.5},
+        {"block": "Communication", "min": 3.3, "likely": 3.7, "max": 4.2, "expected": 4},
+    ]
+    assert result["options"] == [{"block": "Cancellation email", "min": 1, "likely": 2, "max": 4, "expected": 2.5}]
+    assert result["total"] == {"min": 6.3, "likely": 8.7, "max": 13.2, "expected": 9.5}
+    assert check(result, CLIENT) == []
+
+
+def test_estimate_totals_reports_bad_rows_and_client_mismatch():
+    _, errors = totals(ANALYSIS.replace("| 2 | 3 | 6 |", "| 4 | 3 | x |"))
+    assert errors == ["step '1.1 Cancel operation': min, likely and max must be numbers"]
+    _, errors = totals(ANALYSIS.replace("| 2 | 3 | 6 |", "| 4 | 3 | 6 |"))
+    assert errors == ["step '1.1 Cancel operation': expected min <= likely <= max"]
+    result, _ = totals(ANALYSIS)
+    errors = check(result, CLIENT.replace("5,5 h", "5 h").replace("| Cancellation email", "| Email"))
+    assert errors == [
+        "client.md: block 'Item cancellation' should show 3–9 h, expected 5.5 h",
+        "client.md: no table row for block 'Cancellation email'",
+    ]
+    errors = check(result, CLIENT_TEXT_NUMBERS)
+    assert errors == [
+        "client.md: block 'Item cancellation' should show 3–9 h, expected 5.5 h",
+        "client.md: no total row showing 6.3–13.2 h, expected 9.5 h",
+    ]

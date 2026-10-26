@@ -172,5 +172,14 @@ def test_estimate_totals_reports_bad_rows_and_client_mismatch():
     errors = check(result, CLIENT_TEXT_NUMBERS)
     assert errors == [
         "client.md: block 'Item cancellation' should show 3–9 h, expected 5.5 h",
-        "client.md: no total row showing 6.3–13.2 h, expected 9.5 h",
+        "client.md: no total row showing 6.3–13.2 h, expected 9.5 h in the table of the blocks",
     ]
+    swapped = CLIENT.replace("| 3–9 h | 5,5 h |", "| 5,5–9 h | 3 h |")
+    assert check(result, swapped) == ["client.md: block 'Item cancellation' should show 3–9 h, expected 5.5 h"]
+    total_row = "| **Razem** | 6,3–13,2 h | 9,5 h |\n"
+    total_elsewhere = CLIENT.replace(total_row, "") + "\n" + total_row
+    assert check(result, total_elsewhere) == [
+        "client.md: no total row showing 6.3–13.2 h, expected 9.5 h in the table of the blocks"
+    ]
+    _, errors = totals(ANALYSIS.replace("| Step | Block | Min |", "| Step | Area | Min |", 1))
+    assert errors[0].startswith("step '1.1 Cancel operation': no column block")

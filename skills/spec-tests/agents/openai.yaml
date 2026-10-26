@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills Spec Tests"
+  short_description: "Which spec scenarios are verified by tests: covered, partial, missing"
+  default_prompt: "Use $as:spec-tests to report which contract scenarios in docs/spec/ have tests."
+policy:
+  allow_implicit_invocation: false

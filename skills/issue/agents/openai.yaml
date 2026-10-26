@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills Issue"
+  short_description: "Save known problems to docs/issues/ with priority, evidence and a suggested fix"
+  default_prompt: "Use $as:issue to save the problems we found so we can fix them later."
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills Fix"
+  short_description: "Fix known problems from docs/issues/, most important first"
+  default_prompt: "Use $as:fix to show the open issues and fix the most important one."
+policy:
+  allow_implicit_invocation: false

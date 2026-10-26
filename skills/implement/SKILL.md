@@ -35,7 +35,9 @@ Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex):
 6. **Deviations** — when the plan is wrong or incomplete (a missing step, a different file, a scenario that cannot
    hold), stop: show the problem with evidence and propose an edit to `## Plan` (or to the scenarios). Edit the
    proposal only after approval, then continue. Never silently implement something other than the plan.
+   A problem outside the plan noticed on the way (a bug in nearby code, a missing test) is not fixed in passing:
+   offer to save it as an issue per [../issue/references/issue-format.md](../issue/references/issue-format.md).
 7. Repeat 3–6 until no step is unticked, or the user stops. Ask before continuing past each milestone.
-8. **Summary** — steps done, tests added (with scenario IDs), plan edits, open items (unticked steps, `**Verify:**` and
-   `**Rollout:**` from the proposal). Do not commit. Next: `as:finish` — it checks the code against the proposal and
+8. **Summary** — steps done, tests added (with scenario IDs), plan edits, issues saved, open items (unticked steps,
+   `**Verify:**` and `**Rollout:**` from the proposal). Do not commit. Next: `as:finish` — it checks the code against the proposal and
    merges it into the spec.

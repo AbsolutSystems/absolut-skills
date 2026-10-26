@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.6.0
+
+- Known problems live in `docs/issues/`: one Markdown file per problem, `p<1-4>-<slug>.md` with the priority in the
+  name (`p1` data loss, security or a blocker … `p4` clean-up), kind, effort, evidence (file, symbol and a code excerpt, never
+  line numbers) and a suggested fix; fixed means
+  deleted in the same diff. Format and priority rubric in `issue/references/issue-format.md`.
+- New `issue` skill: saves a described problem, or collects the findings reported earlier in the conversation (for
+  example by `/code-review` or `/claude-security`) and asks which to save; checks the evidence, merges duplicates.
+- New `fix` skill: lists open issues by priority and effort and recommends one, or takes a slug or a request ("10 most
+  important bugs"); re-checks the evidence, fixes small ones test-first and deletes the issue, plans larger ones as a
+  change proposal with an `**Issue:**` meta line. Replaces `tech-lead health` / `H-NNN`; `tech-lead` routes "fix the
+  most important bugs" to it.
+- Skills save what they do not fix now (with consent): `finish` (unfixed Must/Should review findings, deferred
+  regressions, failing new tests) and closes the issue of an archived proposal; `health` (larger findings, with the
+  finding's `**Key:**`) and deletes the issues whose findings are gone; `spec-docs` and `init` (behaviour confirmed as
+  a bug, instead of an open-question note; existing bug notes are moved); `tech-lead` (a deferred bug with its root
+  cause); `implement` (problems outside the plan).
+- One command, one job: new `docs-check` skill (audit of agent docs, spec and plugins without writes) replaces
+  `--check` of `agent-docs`, `spec-docs` and `init`; new `spec-tests` skill replaces `spec-docs --tests`. Removed
+  `health --no-fix`, `init --no-principles` and `init --no-plugins` — those steps already ask.
+- `help`: "Which command" table ("I want to… → command") shown first and as the `which` topic, also in README;
+  `issues` topic and Known issues flow.
+
 ## 1.5.0
 
 - New `estimate` skill: analyses a client's feature request against the code and spec, flags gaps, conflicts with

@@ -19,6 +19,11 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
   `references/analysis.md`.
 - `health` — periodic whole-project check; writes HTML to `docs/health/`; owns `assets/health.css`,
   `references/html-format.md` and `scripts/git_signals.py`.
+- `issue` — saves known problems to `docs/issues/`; owns `references/issue-format.md` (file name, priority rubric,
+  lifecycle), which every skill that saves or closes issues links.
+- `fix` — works through `docs/issues/`; reuses the `tech-lead` Bug and Feature paths.
+- `docs-check` — read-only audit: `agent-docs` and `spec-docs` steps 1–4, plugin status.
+- `spec-tests` — scenario test coverage report; the brief lives in `spec-docs/references/analysis.md`.
 - `worktree-create`, `worktree-close` — branch + git worktree in `../<repo>-worktrees/`; close keeps the branch.
 
 ## Dependencies between skills
@@ -31,6 +36,9 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
 - Renaming or restructuring a step or reference in one skill means updating every skill that links to it — the
   validator checks link targets and `#anchors`, but not step numbers or section names quoted in prose.
 - `references/recommended-plugins.md` (repo root) is shared by `init` and `help`.
+- `fix` follows `tech-lead`'s `#bug` and `#feature` paths and `tech-lead` routes known-issue requests to `fix/SKILL.md`;
+  `docs-check` follows `agent-docs` and `spec-docs` steps 1–4 and `init` step 6 by number — renumbering them means
+  updating it. `health` closes issues by their `**Key:**`, so the snapshot `key` format and `issue-format.md` change together.
 
 ## Pitfalls
 
@@ -47,6 +55,9 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
   the plan or scenarios only after approval), `finish` merges and archives, `spec-docs` only reads (and converts legacy HTML
   proposals); `docs/estimates/` — `estimate` writes, `tech-lead` only sets `**Status:** accepted`; the working
   principles block in a project's root `AGENTS.md` — `init` writes, `agent-docs` preserves.
+- `docs/issues/` — any skill that finds a problem writes, only with the user's consent; deleted (with the fix, in the
+  same diff) by `fix`, `tech-lead` (Bug), `finish` (archiving a proposal with `**Issue:**`) and `health` (finding
+  gone). Never numbered: the priority prefix and slug avoid cross-branch collisions.
 - Files generated in user projects are in English, except spec pages (`spec-docs --lang`) and pages that follow
-  their language (`lang` in the marker on the first line of `docs/spec/index.md`): change proposals, health reports and
-  estimate analyses; an estimate's `client.md` follows the client's request (`estimate --lang`).
+  their language (`lang` in the marker on the first line of `docs/spec/index.md`): change proposals, health reports,
+  issues and estimate analyses; an estimate's `client.md` follows the client's request (`estimate --lang`).

@@ -2,7 +2,7 @@
 name: agent-docs
 description: "Build or update minimal documentation for coding agents that holds only what the code cannot tell: a short repo-root AGENTS.md, per-application AGENTS.md (commands, unenforced rules, internal libraries, target vs legacy) with on-demand .guidelines/, and module AGENTS.md only where a module has pitfalls or rules, each with a CLAUDE.md that imports it. Analyses the code to ask the team the right questions, detects drift, prunes lines the code already shows, recommends improvements. Use only when the user explicitly invokes as:agent-docs."
 disable-model-invocation: true
-argument-hint: "[path] [--check] [--depth N]"
+argument-hint: "[path] [--depth N]"
 ---
 
 # Agent docs
@@ -20,8 +20,9 @@ The code analysis exists to ask the team good questions; their answers are the m
 Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex):
 
 - `[path]` — limit the run to this subtree (default: repository root). Parents of the subtree are read for context but not rewritten.
-- `--check` — audit only: produce the report, questions and recommendations, write nothing.
 - `--depth N` — deepest directory level that may get its own `AGENTS.md` (default 4, counted from the repo root).
+
+An audit without writes is `as:docs-check`.
 
 Host-specific mechanics (subagents, asking questions): [Claude Code](../../references/claude-tools.md), [Codex](../../references/codex-tools.md).
 
@@ -109,7 +110,7 @@ Then a **Recommendations** section: what would make a coding agent more effectiv
 command to run a single test, no lint/format script, undocumented environment variables or missing `.env.example`, no
 reference module to copy when adding a new one, inconsistent naming, a detected area without a guideline.
 
-With `--check`, stop here. Otherwise ask for approval: all, a selected subset, or cancel.
+Ask for approval: all, a selected subset, or cancel.
 
 ### 5. Write
 

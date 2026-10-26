@@ -65,7 +65,7 @@ Hotspots in this module: {files with churn and complexity}
 Coverage: {per-file coverage or "unknown"}
 Frequently fixed tests: {list or "none"}
 Testing guideline: {path to .guidelines/testing-guideline.md or "none"}
-Spec scenarios without tests: {from spec-docs --tests, or "n/a"}
+Spec scenarios without tests: {from as:spec-tests, or "n/a"}
 
 Read the module's tests, starting with those covering the hotspots, and the production code they exercise.
 Report, each with file paths and a one-line reason:

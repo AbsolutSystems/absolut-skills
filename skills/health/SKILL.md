@@ -1,8 +1,8 @@
 ---
 name: health
-description: "Periodic health check of the whole project (or a subtree): hotspots (churn x complexity), structural and change coupling, test coverage and test quality (missing, excessive or weak tests), dead code, duplication, dependencies and docs drift. Uses tools the project already has, runs missing ones ephemerally with consent, falls back to git history and code reading. Writes a dated HTML report and metrics snapshot to docs/health/ with trends, then fixes the small items the user picks; larger ones are planned later with as:tech-lead health / H-NNN. Use only when the user explicitly invokes as:health."
+description: "Periodic health check of the whole project (or a subtree): hotspots (churn x complexity), structural and change coupling, test coverage and test quality (missing, excessive or weak tests), dead code, duplication, dependencies and docs drift. Uses tools the project already has, runs missing ones ephemerally with consent, falls back to git history and code reading. Writes a dated HTML report and metrics snapshot to docs/health/ with trends, then fixes the small items the user picks and saves the larger ones to docs/issues/ for as:fix. Use only when the user explicitly invokes as:health."
 disable-model-invocation: true
-argument-hint: "[path] [--quick] [--since <period>] [--no-fix]"
+argument-hint: "[path] [--quick] [--since <period>]"
 ---
 
 # Health
@@ -16,7 +16,6 @@ Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex):
 - `[path]` — limit the run to this subtree (default: repository root).
 - `--quick` — git signals and already configured tools only: no coverage run, no ephemeral tools, no test-quality review.
 - `--since <period>` — git history window, in `git log --since` syntax (default `12 months`).
-- `--no-fix` — stop after the report.
 
 Host-specific mechanics (subagents, asking questions): [Claude Code](../../references/claude-tools.md), [Codex](../../references/codex-tools.md).
 
@@ -56,8 +55,8 @@ Run independent parts in parallel; see [references/signals.md](references/signal
 - **Git** (always, main thread): churn per file, hotspots, change coupling across modules, frequently fixed tests,
   ownership concentration.
 - **Tools**: complexity, structural coupling and cycles, coverage, dead code, duplication, dependencies.
-- **Docs**: the `as:agent-docs --check` and `as:spec-docs --check` analyses in report-only form (no questions, no
-  writes), `as:spec-docs --tests` when `docs/spec/` exists, and open change proposals in `docs/spec/changes/` older
+- **Docs**: the `as:docs-check` analyses (`agent-docs` and `spec-docs` steps 2–4) in report-only form (no questions,
+  no writes), the `as:spec-tests` coverage report when `docs/spec/` exists, and open change proposals in `docs/spec/changes/` older
   than 30 days (a `docs` finding: implement, merge with `as:finish`, or drop).
 - **Test quality** (not with `--quick`): one read-only subagent per module with the brief from
   [references/signals.md](references/signals.md), focused on hotspots — gaps (risky code without tests, untested error
@@ -72,8 +71,10 @@ If a tool fails, record it in the report and continue with the remaining signals
   severity (`high | medium | low`), effort (`S | M | L`), evidence, suggested action. Order as described in
   [references/signals.md](references/signals.md) ("Prioritising").
 - Compare with the baseline findings: mark which earlier findings are resolved and which persist.
-- A finding whose `key` appears in an open proposal in `docs/spec/changes/` (`**Health:**` meta line, written by
-  `as:tech-lead`) is in progress: link the proposal in its suggested action.
+- A finding whose `key` is the `**Key:**` of an issue in `docs/issues/` is tracked: link the issue (and the open
+  proposal that links the issue, if any) in its suggested action instead of proposing it again. Proposals written
+  before 1.6.0 carry the key in a `**Health:**` meta line — treat them the same.
+- An issue with a `**Key:**` whose finding is not found any more (and its scope was checked in this run) is resolved.
 
 ### 5. Report
 
@@ -87,20 +88,20 @@ If a tool fails, record it in the report and continue with the remaining signals
 Check the written pages: `grep -nE 'style=|<style|<script|<svg' docs/health/*.html` finds nothing, and
 every relative link resolves.
 
-With `--no-fix`, finish here with a short summary.
-
 ### 6. Act
 
-Ask which findings to handle (multi-select; `S` effort preselected).
+Ask which findings to fix now (multi-select; `S` effort preselected; none is a valid answer).
 
 - **`S` findings** — fix one at a time: run the module's tests, make the change, rerun the tests, check it against
   [../finish/references/review.md](../finish/references/review.md). New tests follow the app's
   `.guidelines/testing-guideline.md`.
 - **Removing tests** — only with explicit consent per test, with the reason shown, and never a test that is the only
   one covering a spec scenario or an error path.
-- **`M` and `L` findings** — do not implement here. The snapshot keeps them; list each with its next command,
-  `as:tech-lead H-NNN` (plan, change proposal), then `as:implement` and `as:finish`. `as:tech-lead health` later picks
-  the next finding from the newest snapshot.
+- **`M` and `L` findings** — do not implement here. Ask which of the findings not fixed now to save as issues
+  (multi-select; untracked `high` and `medium` preselected) and write them per
+  [../issue/references/issue-format.md](../issue/references/issue-format.md): priority from severity as the format
+  maps it, `**Kind:**` = category, `**Source:**` `as:health`, `**Key:**` = the finding's key. `as:fix` picks them up.
+- **Resolved issues** — the issues found resolved in step 4: offer to delete them (`git rm`, multi-select).
 
-Finish with a summary: findings fixed, findings left for `as:tech-lead`, files changed. Do not commit; suggest `as:finish` on the
+Finish with a summary: findings fixed, issues saved and deleted, files changed. Do not commit; suggest `as:finish` on the
 changes, then committing.

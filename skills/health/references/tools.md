@@ -49,7 +49,7 @@ boundaries (from `AGENTS.md`/`architecture-guideline.md`).
 | .NET | coverlet | `dotnet test --collect:"XPlat Code Coverage" --results-directory <tmp>` |
 
 Prefer a fresh existing report. Running the suite is "runs the test suite" cost — ask first.
-Contract coverage comes from `as:spec-docs --tests` when `docs/spec/` exists.
+Contract coverage comes from `as:spec-tests` when `docs/spec/` exists.
 
 ## Dead code and unused dependencies
 

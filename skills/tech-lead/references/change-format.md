@@ -118,8 +118,9 @@ Support handles ~40 requests a week to remove one item; today the whole order mu
 - Changed and removed scenarios outside an added requirement go under a `### Changed scenarios` heading.
 - When the change touches several modules, put a `**Module:** [Orders](../backend/orders.md)` line before each module's
   requirements and scenarios, so heading levels stay the same as on module pages.
-- A proposal that comes from an `as:health` finding adds `` · **Health:** H-007 · `<key>` `` to the meta line; the
-  `key` is the finding's key from the snapshot, so `as:health` and `as:tech-lead` see the finding is planned.
+- A proposal that fixes an issue from `docs/issues/` adds `` · **Issue:** `<slug>` `` to the meta line
+  (one per issue; a plain slug, not a link — the file's priority prefix may change and the file is deleted when fixed), so `as:fix` skips the planned issue and `as:finish` deletes it when the proposal is
+  archived as `implemented`. Proposals written before 1.6.0 may carry `` · **Health:** H-007 · `<key>` `` instead.
 - A proposal planned from an `as:estimate` analysis adds `· **Estimate:**` and a link to
   `../../estimates/<slug>/analysis.md` to the meta line.
 - `**Status:**` in the meta line is `open`, then `implemented` or `dropped` when archived; `as:finish` updates it.

@@ -52,7 +52,7 @@ Return exactly these sections:
 8. Open questions — what the code cannot tell; propose likely answers as options.
 ```
 
-## Coverage brief (`--tests`, one module)
+## Coverage brief (`as:spec-tests`, one module)
 
 ```text
 You are checking whether the tests of one module verify its specified contract. Read-only: do not modify files.

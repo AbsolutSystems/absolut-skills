@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills Docs Check"
+  short_description: "Audit AGENTS.md docs and the spec against the code, no writes"
+  default_prompt: "Use $as:docs-check to check whether the agent docs and the spec still match the code."
+policy:
+  allow_implicit_invocation: false

@@ -1,8 +1,8 @@
 ---
 name: spec-docs
-description: "Build or update a human-readable Markdown specification of the application in docs/spec/: a system overview, per-application pages and per-module contract pages with requirements and Given/When/Then scenarios (happy, error and edge paths) with stable IDs, formatted to read well rendered and in diffs. Converts a legacy HTML spec to Markdown. Can audit drift against the code and report which contract scenarios are covered by tests. Use only when the user explicitly invokes as:spec-docs."
+description: "Build or update a human-readable Markdown specification of the application in docs/spec/: a system overview, per-application pages and per-module contract pages with requirements and Given/When/Then scenarios (happy, error and edge paths) with stable IDs, formatted to read well rendered and in diffs. Converts a legacy HTML spec to Markdown. Behaviour confirmed as a bug goes to docs/issues/, not into the spec. Use only when the user explicitly invokes as:spec-docs."
 disable-model-invocation: true
-argument-hint: "[path] [--check] [--tests] [--lang en|pl]"
+argument-hint: "[path] [--lang en|pl]"
 ---
 
 # Spec docs
@@ -14,11 +14,11 @@ scenarios are the yardstick for contract-level tests.
 Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex):
 
 - `[path]` — limit the run to this subtree (default: repository root). Pages outside it are read for context but not rewritten.
-- `--check` — audit only: report drift between the spec and the code, ask questions, write nothing.
-- `--tests` — test coverage report only: map every scenario to the tests that verify it, write nothing.
 - `--lang en|pl` — language of the page content (default `en`). IDs, anchors, file names and the fixed values of the
   format (kinds, statuses) stay English.
   When updating existing pages, keep their language unless the user asked to change it.
+
+An audit without writes is `as:docs-check`; the scenario test coverage report is `as:spec-tests`.
 
 Host-specific mechanics (subagents, asking questions): [Claude Code](../../references/claude-tools.md), [Codex](../../references/codex-tools.md).
 
@@ -71,8 +71,6 @@ Fan out one read-only subagent per module (batch tiny sibling modules into one),
 Each gets the spec brief from [references/analysis.md](references/analysis.md) with the existing page content and the
 existing IDs for that module, and returns the structured report defined there.
 
-With `--tests`, skip this step and go to [Test coverage](#test-coverage).
-
 If the host has no subagents, do the same analysis sequentially in the main thread, in the same order.
 
 ### 3. Clarify with the user
@@ -80,7 +78,10 @@ If the host has no subagents, do the same analysis sequentially in the main thre
 Collect open questions from all reports, deduplicate, and ask in small batches, most impactful first, with options
 derived from the code. Typical questions:
 
-- Is this behaviour an intended business rule or a bug? (Only intended rules go into the spec.)
+- Is this behaviour an intended business rule or a bug? Only intended rules go into the spec. A bug becomes an issue
+  candidate (kind `bug`, with the evidence from the report and the intended behaviour from the answer) per
+  [../issue/references/issue-format.md](../issue/references/issue-format.md), saved in step 5 — not a note on the
+  page.
 - Who the actors are and what a term means in the business domain (glossary).
 - Whether an operation is public contract or internal (used by other modules only by accident).
 - What should happen in an unhandled error case — record the answer as an open question on the page if it is not
@@ -102,7 +103,13 @@ Below the table list scenario changes per page: added (new IDs), changed (ID + w
 marked removed, not deleted). For a migration also list the files outside `docs/spec/` whose links will be
 rewritten, and whether `docs/spec/spec.css` can be removed.
 
-With `--check`, stop here. Otherwise ask for approval: all, a selected subset, or cancel.
+Then the issue candidates: the bugs from step 3, and existing `> [!NOTE]` open questions that describe a confirmed
+bug rather than an open decision (written that way before 1.6.0) — these move to issues and their notes are removed.
+Such a note says what the code does now and what it should do ("known gap", "currently X, should be Y", "is lost
+instead of deferred"); a note that asks what the behaviour should be stays a question. Unsure → ask. Each moved note
+is re-checked in the code first, so its issue gets current evidence (symbol and excerpt), not just the note's text.
+
+Ask for approval: all, a selected subset, or cancel; issues are chosen separately (multi-select).
 
 ### 5. Write
 
@@ -114,6 +121,8 @@ With `--check`, stop here. Otherwise ask for approval: all, a selected subset, o
   (fragments unchanged) in the converted pages and, only in their link targets, in the files listed in the report.
   Delete `docs/spec/spec.css` unless something still links it (`git grep -l 'spec/spec.css'`) — then keep it and say
   that `as:health` relinks its reports on the next run.
+- Approved issues: write them to `docs/issues/` per the issue format (duplicates update the existing file), and
+  remove the open-question notes they replace.
 - New pages from the skeletons in [references/markdown-format.md](references/markdown-format.md).
 - Existing pages: minimal edits. Keep hand-written text, fix only false or missing facts, keep every existing ID.
   New scenarios take the next free number for the prefix. Removed scenarios get the removed status and stay.
@@ -138,29 +147,7 @@ With `--check`, stop here. Otherwise ask for approval: all, a selected subset, o
 The script has no dependencies; suggest the user add it to CI (copied into the repository) so the spec stays
 checkable without an agent.
 
-Finish with a short summary (pages created / updated / left as is, scenarios added / removed, open questions) and
+Finish with a short summary (pages created / updated / left as is, scenarios added / removed, open questions, issues
+saved — fix them with `as:fix`) and
 suggest reading `docs/spec/index.md` in the repository browser or the IDE's Markdown preview and reviewing `git diff`. If pages were created or removed and the
 repository has `AGENTS.md` files, suggest running `as:agent-docs` so the app docs link the new pages.
-
-## Test coverage
-
-`--tests` is read-only and requires an existing `docs/spec/`. It answers: does each promise in the contract have a test
-that checks it through the module's public entry points?
-
-1. Collect all active scenarios (status not `removed`) with their ID, module, kind and Given/When/Then text. Legacy
-   HTML pages are read as they are; suggest migrating them.
-2. **Cheap pass:** search test sources for each scenario ID (`git grep -n '<ID>'` over test directories) — in test names,
-   tags/annotations or comments. A hit is a candidate match.
-3. **Semantic pass:** for scenarios without a hit, fan out one read-only subagent per module with the coverage brief
-   from [references/analysis.md](references/analysis.md). It reads the module's tests and classifies each scenario.
-   Tests that only exercise internal classes do not count as contract coverage, but are mentioned as `PARTIAL` evidence.
-4. Report per module, one row per scenario:
-
-| ID | Kind | Status | Evidence |
-|----|------|--------|----------|
-| `ORD-003` | error | `COVERED` / `PARTIAL` / `MISSING` | test file path and test name, or what is missing |
-
-Then a summary per module and in total: covered / partial / missing, with a separate count for `error` and `edge`
-scenarios (unhappy paths are usually the gap). End with recommendations: which missing scenarios matter most, and — if
-the cheap pass found few IDs — tagging contract tests with scenario IDs so future runs map them deterministically.
-Do not write tests.

@@ -2,17 +2,21 @@
 
 | Skill | Claude Code | Codex | Purpose |
 |-------|-------------|-------|---------|
-| `help` | `/as:help` | `$as:help` | Installation check, recommended plugins status, the flows (client request estimate, feature, bug, health fixes), and how to work with `as`, Anthropic plugins and plan mode |
-| `tech-lead` | `/as:tech-lead` | `$as:tech-lead` | Design partner (auto-invoked): grounds features and bugs in code and spec, compares architectures, writes a change proposal with the plan as a checklist, hands off to plan mode; `health` / `H-NNN` plans the next fix from the health snapshot; `docs/estimates/<slug>` plans an accepted estimate |
+| `help` | `/as:help` | `$as:help` | Installation check, recommended plugins status, the flows (client request estimate, feature, bug, known issues, health), and how to work with `as`, Anthropic plugins and plan mode |
+| `tech-lead` | `/as:tech-lead` | `$as:tech-lead` | Design partner (auto-invoked): grounds features and bugs in code and spec, compares architectures, writes a change proposal with the plan as a checklist, hands off to plan mode; `docs/estimates/<slug>` plans an accepted estimate |
 | `estimate` | `/as:estimate` | `$as:estimate` | Client feature request → analysis partner: grounds it in code, flags gaps, conflicts and better alternatives, prices a step plan in hours (min / likely / max) and writes an internal analysis plus a client document (PRD, estimate, questions, suggestions) to `docs/estimates/<slug>/` |
 | `implement` | `/as:implement` | `$as:implement` | Executes the approved `## Plan` of the branch's change proposal step by step in any session: tests first, tick, stop on deviations |
 | `init` | `/as:init` | `$as:init` | Onboard a repo: `agent-docs`, then `spec-docs` for a chosen scope, then links between them |
 | `finish` | `/as:finish` | `$as:finish` | Wrap up a feature: simplify, review, spec drift check, missing contract tests, docs refresh — for the branch's changes |
-| `health` | `/as:health` | `$as:health` | Periodic project health: hotspots, coupling, coverage and test quality, dead code, deps, docs drift; report with trends in `docs/health/`; larger findings go to `tech-lead health` |
+| `issue` | `/as:issue` | `$as:issue` | Save known problems (described, or found earlier in the conversation, e.g. by `/code-review`) to `docs/issues/p<1-4>-<slug>.md` with evidence |
+| `fix` | `/as:fix` | `$as:fix` | Work through `docs/issues/` by priority: re-check, fix test-first and delete the issue, or plan larger ones as a proposal |
+| `health` | `/as:health` | `$as:health` | Periodic project health: hotspots, coupling, coverage and test quality, dead code, deps, docs drift; report with trends in `docs/health/`; larger findings go to `docs/issues/` |
 | `worktree-create` | `/as:worktree-create` | `$as:worktree-create` | New branch and git worktree in `../<repo>-worktrees/<name>`, from the current branch or `from <branch>`; optionally copies `.env*` and installs dependencies |
 | `worktree-close` | `/as:worktree-close` | `$as:worktree-close` | Offers to commit leftovers, then removes the worktree folder; the branch stays |
-| `agent-docs` | `/as:agent-docs` | `$as:agent-docs` | Build and audit minimal `AGENTS.md`/`CLAUDE.md` docs and `.guidelines/` holding only what the code cannot tell; prunes the rest |
-| `spec-docs` | `/as:spec-docs` | `$as:spec-docs` | Human-readable Markdown spec of module contracts (scenarios with stable IDs) in `docs/spec/`, plus scenario test coverage report |
+| `docs-check` | `/as:docs-check` | `$as:docs-check` | Audit agent docs and the spec against the code without writing; offers to save problems as issues |
+| `agent-docs` | `/as:agent-docs` | `$as:agent-docs` | Build and update minimal `AGENTS.md`/`CLAUDE.md` docs and `.guidelines/` holding only what the code cannot tell; prunes the rest |
+| `spec-docs` | `/as:spec-docs` | `$as:spec-docs` | Human-readable Markdown spec of module contracts (scenarios with stable IDs) in `docs/spec/`; bugs go to `docs/issues/` |
+| `spec-tests` | `/as:spec-tests` | `$as:spec-tests` | Which spec scenarios are verified by tests (`COVERED` / `PARTIAL` / `MISSING`) |
 
 Every skill lives in `skills/<name>/`:
 

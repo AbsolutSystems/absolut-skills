@@ -14,6 +14,11 @@ How to write and change skills, references and assets in `skills/` and `referenc
 - Host-agnostic text only: refer to "subagents" and "ask the user"; put tool names (AskUserQuestion, EnterPlanMode,
   Skill tool, Codex equivalents) in `references/claude-tools.md` / `references/codex-tools.md`.
 - Arguments: document them under "Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex)".
+  An argument is a target (path, description, name) or a tuning value (`--lang`, `--depth`, `--since`). A mode that
+  changes the procedure (audit only, a report of another kind) is a separate skill, not a flag; do not add a flag
+  that duplicates a question the skill already asks.
+- A problem a skill finds and does not fix now is offered as an issue per
+  `skills/issue/references/issue-format.md` (with consent), not left only in the summary.
 - Links are relative to the file and must resolve (checked by the validator); refer to other skills by path, not by copying.
 - Assets that projects receive (e.g. `health.css`) are copied with a shell copy by the skill, never retyped by the agent.
 - Deterministic work the agent would otherwise redo in every run (counting, parsing, linting) goes to

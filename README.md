@@ -49,12 +49,30 @@ Then check: `$as:help`. Update later with `codex plugin marketplace upgrade`.
 Point either host at a local clone instead of `AbsolutSystems/absolut-skills`, e.g.
 `claude plugin marketplace add ./absolut-skills` or `codex plugin marketplace add ./absolut-skills`.
 
+## Which command when
+
+| I want to… | Command |
+|------------|---------|
+| start with a repository (agent docs, spec, plugins) | `/as:init` |
+| design a feature, investigate a bug, choose between options | `/as:tech-lead` (also starts on its own) |
+| analyse and price a client's feature request | `/as:estimate` |
+| continue an approved plan, also in a new session | `/as:implement` |
+| wrap up a feature before the PR (simplify, review, spec, tests, docs) | `/as:finish` |
+| save a problem to fix later (also findings of `/code-review`) | `/as:issue` |
+| fix the saved problems, most important first | `/as:fix` |
+| check whether agent docs and spec still match the code (no writes) | `/as:docs-check` |
+| update agent docs / the spec | `/as:agent-docs` / `/as:spec-docs` |
+| see which spec scenarios have no tests | `/as:spec-tests` |
+| review the health of the whole project | `/as:health` |
+| work on several branches at once | `/as:worktree-create` / `/as:worktree-close` |
+| learn how it all fits together | `/as:help flows` |
+
 ## How to work with `as`
 
 Three ideas run through every command:
 
-- **State lives in files, not in the conversation.** A plan is a checklist in `docs/spec/changes/<slug>.md`, a health
-  check is a snapshot in `docs/health/<date>.json`. Any step can continue in a new session or with a cheaper model.
+- **State lives in files, not in the conversation.** A plan is a checklist in `docs/spec/changes/<slug>.md`, a known
+  problem is a file in `docs/issues/`, a health check is a snapshot in `docs/health/<date>.json`. Any step can continue in a new session or with a cheaper model.
 - **Nothing is written to code before you approve a plan**, and nothing is committed by `as` — you commit at the end.
 - **Docs follow the code.** `AGENTS.md` tells agents what the code cannot; `docs/spec/` describes module contracts as
   scenarios with stable IDs (`ORD-003`) that tests refer to. `as:finish` keeps both current.
@@ -97,34 +115,47 @@ module gets a short plan without a proposal.
 ```text
 /as:tech-lead why are refunds sometimes doubled?
     → reproduces, finds the violated or missing scenario, verifies hypotheses, root cause
-    → failing test first, then the fix after you approve the plan
+    → failing test first, then the fix after you approve the plan (or saved to docs/issues/ if you defer it)
 /as:finish
 ```
 
-### 5. Health check and fixes (once a sprint or month)
+### 5. Known issues
 
 ```text
-/as:health                          # report + snapshot in docs/health/, then fixes the small (S) items you pick
-/as:tech-lead health                # later: proposes the next findings from the snapshot, plans the one you choose
-/as:tech-lead H-007                 # ... or plan one finding directly
-/as:implement                       # execute the plan, then /as:finish and commit
+/as:issue                           # after /code-review, /claude-security or a review: save the findings you defer
+/as:fix                             # open issues by priority, recommends one, fixes it and deletes its file
+/as:fix 10 most important bugs      # ... or a selection, one by one; larger ones get a proposal → /as:implement
 ```
 
-The proposal records the finding's key, so the next `/as:health` shows it as in progress and, once merged, as resolved.
+Every skill that finds a problem it does not fix now (`finish` review, `health`, `spec-docs` "rule or bug?",
+`tech-lead` bug, `implement`) offers to save it as `docs/issues/p<1-4>-<slug>.md` — priority in the file name, so
+`ls docs/issues` is the list. Fixed means deleted, in the same diff as the fix.
 
-### 6. Parallel work
+### 6. Health check (once a sprint or month)
+
+```text
+/as:health                          # report + snapshot in docs/health/, fixes the small (S) items you pick,
+                                    # saves the larger ones you choose to docs/issues/
+/as:fix                             # later: the Known issues flow
+```
+
+An issue from health keeps the finding's key, so the next `/as:health` shows it as tracked and closes it once the
+finding is gone.
+
+### 7. Parallel work
 
 ```text
 /as:worktree-create feature-x       # new branch + folder ../<repo>-worktrees/feature-x; open a new session there
 /as:worktree-close feature-x        # offers to commit leftovers, removes the folder, keeps the branch
 ```
 
-### 7. Keeping docs true
+### 8. Keeping docs true
 
 ```text
-/as:agent-docs --check              # audit AGENTS.md / .guidelines (drop --check to apply)
-/as:spec-docs --check               # spec drift against code (drop --check to apply)
-/as:spec-docs --tests               # which scenarios have no tests
+/as:docs-check                      # audit AGENTS.md, .guidelines and the spec against the code, no writes
+/as:agent-docs                      # apply: refresh AGENTS.md / .guidelines (asks before writing)
+/as:spec-docs                       # apply: refresh the spec (asks before writing)
+/as:spec-tests                      # which scenarios have no tests
 ```
 
 ### Plan mode and other plugins
@@ -143,23 +174,28 @@ and PRs, `code-review` on an open PR, `claude-security` for security-sensitive c
 | `docs/spec/changes/<slug>.md` | `tech-lead`, `implement` (ticks) | Open change proposal: decision, scenarios, `## Plan` |
 | `docs/spec/changes/archive/` | `finish` | Merged proposals — the decision log |
 | `docs/estimates/<slug>/` | `estimate` | Client request analysis and hour estimate: `analysis.md` (internal), `client.md` (to send) |
+| `docs/issues/p<1-4>-<slug>.md` | `issue`, `finish`, `health`, `spec-docs`, `tech-lead`, `implement`, `docs-check`, `spec-tests`; deleted by `fix`, `finish`, `health` | Known problems not fixed yet, one file each, priority in the name |
 | `docs/health/` | `health` | Dated HTML reports, JSON snapshots, index with trends |
 
 ## Commands
 
 | Command | Arguments | When |
 |---------|-----------|------|
-| `/as:help` | `[flows\|onboarding\|plan\|build\|review\|finish\|commit\|worktree\|docs\|health]` | How to work with `as`, installed plugins |
-| `/as:init` | `[path] [--spec <path>… \| all] [--no-spec] [--check] [--no-principles] [--no-plugins] [--lang en\|pl]` | Once per repository |
-| `/as:tech-lead` | `<feature, bug or question>` \| `health` \| `H-NNN` \| `docs/estimates/<slug>` | Before any non-trivial change; next health fix |
+| `/as:help` | `[which\|flows\|onboarding\|plan\|build\|review\|finish\|commit\|worktree\|docs\|health\|issues]` | How to work with `as`, installed plugins |
+| `/as:init` | `[path] [--spec <path>… \| all] [--no-spec] [--lang en\|pl]` | Once per repository |
+| `/as:tech-lead` | `<feature, bug or question>` \| `docs/estimates/<slug>` | Before any non-trivial change |
 | `/as:estimate` | `<request text or file> [--lang en\|pl]` \| `docs/estimates/<slug>` | Client asks for a feature quote; revision after answers |
 | `/as:implement` | `[slug] [--step <n>]` | Execute an approved plan, in any session |
 | `/as:finish` | `[base] [--no-simplify] [--no-review] [--no-tests] [--no-docs]` | Feature done, before the PR |
-| `/as:health` | `[path] [--quick] [--since <period>] [--no-fix]` | Once a sprint or month |
+| `/as:issue` | `[problem description]` | Save a problem you will not fix now |
+| `/as:fix` | `[slug or request]` | Work through `docs/issues/`, most important first |
+| `/as:health` | `[path] [--quick] [--since <period>]` | Once a sprint or month |
 | `/as:worktree-create` | `<name> [from <branch>]` | Start parallel work |
 | `/as:worktree-close` | `[<name>]` | Parallel work done |
-| `/as:agent-docs` | `[path] [--check] [--depth <n>]` | Agent docs audit or refresh |
-| `/as:spec-docs` | `[path] [--check] [--tests] [--lang en\|pl]` | Spec audit, refresh, scenario test coverage |
+| `/as:docs-check` | `[path]` | Audit agent docs and spec, no writes |
+| `/as:agent-docs` | `[path] [--depth <n>]` | Agent docs refresh |
+| `/as:spec-docs` | `[path] [--lang en\|pl]` | Spec refresh |
+| `/as:spec-tests` | `[path]` | Scenario test coverage |
 
 ## Skills in detail
 
@@ -172,7 +208,7 @@ planning in plan mode, building, review, commit, keeping docs true, and how the 
 
 ```text
 /as:help                            # everything
-/as:help flows                      # one topic: flows | onboarding | plan | build | review | finish | commit | worktree | docs | health
+/as:help flows                      # one topic: which | flows | onboarding | plan | build | review | finish | commit | worktree | docs | health | issues
 ```
 
 ### `tech-lead` — design partner (starts on its own)
@@ -194,22 +230,39 @@ It sizes the task first: a small change in one module gets one recommendation an
 a change proposal.
 
 Bugs follow their own path: reproduce, find the violated or missing scenario, verify hypotheses, root cause, then a
-failing test first; after you approve the plan it implements the fix and suggests `/as:finish`. No production code is
-written before you approve the plan.
+failing test first; after you approve the plan it implements the fix and suggests `/as:finish`. A bug you defer is
+saved to `docs/issues/` with its root cause. No production code is written before you approve the plan.
 
 With `docs/estimates/<slug>` it plans a client-accepted `as:estimate` from its analysis: re-checks the listed code,
 asks only the open client questions, and starts from the estimate's steps, warning when the plan exceeds its `max`.
 
-It also plans fixes from the latest `as:health` snapshot: `health` lists the top findings that are not planned yet and
-recommends one; `H-NNN` takes one finding. It starts from the finding's evidence, keeps behaviour unchanged for
-refactors (tests pin it first), asks per test before removing any, and records the finding's key in the proposal.
+Asked to fix known problems ("fix the most important bugs"), it follows `as:fix` over `docs/issues/`.
 
 ```text
 /as:tech-lead I want customers to cancel single items of an order
 /as:tech-lead why are refunds sometimes doubled?
-/as:tech-lead health                # what to fix next from docs/health/
-/as:tech-lead H-007
 ```
+
+### `issue` and `fix` — known problems
+
+`docs/issues/` is a small file-based tracker: one Markdown file per problem not fixed yet, named
+`p<1-4>-<slug>.md` — `p1` data loss, security or a blocker, `p2` a broken main flow, `p3` an edge case or a
+workaround exists, `p4` clean-up — with kind, effort, evidence (file, `Class.method` and a code excerpt — no line numbers) and a suggested fix
+([format](skills/issue/references/issue-format.md)). Every skill that finds a problem it does not fix now offers to
+save it there; `issue` saves the ones found elsewhere.
+
+```text
+/as:issue                           # collect the findings of /code-review, /claude-security or a review, pick what to save
+/as:issue cooldown starts on a failed refresh   # one problem in your words
+/as:fix                             # open issues by priority and effort, recommends one
+/as:fix exhaustion-divides-by-zero  # one issue by slug or title words
+/as:fix 10 most important bugs      # a selection, fixed one by one
+```
+
+`fix` re-checks each issue's evidence against the current code (gone → offers to delete the file), fixes small ones
+test-first after you approve the plan and deletes the issue file in the same diff, and turns larger ones into a change
+proposal (`**Issue:** <slug>` in its meta line) for `/as:implement`; `/as:finish` deletes the issue when it archives
+that proposal. Refactors keep behaviour (tests pin it first); removing tests needs per-test consent.
 
 ### `estimate` — client feature request analysis and hour estimate
 
@@ -252,7 +305,7 @@ modules and extend it later with `spec-docs`.
 ```text
 /as:init                            # inventory, then asks which modules to specify
 /as:init --spec backend/orders      # spec only for the given modules (or --spec all / --no-spec)
-/as:init --check                    # audit both, write nothing
+/as:docs-check                      # audit both, write nothing
 ```
 
 With your consent it adds a fixed **Working principles** block to the repo root `AGENTS.md` — rules that keep agents
@@ -263,7 +316,7 @@ version changes; declining leaves an `off` marker so you are not asked again; `a
 Inspired by [ponytail](https://github.com/DietrichGebert/ponytail).
 
 At the end it checks the recommended Anthropic plugins (see `help` below) and installs missing ones after you
-agree; skip with `--no-plugins`.
+agree.
 
 Order matters: `agent-docs` settles apps, modules and boundaries cheaply; `spec-docs` reuses that and asks only about
 behaviour; links are added once the spec pages exist.
@@ -279,7 +332,7 @@ The counterpart of `init`, run after delivering a feature and before the PR. Wor
 ```
 
 1. **Scope** — changed files → touched modules. 2. **Baseline checks** — tests, lint, type-check, build; stops if red.
-3. **Simplify**, then tests. 4. **Review** — findings Must / Should / Nice, you pick fixes, then tests.
+3. **Simplify**, then tests. 4. **Review** — findings Must / Should / Nice, you pick fixes, then tests; unfixed ones can be saved to `docs/issues/`.
 5. **Analysis** — one read-only subagent per touched module reports only what the diff changed: proposal status, spec
 drift, new behaviour, its tests, stale docs.
 6. **Spec** — merges the branch's change proposal (plan, scenarios, `Verify`, IDs still free on the default branch),
@@ -302,7 +355,6 @@ dependencies, and docs drift.
 /as:health                          # full check, report, then fix the small items you pick
 /as:health --quick                  # git + already configured tools only
 /as:health backend --since "6 months"
-/as:health --no-fix                 # report only
 ```
 
 Tools: first what the project already has (JaCoCo, ArchUnit, dependency-cruiser, knip, …); missing ones run once
@@ -310,8 +362,8 @@ without being added to the project (`uvx lizard`, `npx madge`, `npx jscpd`, osv-
 git history and code reading always (churn, change coupling and frequently fixed tests are computed by
 `skills/health/scripts/git_signals.py`). The report goes to `docs/health/<date>.html` with a `<date>.json` snapshot, so
 the next run shows what improved or got worse. Small findings are fixed with tests before and after; tests are
-removed only with per-test consent; larger findings stay in the snapshot for `/as:tech-lead health` or
-`/as:tech-lead H-NNN`, which plans them for `/as:implement`.
+removed only with per-test consent; larger findings you choose are saved to `docs/issues/` (with the finding's key)
+for `/as:fix`, and the next run deletes the issues whose findings are gone.
 
 ### `worktree-create` / `worktree-close` — parallel branches in git worktrees
 
@@ -341,7 +393,6 @@ questions for the team — their answers are the valuable part.
 
 ```text
 /as:agent-docs                      # whole repository: analyse, ask, report, write after approval
-/as:agent-docs --check              # audit only: report, questions and recommendations, no writes
 /as:agent-docs backend              # limit the run to one subtree
 /as:agent-docs --depth 3            # deepest directory level that may get its own AGENTS.md (default 4)
 ```
@@ -387,8 +438,6 @@ paths. Scenario IDs (e.g. `ORD-003`) are stable, so tests can refer to them.
 
 ```text
 /as:spec-docs                       # analyse, ask, report, write docs/spec/ after approval
-/as:spec-docs --check               # audit only: drift between spec and code, no writes
-/as:spec-docs --tests               # coverage report: which scenarios are verified by tests (COVERED / PARTIAL / MISSING)
 /as:spec-docs --lang pl             # page content in Polish (default English)
 /as:spec-docs backend               # limit the run to one subtree
 ```
@@ -405,8 +454,14 @@ docs/spec/
 Pages are Markdown formatted for people: breadcrumbs, a one-line purpose, a table of contents, requirements as quoted
 SHALL sentences, scenarios marked ✅ happy / ❌ error / ⚠️ edge with Given/When/Then lists, open questions as callouts.
 They read well on GitHub/GitLab, in an IDE preview and in a diff. A spec written by an earlier version as HTML is
-converted to Markdown on the next run (content and IDs unchanged, links from `AGENTS.md` updated). To make `--tests` mapping deterministic, put the
-scenario ID in contract test names or tags (e.g. `@Tag("ORD-003")`, `it("ORD-003 rejects out-of-stock order")`).
+converted to Markdown on the next run (content and IDs unchanged, links from `AGENTS.md` updated). Behaviour you
+confirm as a bug is not specified: it goes to `docs/issues/` (older specs that parked bugs as open questions get them
+moved).
+
+An audit without writes is `/as:docs-check` (agent docs and spec together). `/as:spec-tests` reports which scenarios
+are verified by tests (`COVERED` / `PARTIAL` / `MISSING`) and can save the gaps as issues; to make its mapping
+deterministic, put the scenario ID in contract test names or tags (e.g. `@Tag("ORD-003")`,
+`it("ORD-003 rejects out-of-stock order")`).
 
 `skills/spec-docs/scripts/spec_lint.py` (Python, no dependencies) checks the spec mechanically: unique and well-formed
 IDs, no ID reserved twice by parallel branches (`--against origin/HEAD`), resolving links and anchors, no leftover

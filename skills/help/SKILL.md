@@ -1,8 +1,8 @@
 ---
 name: help
-description: "Show how to work with Claude Code (or Codex) using the as: commands, the recommended Anthropic plugins and plan mode: confirms the plugin is installed, lists as: skills, reports which recommended plugins are installed, and walks through the task workflow from onboarding to planning, building (implementing an approved plan), review, finishing a feature, commit, docs upkeep and periodic health checks, and how the commands chain into flows (client request estimate, feature, bug, health fixes). Use only when the user explicitly invokes as:help."
+description: "Show how to work with Claude Code (or Codex) using the as: commands, the recommended Anthropic plugins and plan mode: confirms the plugin is installed, lists as: skills, reports which recommended plugins are installed, and walks through the task workflow from onboarding to planning, building (implementing an approved plan), review, finishing a feature, commit, docs upkeep, periodic health checks and known issues, and how the commands chain into flows (client request estimate, feature, bug, known issues, health). Use only when the user explicitly invokes as:help."
 disable-model-invocation: true
-argument-hint: "[flows|onboarding|plan|build|review|finish|commit|worktree|docs|health]"
+argument-hint: "[which|flows|onboarding|plan|build|review|finish|commit|worktree|docs|health|issues]"
 ---
 
 # Help
@@ -12,16 +12,37 @@ current host: `/as:<skill>` in Claude Code, `$as:<skill>` in Codex.
 
 With a topic argument, show only that section of the guide. Without one, show:
 
-1. **Installed** — one line confirming that `as` is installed, then each skill from `skills/*/SKILL.md` next to this
-   file: its invocation and a one-line summary of its `description`.
-2. **Recommended plugins** — on Claude Code, check them as described in
+1. **Installed** — one line confirming that `as` is installed (skills from `skills/*/SKILL.md` next to this file that
+   are missing from the table below are listed with a one-line summary of their `description`).
+2. **Which command** — the [which](#which--which-command-for-what) table.
+3. **Recommended plugins** — on Claude Code, check them as described in
    [references/recommended-plugins.md](../../references/recommended-plugins.md) and show `INSTALLED` / `DISABLED` /
    `MISSING` per plugin. For missing or disabled ones, suggest `/as:init` or the `claude plugin` command. On Codex, say
    these are Claude Code plugins and skip.
-3. **Guide** — the sections below, concise, as a numbered workflow. Commands of plugins that are not installed are
+4. **Guide** — the sections below, concise, as a numbered workflow. Commands of plugins that are not installed are
    marked "(not installed)".
 
 ## Guide
+
+### which — which command for what
+
+Show this table as it is, in the user's language:
+
+| I want to… | Command |
+|------------|---------|
+| start with a repository (agent docs, spec, plugins) | `as:init` |
+| design a feature, investigate a bug, choose between options | `as:tech-lead` (also starts on its own) |
+| analyse and price a client's feature request | `as:estimate` |
+| continue an approved plan, also in a new session | `as:implement` |
+| wrap up a feature before the PR (simplify, review, spec, tests, docs) | `as:finish` |
+| save a problem to fix later (also findings of `/code-review`) | `as:issue` |
+| fix the saved problems, most important first | `as:fix` |
+| check whether agent docs and spec still match the code (no writes) | `as:docs-check` |
+| update agent docs / the spec | `as:agent-docs` / `as:spec-docs` |
+| see which spec scenarios have no tests | `as:spec-tests` |
+| review the health of the whole project | `as:health` |
+| work on several branches at once | `as:worktree-create` / `as:worktree-close` |
+| learn how it all fits together | `as:help flows` |
 
 ### flows — how the commands chain
 
@@ -32,15 +53,18 @@ Show these as short chains, then point to the sections below for details:
 - **Client request**: `as:estimate <request>` (analysis, PRD and hour estimate in `docs/estimates/<slug>/`;
   send `client.md`) → `as:estimate docs/estimates/<slug>` with the client's answers → after acceptance
   `as:tech-lead docs/estimates/<slug>` → the Feature flow.
-- **Bug**: `as:tech-lead <symptom>` (root cause, failing test, fix after approval) → `as:finish` → commit.
-- **Health fixes**: `as:health` (report and snapshot in `docs/health/`, fixes small items you pick) →
-  `as:tech-lead health` (proposes the next findings, plans the one you choose) or `as:tech-lead H-007` →
-  `as:implement` → `as:finish` → commit; the next `as:health` marks it resolved.
+- **Bug**: `as:tech-lead <symptom>` (root cause, failing test, fix after approval; or saved to `docs/issues/` if you
+  defer it) → `as:finish` → commit.
+- **Known issues**: problems found by any skill, or by `/code-review` and `/claude-security` saved with `as:issue`,
+  wait in `docs/issues/p1…p4-<slug>.md` → `as:fix` (list by priority, fixes the one you choose and deletes its file;
+  larger ones get a proposal → `as:implement`) → `as:finish` → commit.
+- **Health**: `as:health` (report and snapshot in `docs/health/`, fixes small items you pick, saves larger ones as
+  issues) → the Known issues flow; the next `as:health` closes issues it no longer finds.
 - **Parallel work**: `as:worktree-create <name>`, run any flow there in a new session, `as:worktree-close`.
-- **Upkeep**: `as:agent-docs --check`, `as:spec-docs --check`, `as:spec-docs --tests`.
+- **Upkeep**: `as:docs-check` (docs and spec against the code, no writes), `as:spec-tests` (scenarios without tests).
 
-Every step writes its state to files (proposal `## Plan` checklist, `docs/health/*.json`), so each can start in a new
-session.
+Every step writes its state to files (proposal `## Plan` checklist, `docs/issues/`, `docs/health/*.json`), so each can
+start in a new session.
 
 ### onboarding — once per repository
 
@@ -75,7 +99,9 @@ session.
 
 - Default path: `/as:finish` (next section) — it runs simplify and review for you. The items below are for ad-hoc use.
 - Ask Claude to run the `code-simplifier` agent on the recent changes.
-- `/as:spec-docs --tests` — which contract scenarios lack tests (unhappy paths first).
+- `/as:spec-tests` — which contract scenarios lack tests (unhappy paths first).
+- Findings you do not fix now (from `/code-review`, `/claude-security` or your own review): `/as:issue` saves them to
+  `docs/issues/`.
 - Security-sensitive changes or a release: run `/claude-security` (or ask for a security scan).
 - PR open: `/code-review:code-review`.
 
@@ -101,8 +127,8 @@ session.
 
 ### docs — keeping documentation true
 
-- Periodically, or after larger refactors: `/as:agent-docs --check` and `/as:spec-docs --check`, then run them without
-  `--check` to apply fixes.
+- Periodically, or after larger refactors: `/as:docs-check` audits `AGENTS.md` and the spec against the code without
+  writing; `/as:agent-docs` and `/as:spec-docs` apply the fixes (they ask before writing).
 
 ### health — once a sprint or month
 
@@ -110,6 +136,17 @@ session.
   test quality (missing, excessive or weak tests), dead code, duplication, dependencies, docs drift. Writes
   `docs/health/<date>.html` and a `<date>.json` snapshot with trends against the previous run, then fixes the small
   items you pick.
-- Larger findings stay in the snapshot: `/as:tech-lead health` proposes what to fix next and plans the finding you
-  choose (or `/as:tech-lead H-007` for one finding), then `/as:implement` and `/as:finish`.
-- `/as:health --quick` for a fast pass (git and configured tools only); `--no-fix` for the report only.
+- Larger findings you choose are saved to `docs/issues/` (with the finding's key, so the next run closes them when
+  they are gone); `/as:fix` works through them.
+- `/as:health --quick` for a fast pass (git and configured tools only).
+
+### issues — known problems
+
+- `docs/issues/p<1-4>-<slug>.md` — one file per known problem, priority in the name (`p1` data loss or security …
+  `p4` clean-up), so `ls docs/issues` is the list. Written with your consent by `as:finish`, `as:health`,
+  `as:spec-docs`, `as:tech-lead`, `as:implement`, `as:docs-check` and `as:spec-tests`.
+- `/as:issue [description]` — saves a problem; without a description it collects the findings from the conversation
+  (for example after `/code-review` or `/claude-security`) and asks which to save.
+- `/as:fix` — lists open issues by priority and effort and recommends one; `/as:fix <slug>` or
+  `/as:fix 10 most important bugs`. Small ones are fixed test-first and their file is deleted in the same diff;
+  larger ones get a change proposal. Saying "fix the most important bugs" to `as:tech-lead` does the same.

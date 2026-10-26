@@ -2,7 +2,7 @@
 
 Plugin `as` (marketplace `absolut-skills`) for Claude Code and Codex. Commands: `/as:<skill>` (Claude), `$as:<skill>` (Codex).
 Skills are Markdown instructions executed by the coding agent; the only executable code is the validator and the
-stdlib-only helper scripts in `skills/<name>/scripts/` for deterministic work (git statistics, spec lint).
+stdlib-only helper scripts in `skills/<name>/scripts/` for deterministic work (git statistics, spec lint, estimate totals).
 
 ## Repository map
 

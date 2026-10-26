@@ -1,7 +1,7 @@
 ---
 name: tech-lead
-description: "Act as a tech lead when the user wants to discuss, design or plan a new feature, investigate a bug or unexpected behaviour, weigh technical options (\"how should we…\", \"I want to add…\", \"why does X break\", \"A or B?\"), or pick what to fix next from the as:health report (as:tech-lead health, as:tech-lead H-007). Grounds the discussion in the code, AGENTS.md and the docs/spec contracts first, asks targeted questions, challenges the request, compares alternative architectures from parallel subagents, records the decision and the proposed spec scenarios in a change proposal (docs/spec/changes/), and produces an implementation plan saved in that proposal, then offers to continue in plan mode for larger changes — without writing code until the plan is approved. Not for small, clearly specified edits (rename, typo, one-line fix), questions about how existing code works, or executing an already approved plan (as:implement)."
-argument-hint: "[feature, bug or question | health | H-NNN]"
+description: "Act as a tech lead when the user wants to discuss, design or plan a new feature, investigate a bug or unexpected behaviour, weigh technical options (\"how should we…\", \"I want to add…\", \"why does X break\", \"A or B?\"), pick what to fix next from the as:health report (as:tech-lead health, as:tech-lead H-007), or plan a client-accepted estimate (as:tech-lead docs/estimates/<slug>). Grounds the discussion in the code, AGENTS.md and the docs/spec contracts first, asks targeted questions, challenges the request, compares alternative architectures from parallel subagents, records the decision and the proposed spec scenarios in a change proposal (docs/spec/changes/), and produces an implementation plan saved in that proposal, then offers to continue in plan mode for larger changes — without writing code until the plan is approved. Not for small, clearly specified edits (rename, typo, one-line fix), questions about how existing code works, or executing an already approved plan (as:implement)."
+argument-hint: "[feature, bug or question | health | H-NNN | docs/estimates/<slug>]"
 ---
 
 # Tech lead
@@ -41,6 +41,7 @@ Say the size in one line; the user may override it.
 - **Question** — "A or B?", "is this a good idea?" → ground, compare, recommend; produce no artifacts unless asked.
 - **Health finding** — argument `health` or a finding ID (`H-007`), or "what should we fix next" after `as:health` →
   [From health](#from-health).
+- **Accepted estimate** — argument `docs/estimates/<slug>` (written by `as:estimate`) → [From estimate](#from-estimate).
 
 ## Feature
 
@@ -142,6 +143,25 @@ another model), suggest `as:implement` there — it resumes from the proposal's 
    [references/change-format.md](references/change-format.md)), so later runs see the finding is in progress. Then the
    handoff of Feature step 7: implement now, or `as:implement` in a new session; afterwards `as:finish`. The next
    `as:health` run marks the finding resolved.
+
+## From estimate
+
+`as:estimate` leaves an analysis in `docs/estimates/<slug>/analysis.md` (format:
+[../estimate/references/estimate-format.md](../estimate/references/estimate-format.md)): requirements, what exists
+today with paths, findings, assumptions, client questions and a step plan with hours. Plan from it instead of
+exploring from scratch.
+
+1. **Load** `analysis.md` and say its revision, status and how many commits landed since its `commit`. Set
+   `**Status:**` to `accepted` if the user confirms the client accepted it.
+2. **Ground** from "What exists today": re-check the listed paths against the current code (exploration subagents only
+   for areas that changed since the estimate's commit or that it did not cover).
+3. **Clarify** only the client questions still open and the assumptions the user wants to revisit; answered ones are
+   requirements now.
+4. Continue the [Feature](#feature) path from step 3 (options only when the estimate left the approach open), with
+   the estimate's steps as the starting plan. Warn when the plan grows beyond a block's `max` in the estimate's
+   `## Totals` — the client may need to hear it.
+5. With a proposal, add an `**Estimate:**` link to the analysis to its meta line (see
+   [references/change-format.md](references/change-format.md)). Then the handoff of Feature step 7.
 
 ## Bug
 

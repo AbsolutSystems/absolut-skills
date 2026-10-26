@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.5.0
+
+- New `estimate` skill: analyses a client's feature request against the code and spec, flags gaps, conflicts with
+  current behaviour, better alternatives and worthwhile additions, and prices a step plan in `min / likely / max`
+  hours for a developer who knows the code and works with an AI agent (tests and communication included, manual QA
+  and deployment listed as not included). Writes `docs/estimates/<slug>/analysis.md` (internal) and `client.md` (PRD,
+  estimate per block, assumptions, questions, priced suggestions) in the client's language; revisions after the
+  client's answers. `scripts/estimate_totals.py` sums blocks, computes PERT expected values and checks `client.md`.
+- `tech-lead`: `docs/estimates/<slug>` plans an accepted estimate from its analysis — re-checks the code instead of
+  exploring again, asks only open client questions, warns when the plan exceeds the estimate; the proposal links it in
+  an `**Estimate:**` meta line.
+- `help`: client request flow in the `flows` topic.
+
 ## 1.4.0
 
 - Health fixes flow: `tech-lead` takes `health` (proposes the next findings from the newest `docs/health/*.json`,

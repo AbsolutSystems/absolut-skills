@@ -1,6 +1,6 @@
 ---
 name: help
-description: "Show how to work with Claude Code (or Codex) using the as: commands, the recommended Anthropic plugins and plan mode: confirms the plugin is installed, lists as: skills, reports which recommended plugins are installed, and walks through the task workflow from onboarding to planning, building (implementing an approved plan), review, finishing a feature, commit, docs upkeep and periodic health checks, and how the commands chain into flows (feature, bug, health fixes). Use only when the user explicitly invokes as:help."
+description: "Show how to work with Claude Code (or Codex) using the as: commands, the recommended Anthropic plugins and plan mode: confirms the plugin is installed, lists as: skills, reports which recommended plugins are installed, and walks through the task workflow from onboarding to planning, building (implementing an approved plan), review, finishing a feature, commit, docs upkeep and periodic health checks, and how the commands chain into flows (client request estimate, feature, bug, health fixes). Use only when the user explicitly invokes as:help."
 disable-model-invocation: true
 argument-hint: "[flows|onboarding|plan|build|review|finish|commit|worktree|docs|health]"
 ---
@@ -29,6 +29,9 @@ Show these as short chains, then point to the sections below for details:
 
 - **Feature**: `as:tech-lead <feature>` (proposal + plan in `docs/spec/changes/<slug>.md`) → implement now or
   `as:implement` in a new session → `as:finish` → `/commit-commands:commit-push-pr`.
+- **Client request**: `as:estimate <request>` (analysis, PRD and hour estimate in `docs/estimates/<slug>/`;
+  send `client.md`) → `as:estimate docs/estimates/<slug>` with the client's answers → after acceptance
+  `as:tech-lead docs/estimates/<slug>` → the Feature flow.
 - **Bug**: `as:tech-lead <symptom>` (root cause, failing test, fix after approval) → `as:finish` → commit.
 - **Health fixes**: `as:health` (report and snapshot in `docs/health/`, fixes small items you pick) →
   `as:tech-lead health` (proposes the next findings, plans the one you choose) or `as:tech-lead H-007` →

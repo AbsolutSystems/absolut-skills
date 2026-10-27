@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """Check a Markdown spec written by as:spec-docs (stdlib only); suitable for CI.
 
-Usage: spec_lint.py [--spec docs/spec] [--against REF]
+Usage: spec_lint.py [--spec docs/spec] [--features docs/features] [--against REF]
 Checks: no legacy *.html pages; raw HTML only in the marker and anchors; anchor IDs well-formed and unique outside
 changes/; one ID prefix per module page; relative links and #anchors resolve; IDs added by open proposals are not
 used by the spec or by another open proposal, nor on REF (e.g. origin/HEAD) when --against is given.
-Exit code 1 when anything is wrong. Format: ../references/markdown-format.md.
+Feature pages (when the features directory exists): raw HTML, links and anchors as above; anchors are AC<n>; a
+phase heading ending in "🔄 in progress" links an open proposal in spec/changes/, one ending in "✅ done" links
+spec/changes/archive/; every file in <feature>/sources/ (except dotfiles) is linked from the feature's index.md.
+Exit code 1 when anything is wrong. Formats: ../references/markdown-format.md,
+../../feature/references/feature-format.md.
 """
 
 from __future__ import annotations
@@ -25,6 +29,9 @@ FENCE_RE = re.compile(r"^(```|~~~).*?^\1[ \t]*$", re.MULTILINE | re.DOTALL)
 CODE_SPAN_RE = re.compile(r"`[^`\n]*`")
 RAW_HTML_RE = re.compile(r"<(?![a-zA-Z][\w+.-]*:)[a-zA-Z/!]")  # not autolinks <https://…>
 ADDED_RE = re.compile(r"\*\*Change:\*\*[^\n]*\badded\b")
+AC_RE = re.compile(r"^AC\d+$")
+IN_PROGRESS_RE = re.compile(r"🔄\s*in progress$")
+DONE_RE = re.compile(r"✅\s*done$")
 
 
 def prose(text: str) -> str:
@@ -79,10 +86,7 @@ def lint(spec: Path, against: str | None = None) -> list[str]:
     for page, text in texts.items():
         rel = page.relative_to(spec).parts
         in_changes = rel[0] == "changes"
-        for n, line in enumerate(prose(text).splitlines(), 1):
-            rest = ANCHOR_RE.sub("", line)
-            if RAW_HTML_RE.search(rest) and not (n == 1 and line.startswith("<!-- as:")):
-                errors.append(f"{page}:{n}: raw HTML outside the marker and anchors")
+        errors += html_errors(page, text)
         ids = ANCHOR_RE.findall(text)
         errors += [f"{page}: malformed ID {i!r} (expected PREFIX-NNN or PREFIX-R<n>)" for i in ids if not ID_RE.match(i)]
         if in_changes:
@@ -108,28 +112,99 @@ def lint(spec: Path, against: str | None = None) -> list[str]:
                    if i in taken and i not in owners]
 
     for page, text in texts.items():
-        for target in LINK_RE.findall(prose(text)):
-            if re.match(r"^[a-z]+:", target):
-                continue
-            rel_target, _, fragment = target.partition("#")
-            dest = (page.parent / rel_target) if rel_target else page
-            if not dest.exists():
-                errors.append(f"{page}: broken link {target!r}")
-            elif fragment and dest.suffix == ".md" and fragment not in anchors(dest.read_text(encoding="utf-8")):
-                errors.append(f"{page}: broken anchor {target!r}")
+        errors += link_errors(page, text)
+    return errors
+
+
+def html_errors(page: Path, text: str) -> list[str]:
+    errors = []
+    for n, line in enumerate(prose(text).splitlines(), 1):
+        rest = ANCHOR_RE.sub("", line)
+        if RAW_HTML_RE.search(rest) and not (n == 1 and line.startswith("<!-- as:")):
+            errors.append(f"{page}:{n}: raw HTML outside the marker and anchors")
+    return errors
+
+
+def local_links(page: Path, text: str) -> list[tuple[str, Path, str]]:
+    """(target, destination path, fragment) of every relative link."""
+    result = []
+    for target in LINK_RE.findall(prose(text)):
+        if re.match(r"^[a-z]+:", target):
+            continue
+        rel_target, _, fragment = target.partition("#")
+        result.append((target, (page.parent / rel_target) if rel_target else page, fragment))
+    return result
+
+
+def link_errors(page: Path, text: str) -> list[str]:
+    errors = []
+    for target, dest, fragment in local_links(page, text):
+        if not dest.exists():
+            errors.append(f"{page}: broken link {target!r}")
+        elif fragment and dest.suffix == ".md" and fragment not in anchors(dest.read_text(encoding="utf-8")):
+            errors.append(f"{page}: broken anchor {target!r}")
+    return errors
+
+
+def roadmap_errors(page: Path, text: str) -> list[str]:
+    """Phases (`###` headings ending in a status marker, any language): "🔄 in progress" links spec/changes/<slug>.md,
+    "✅ done" links spec/changes/archive/."""
+    errors, phase, targets = [], None, []
+
+    def check_phase() -> None:
+        if phase is None:
+            return
+        if IN_PROGRESS_RE.search(phase) and not any("changes/" in t and "/archive/" not in t for t in targets):
+            errors.append(f"{page}: phase {phase!r} is in progress but links no open proposal in spec/changes/")
+        elif DONE_RE.search(phase) and not any("changes/archive/" in t for t in targets):
+            errors.append(f"{page}: phase {phase!r} is done but links no archived proposal in spec/changes/archive/")
+
+    for line in prose(text).splitlines():
+        m = HEADING_RE.match(line)
+        if m and len(m.group(1)) <= 3:
+            check_phase()
+            is_phase = len(m.group(1)) == 3 and (IN_PROGRESS_RE.search(m.group(2)) or DONE_RE.search(m.group(2)))
+            phase, targets = (m.group(2) if is_phase else None), []
+        elif phase is not None:
+            targets += LINK_RE.findall(line)
+    check_phase()
+    return errors
+
+
+def lint_features(features: Path) -> list[str]:
+    errors: list[str] = []
+    for page in sorted(features.rglob("*.md")):
+        if "sources" in page.relative_to(features).parts:
+            continue
+        text = page.read_text(encoding="utf-8")
+        errors += html_errors(page, text) + link_errors(page, text) + roadmap_errors(page, text)
+        errors += [f"{page}: malformed anchor {i!r} (expected AC<n>)" for i in ANCHOR_RE.findall(text) if not AC_RE.match(i)]
+    for sources in sorted(features.glob("*/sources")):
+        index = sources.parent / "index.md"
+        text = index.read_text(encoding="utf-8") if index.exists() else ""
+        linked = {dest.resolve() for _, dest, _ in local_links(index, text)}
+        errors += [f"{index}: source {f.name!r} is not listed under Sources" for f in sorted(sources.rglob("*"))
+                   if f.is_file() and not f.name.startswith(".") and f.resolve() not in linked]
     return errors
 
 
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--spec", default="docs/spec", type=Path)
+    parser.add_argument("--features", default="docs/features", type=Path,
+                        help="feature pages from as:feature; checked when the directory exists")
     parser.add_argument("--against", help="git ref whose spec pages must not already use IDs added by open proposals")
     args = parser.parse_args(argv)
-    if not args.spec.is_dir():
-        print(f"{args.spec}: not a directory", file=sys.stderr)
+    if not args.spec.is_dir() and not args.features.is_dir():
+        print(f"neither {args.spec} nor {args.features} is a directory", file=sys.stderr)
+        return 1
+    if args.against and not args.spec.is_dir():
+        print(f"--against needs {args.spec}", file=sys.stderr)
         return 1
     try:
-        errors = lint(args.spec, args.against)
+        errors = lint(args.spec, args.against) if args.spec.is_dir() else []
+        if args.features.is_dir():
+            errors += lint_features(args.features)
     except RuntimeError as exc:
         print(f"git grep failed: {exc}", file=sys.stderr)
         return 1

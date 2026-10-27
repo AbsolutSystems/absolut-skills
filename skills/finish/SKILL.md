@@ -92,7 +92,12 @@ name or commit messages, or affected modules among the touched ones), as confirm
 - when all is merged or dropped, set the proposal's `**Status:**` (`implemented` / `dropped`), fix its relative links
   for the new depth, and move it to `docs/spec/changes/archive/<YYYY-MM-DD>-<slug>.md`. An `implemented` proposal
   with an `**Issue:**` meta line closes that issue: delete the issue file with `git rm` in the same diff (a `dropped`
-  one leaves the issue open).
+  one leaves the issue open);
+- a proposal with a `**Feature:**` meta line updates that feature page per
+  [../feature/references/feature-format.md](../feature/references/feature-format.md): its phase becomes `✅ done`
+  (or `🗑️ dropped`) linking the archived proposal, the criteria it realises get `**Realised by:**` links to the
+  merged scenarios, the Now line, `**Updated:**`, the feature status (`shipped` when no phase is left) and the
+  catalogue row follow. `spec_lint.py` (it also checks `docs/features/`) must then print `OK`.
 
 Drift explained by a merged proposal is intended by definition. For the remaining items of the Spec drift and New
 behaviour sections from step 5, ask the user to classify each:

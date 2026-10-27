@@ -1,6 +1,6 @@
 ---
 name: help
-description: "Show how to work with Claude Code (or Codex) using the as: commands, the recommended Anthropic plugins and plan mode: confirms the plugin is installed, lists as: skills, reports which recommended plugins are installed, and walks through the task workflow from onboarding to planning, building (implementing an approved plan), review, finishing a feature, commit, docs upkeep, periodic health checks and known issues, and how the commands chain into flows (client request estimate, feature, bug, known issues, health). Use only when the user explicitly invokes as:help."
+description: "Show how to work with Claude Code (or Codex) using the as: commands, the recommended Anthropic plugins and plan mode: confirms the plugin is installed, lists as: skills, reports which recommended plugins are installed, and walks through the task workflow from onboarding to planning, building (implementing an approved plan), review, finishing a feature, commit, docs upkeep, periodic health checks and known issues, and how the commands chain into flows (client request estimate, feature, feature roadmap, bug, known issues, health). Use only when the user explicitly invokes as:help."
 disable-model-invocation: true
 argument-hint: "[which|flows|onboarding|plan|build|review|finish|commit|worktree|docs|health|issues]"
 ---
@@ -33,6 +33,7 @@ Show this table as it is, in the user's language:
 | start with a repository (agent docs, spec, plugins) | `as:init` |
 | design a feature, investigate a bug, choose between options | `as:tech-lead` (also starts on its own) |
 | analyse and price a client's feature request | `as:estimate` |
+| keep a feature's why, acceptance criteria, roadmap and sources (PDF, e-mails) in one place | `as:feature` |
 | continue an approved plan, also in a new session | `as:implement` |
 | wrap up a feature before the PR (simplify, review, spec, tests, docs) | `as:finish` |
 | save a problem to fix later (also findings of `/code-review`) | `as:issue` |
@@ -53,6 +54,11 @@ Show these as short chains, then point to the sections below for details:
 - **Client request**: `as:estimate <request>` (analysis, PRD and hour estimate in `docs/estimates/<slug>/`;
   send `client.md`) → `as:estimate docs/estimates/<slug>` with the client's answers → after acceptance
   `as:tech-lead docs/estimates/<slug>` → the Feature flow.
+- **Feature roadmap** (a feature that ships in several changes, or comes with client material): `as:feature
+  <description, files, pasted e-mail>` (or `docs/estimates/<slug>`, or a legacy docs folder) → page and sources in
+  `docs/features/<slug>/` → `as:tech-lead docs/features/<slug>` per phase → the Feature flow (`as:finish` marks the
+  phase done); new material → `as:feature docs/features/<slug>`. To brief a new session: "read
+  `docs/features/<slug>/index.md`".
 - **Bug**: `as:tech-lead <symptom>` (root cause, failing test, fix after approval; or saved to `docs/issues/` if you
   defer it) → `as:finish` → commit.
 - **Known issues**: problems found by any skill, or by `/code-review` and `/claude-security` saved with `as:issue`,
@@ -129,6 +135,8 @@ start in a new session.
 
 - Periodically, or after larger refactors: `/as:docs-check` audits `AGENTS.md` and the spec against the code without
   writing; `/as:agent-docs` and `/as:spec-docs` apply the fixes (they ask before writing).
+- Feature pages (`docs/features/`): `/as:feature docs/features/<slug>` with a new e-mail or document records it and
+  what it changes; `as:finish` updates the roadmap when a phase's proposal is merged.
 
 ### health — once a sprint or month
 

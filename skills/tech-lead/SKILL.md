@@ -1,7 +1,7 @@
 ---
 name: tech-lead
-description: "Act as a tech lead when the user wants to discuss, design or plan a new feature, investigate a bug or unexpected behaviour, weigh technical options (\"how should we…\", \"I want to add…\", \"why does X break\", \"A or B?\"), work through the known problems saved in docs/issues/ (\"fix the most important bugs\"), or plan a client-accepted estimate (as:tech-lead docs/estimates/<slug>). Grounds the discussion in the code, AGENTS.md and the docs/spec contracts first, asks targeted questions, challenges the request, compares alternative architectures from parallel subagents, records the decision and the proposed spec scenarios in a change proposal (docs/spec/changes/), and produces an implementation plan saved in that proposal, then offers to continue in plan mode for larger changes — without writing code until the plan is approved. Not for small, clearly specified edits (rename, typo, one-line fix), questions about how existing code works, or executing an already approved plan (as:implement)."
-argument-hint: "[feature, bug or question | docs/estimates/<slug>]"
+description: "Act as a tech lead when the user wants to discuss, design or plan a new feature, investigate a bug or unexpected behaviour, weigh technical options (\"how should we…\", \"I want to add…\", \"why does X break\", \"A or B?\"), work through the known problems saved in docs/issues/ (\"fix the most important bugs\"), plan a client-accepted estimate or the next phase of a documented feature (as:tech-lead docs/estimates/<slug> | docs/features/<slug>). Grounds the discussion in the code, AGENTS.md and the docs/spec contracts first, asks targeted questions, challenges the request, compares alternative architectures, records the decision and the proposed spec scenarios in a change proposal (docs/spec/changes/), and saves an implementation plan in it, then offers to continue in plan mode for larger changes — without writing code until the plan is approved. Not for small, clearly specified edits (rename, typo, one-line fix), questions about how existing code works, or executing an already approved plan (as:implement)."
+argument-hint: "[feature, bug or question | docs/estimates/<slug> | docs/features/<slug>]"
 ---
 
 # Tech lead
@@ -42,14 +42,16 @@ Say the size in one line; the user may override it.
 - **Known issues** — "what should we fix next", "fix the 10 most important bugs", an issue slug: read
   [../fix/SKILL.md](../fix/SKILL.md) and follow it — it picks from `docs/issues/` and comes back to the paths below.
 - **Accepted estimate** — argument `docs/estimates/<slug>` (written by `as:estimate`) → [From estimate](#from-estimate).
+- **Feature phase** — argument `docs/features/<slug>` (written by `as:feature`) → [From feature](#from-feature).
 
 ## Feature
 
 ### 1. Ground
 
 - Read the root, app and module `AGENTS.md` for the likely area, the spec pages of the touched modules, any open
-  change proposals in `docs/spec/changes/` (avoid conflicting or duplicate work), and the issues in `docs/issues/` of
-  those modules (the change may fix or collide with one).
+  change proposals in `docs/spec/changes/` (avoid conflicting or duplicate work), the issues in `docs/issues/` of
+  those modules (the change may fix or collide with one), and the feature pages in `docs/features/` that link those
+  modules (`git grep -l 'spec/<module page path under docs/spec>' docs/features`, e.g. `spec/backend/orders.md`) — their acceptance criteria and decisions bind the change.
 - Fan out read-only exploration subagents (brief "Explore" in [references/briefs.md](references/briefs.md)) to find the
   entry points, similar features to reuse, data model and tests involved. Run them in parallel when the areas are independent.
 - Summarise "what exists today" in a few lines with paths before asking anything.
@@ -75,7 +77,10 @@ The user picks or adjusts an option. Record open points that remain undecided; d
 
 Draft the change proposal per [references/change-format.md](references/change-format.md): why, scope, decision (options
 considered, choice, rationale), affected modules, scenarios added / changed / removed with IDs, open questions. Show a
-short summary of the scenarios and ask before writing `docs/spec/changes/<slug>.md`.
+short summary of the scenarios and ask before writing `docs/spec/changes/<slug>.md`. A proposal for a feature phase
+carries the `**Feature:**` meta line, and after writing it set that phase to `🔄 in progress` with a link to the
+proposal on the feature page (format: [../feature/references/feature-format.md](../feature/references/feature-format.md)).
+A change that serves a documented feature outside its roadmap: ask whether to add it as a phase (`as:feature`).
 
 If `docs/spec/` does not exist, offer to write the proposal anyway (it creates `docs/spec/changes/`) or keep the
 scenarios only in the plan. If the spec still has legacy `*.html` pages, read them as they are, write the proposal in
@@ -122,6 +127,9 @@ another model), suggest `as:implement` there — it resumes from the proposal's 
 today with paths, findings, assumptions, client questions and a step plan with hours. Plan from it instead of
 exploring from scratch.
 
+An estimate with several blocks that will ship in more than one proposal is better turned into a feature first
+(`as:feature docs/estimates/<slug>`, then [From feature](#from-feature)): suggest it once.
+
 1. **Load** `analysis.md` and say its revision, status and how many commits landed since its `commit`. Status not
    `accepted` → ask whether the client accepted it: yes → set `**Status:** accepted`; no → stop and suggest
    `as:estimate docs/estimates/<slug>` (for a revision) unless the user wants to plan anyway. Accepted suggestions still
@@ -136,11 +144,27 @@ exploring from scratch.
 5. With a proposal, add an `**Estimate:**` link to the analysis to its meta line (see
    [references/change-format.md](references/change-format.md)). Then the handoff of Feature step 7.
 
+## From feature
+
+`as:feature` keeps `docs/features/<slug>/index.md` (format:
+[../feature/references/feature-format.md](../feature/references/feature-format.md)): why, acceptance criteria `AC<n>`,
+a roadmap of phases, decisions and sources. One phase becomes one change proposal.
+
+1. **Load** the page and say its status and Now line. Pick the first `⏳ planned` phase, or the one the user names; a
+   phase already `🔄 in progress` → offer `as:implement` on its proposal instead.
+2. **Ground** as in [Feature](#feature) step 1, starting from the page's modules, the `**Realised by:**` links of
+   done criteria, and the decisions; read a source only when the page does not answer a question.
+3. **Clarify** only what the phase's criteria and the page's open questions leave unknown; an answer that changes a
+   criterion or adds a decision is recorded on the feature page with `as:feature` after this run — say so.
+4. Continue the [Feature](#feature) path from step 3. The proposal's `## Why` links the feature instead of repeating
+   it; its meta line has `**Feature:**` with the criteria it realises; writing it sets the phase to `🔄 in progress`.
+
 ## Bug
 
 1. **Reproduce** — establish symptom, expected vs actual behaviour, inputs and environment. An issue in
    `docs/issues/` that describes it gives its evidence as a start. Locate the code path
-   (exploration subagents for unfamiliar areas). Find the spec scenario for this behaviour:
+   (exploration subagents for unfamiliar areas). Find the spec scenario for this behaviour, and the feature page
+   that links it (`docs/features/`) for the intended outcome:
    - scenario exists and the code violates it → bug;
    - no scenario → specification gap;
    - code matches the scenario → the expectation differs from the contract: this is a feature request → [Feature](#feature).

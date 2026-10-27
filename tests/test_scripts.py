@@ -6,10 +6,12 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "skills/health/scripts"))
 sys.path.insert(0, str(ROOT / "skills/spec-docs/scripts"))
 sys.path.insert(0, str(ROOT / "skills/estimate/scripts"))
+sys.path.insert(0, str(ROOT / "skills/feature/scripts"))
 
 from estimate_totals import check, totals  # noqa: E402
 from git_signals import signals  # noqa: E402
-from spec_lint import lint  # noqa: E402
+from spec_lint import lint, lint_features  # noqa: E402
+from xlsx_text import markdown, sheets  # noqa: E402
 
 
 def git(repo: Path, *args: str) -> str:
@@ -102,6 +104,91 @@ def test_spec_lint_against_ref_finds_id_taken_on_other_branch(tmp_path):
     finally:
         os.chdir(cwd)
     assert errors == ["docs/spec/changes/cancel.md: added ID 'ORD-002' already used on other"]
+
+
+FEATURE = """<!-- as:feature lang=en -->
+[Features](../index.md) › Cancel
+
+# Cancel
+
+### <a id="AC1"></a>AC1 — Cancel one item
+
+**Realised by:** [ORD-001](../../spec/orders.md#ORD-001) · **Source:** [order](sources/2026-10-12-order.pdf)
+
+## Roadmap
+
+### Phase 1 — Place ✅ done
+
+[decision](../../spec/changes/archive/2026-10-01-place.md)
+
+### Phase 2 — Cancel 🔄 in progress
+
+[proposal](../../spec/changes/cancel.md)
+
+### Phase 3 — Mark orders as done, work in progress view ⏳ planned
+
+## Sources
+
+| File | Date |
+|------|------|
+| [order](sources/2026-10-12-order.pdf) | 2026-10-12 |
+"""
+
+
+def features(tmp_path: Path) -> Path:
+    spec(tmp_path)
+    root = tmp_path / "docs/features"
+    write(root / "index.md", "# Features\n\n[Cancel](cancel/index.md)\n")
+    write(root / "cancel/index.md", FEATURE)
+    write(root / "cancel/sources/2026-10-12-order.pdf", "%PDF")
+    write(root / "cancel/sources/notes.md", "<b>legacy html is fine in sources</b> [x](missing.md)\n")
+    write(root / "cancel/sources/.DS_Store", "")
+    write(tmp_path / "docs/spec/changes/archive/2026-10-01-place.md", "# Place\n")
+    return root
+
+
+def test_feature_lint_clean_except_unlisted_source(tmp_path):
+    assert lint_features(features(tmp_path)) == [
+        f"{tmp_path}/docs/features/cancel/index.md: source 'notes.md' is not listed under Sources"
+    ]
+
+
+def test_feature_lint_links_anchors_and_roadmap(tmp_path):
+    root = features(tmp_path)
+    (root / "cancel/sources/notes.md").unlink()
+    text = FEATURE.replace("#ORD-001", "#ORD-099").replace('id="AC1"', 'id="X1"')
+    text = text.replace("changes/archive/2026-10-01-place.md", "changes/cancel.md")
+    text = text.replace("(../../spec/changes/cancel.md)", "(../../spec/orders.md)")
+    write(root / "cancel/index.md", text)
+    errors = "\n".join(lint_features(root))
+    assert "broken anchor '../../spec/orders.md#ORD-099'" in errors
+    assert "malformed anchor 'X1'" in errors
+    assert "'Phase 1 — Place ✅ done' is done but links no archived proposal" in errors
+    assert "'Phase 2 — Cancel 🔄 in progress' is in progress but links no open proposal" in errors
+    assert "Phase 3" not in errors
+
+
+def test_xlsx_text_shared_inline_and_sparse_cells(tmp_path):
+    import zipfile
+
+    main = 'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"'
+    rel = 'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"'
+    book = tmp_path / "pricing.xlsx"
+    with zipfile.ZipFile(book, "w") as z:
+        z.writestr("xl/workbook.xml", f'<workbook {main} {rel}><sheets>'
+                   '<sheet name="Prices" sheetId="1" r:id="rId1"/></sheets></workbook>')
+        z.writestr("xl/_rels/workbook.xml.rels",
+                   '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+                   '<Relationship Id="rId1" Target="worksheets/sheet1.xml"/></Relationships>')
+        z.writestr("xl/sharedStrings.xml", f'<sst {main}><si><t>Item</t></si><si><t>a|b</t></si></sst>')
+        z.writestr("xl/worksheets/sheet1.xml", f'<worksheet {main}><sheetData>'
+                   '<row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1" t="inlineStr"><is><t>Price</t></is></c></row>'
+                   '<row r="2"/>'
+                   '<row r="3"><c r="A3" t="s"><v>1</v></c><c r="C3"><f>1+1</f><v>2</v></c></row>'
+                   '</sheetData></worksheet>')
+    assert markdown(sheets(str(book))) == (
+        "## Prices\n\n| Item | Price |  |\n|---|---|---|\n| a\\|b |  | 2 |\n"
+    )
 
 
 ANALYSIS = """# Cancel items

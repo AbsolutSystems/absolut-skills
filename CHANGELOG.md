@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.7.0
+
+- New `feature` skill: living feature docs in `docs/features/<slug>/` — `index.md` with why, users and goals,
+  non-goals, user-level acceptance criteria (`AC<n>`) linked to the module scenarios that realise them, a roadmap of
+  phases (one change proposal each), decisions and sources; `sources/` keeps the client's PDF, spreadsheets, pasted
+  e-mails and meeting notes verbatim, and every criterion and decision links its source. Seeds from an accepted
+  estimate, documents an existing feature from the code and archived proposals, records new material and what it
+  changes, and maps a legacy documentation folder file by file (`git mv` after approval). Catalogue in
+  `docs/features/index.md`; format in `feature/references/feature-format.md`.
+- `feature/scripts/xlsx_text.py`: `.xlsx` sheets as Markdown tables (stdlib only), saved next to the original.
+- `tech-lead`: `docs/features/<slug>` plans the next phase (From feature path); proposals for a phase carry a
+  `**Feature:**` meta line with the criteria they realise and set the phase `in progress`; feature pages of the
+  touched modules are read when grounding features and bugs.
+- `finish`: archiving a proposal with `**Feature:**` marks its phase done, fills `**Realised by:**`, the Now line and
+  the feature status.
+- `spec_lint.py` also checks `docs/features/` (`--features`): links and anchors, `AC<n>` anchors, phases `in progress`
+  linking an open proposal and `done` linking an archived one, every file in `sources/` listed; runs without
+  `docs/spec/`. `docs-check` reports its feature errors.
+- `estimate` suggests `as:feature` for multi-phase requests; `agent-docs` links `docs/features/index.md` from the root
+  `AGENTS.md`; `help`: Feature roadmap flow.
+
 ## 1.6.0
 
 - Known problems live in `docs/issues/`: one Markdown file per problem, `p<1-4>-<slug>.md` with the priority in the

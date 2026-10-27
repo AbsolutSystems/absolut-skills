@@ -56,6 +56,7 @@ Point either host at a local clone instead of `AbsolutSystems/absolut-skills`, e
 | start with a repository (agent docs, spec, plugins) | `/as:init` |
 | design a feature, investigate a bug, choose between options | `/as:tech-lead` (also starts on its own) |
 | analyse and price a client's feature request | `/as:estimate` |
+| keep a feature's why, acceptance criteria, roadmap and sources (PDF, e-mails) in one place | `/as:feature` |
 | continue an approved plan, also in a new session | `/as:implement` |
 | wrap up a feature before the PR (simplify, review, spec, tests, docs) | `/as:finish` |
 | save a problem to fix later (also findings of `/code-review`) | `/as:issue` |
@@ -75,7 +76,8 @@ Three ideas run through every command:
   problem is a file in `docs/issues/`, a health check is a snapshot in `docs/health/<date>.json`. Any step can continue in a new session or with a cheaper model.
 - **Nothing is written to code before you approve a plan**, and nothing is committed by `as` — you commit at the end.
 - **Docs follow the code.** `AGENTS.md` tells agents what the code cannot; `docs/spec/` describes module contracts as
-  scenarios with stable IDs (`ORD-003`) that tests refer to. `as:finish` keeps both current.
+  scenarios with stable IDs (`ORD-003`) that tests refer to; `docs/features/` keeps each feature's why, acceptance
+  criteria and roadmap across many changes. `as:finish` keeps them current.
 
 ### 1. Onboard a repository (once)
 
@@ -110,7 +112,20 @@ module gets a short plan without a proposal.
 /as:tech-lead docs/estimates/cancel-items      # accepted: plan from the analysis, then the feature flow
 ```
 
-### 4. Bug
+### 4. Feature documentation and roadmap
+
+```text
+/as:feature cancel single items — order in the attached PDF, e-mail below   # or docs/estimates/<slug>, or a legacy folder
+    → saves the sources verbatim in docs/features/cancel-items/sources/ (PDF, .xlsx + its text, pasted e-mails)
+    → docs/features/cancel-items/index.md: why, acceptance criteria linked to module scenarios, phases, decisions
+/as:tech-lead docs/features/cancel-items       # plans the next phase as a change proposal → the feature flow
+/as:feature docs/features/cancel-items         # a new e-mail or document: records it and what it changes
+```
+
+`as:finish` marks the phase done on the feature page; "read `docs/features/<slug>/index.md`" is the briefing for any
+later session.
+
+### 5. Bug
 
 ```text
 /as:tech-lead why are refunds sometimes doubled?
@@ -119,7 +134,7 @@ module gets a short plan without a proposal.
 /as:finish
 ```
 
-### 5. Known issues
+### 6. Known issues
 
 ```text
 /as:issue                           # after /code-review, /claude-security or a review: save the findings you defer
@@ -131,7 +146,7 @@ Every skill that finds a problem it does not fix now (`finish` review, `health`,
 `tech-lead` bug, `implement`) offers to save it as `docs/issues/p<1-4>-<slug>.md` — priority in the file name, so
 `ls docs/issues` is the list. Fixed means deleted, in the same diff as the fix.
 
-### 6. Health check (once a sprint or month)
+### 7. Health check (once a sprint or month)
 
 ```text
 /as:health                          # report + snapshot in docs/health/, fixes the small (S) items you pick,
@@ -142,14 +157,14 @@ Every skill that finds a problem it does not fix now (`finish` review, `health`,
 An issue from health keeps the finding's key, so the next `/as:health` shows it as tracked and closes it once the
 finding is gone.
 
-### 7. Parallel work
+### 8. Parallel work
 
 ```text
 /as:worktree-create feature-x       # new branch + folder ../<repo>-worktrees/feature-x; open a new session there
 /as:worktree-close feature-x        # offers to commit leftovers, removes the folder, keeps the branch
 ```
 
-### 8. Keeping docs true
+### 9. Keeping docs true
 
 ```text
 /as:docs-check                      # audit AGENTS.md, .guidelines and the spec against the code, no writes
@@ -173,6 +188,7 @@ and PRs, `code-review` on an open PR, `claude-security` for security-sensitive c
 | `docs/spec/**/*.md` | `init`, `spec-docs`, `finish` | Module contracts: requirements and scenarios with IDs |
 | `docs/spec/changes/<slug>.md` | `tech-lead`, `implement` (ticks) | Open change proposal: decision, scenarios, `## Plan` |
 | `docs/spec/changes/archive/` | `finish` | Merged proposals — the decision log |
+| `docs/features/<slug>/` | `feature`; phase status by `tech-lead`, `finish` | Feature page (why, acceptance criteria, roadmap, decisions) and `sources/` kept verbatim |
 | `docs/estimates/<slug>/` | `estimate` | Client request analysis and hour estimate: `analysis.md` (internal), `client.md` (to send) |
 | `docs/issues/p<1-4>-<slug>.md` | `issue`, `finish`, `health`, `spec-docs`, `tech-lead`, `implement`, `docs-check`, `spec-tests`; deleted by `fix`, `finish`, `health` | Known problems not fixed yet, one file each, priority in the name |
 | `docs/health/` | `health` | Dated HTML reports, JSON snapshots, index with trends |
@@ -183,8 +199,9 @@ and PRs, `code-review` on an open PR, `claude-security` for security-sensitive c
 |---------|-----------|------|
 | `/as:help` | `[which\|flows\|onboarding\|plan\|build\|review\|finish\|commit\|worktree\|docs\|health\|issues]` | How to work with `as`, installed plugins |
 | `/as:init` | `[path] [--spec <path>… \| all] [--no-spec] [--lang en\|pl]` | Once per repository |
-| `/as:tech-lead` | `<feature, bug or question>` \| `docs/estimates/<slug>` | Before any non-trivial change |
+| `/as:tech-lead` | `<feature, bug or question>` \| `docs/estimates/<slug>` \| `docs/features/<slug>` | Before any non-trivial change |
 | `/as:estimate` | `<request text or file> [--lang en\|pl]` \| `docs/estimates/<slug>` | Client asks for a feature quote; revision after answers |
+| `/as:feature` | `<description, files>` \| `docs/features/<slug>` \| `docs/estimates/<slug>` \| `<legacy folder>` `[--lang en\|pl]` | A feature spanning several changes, or new client material |
 | `/as:implement` | `[slug] [--step <n>]` | Execute an approved plan, in any session |
 | `/as:finish` | `[base] [--no-simplify] [--no-review] [--no-tests] [--no-docs]` | Feature done, before the PR |
 | `/as:issue` | `[problem description]` | Save a problem you will not fix now |
@@ -282,6 +299,26 @@ from the analysis instead of exploring again.
 ```text
 /as:estimate <pasted request or path>
 /as:estimate docs/estimates/cancel-items       # revision after the client's answers
+```
+
+### `feature` — living feature documentation
+
+One folder per feature, `docs/features/<slug>/`: `index.md` is the page you (or an agent) read first — why, users and
+goals, non-goals, acceptance criteria (`AC1…`) linked to the module scenarios that realise them, a roadmap of phases
+(each one change proposal), decisions and a list of sources; `sources/` keeps the material verbatim — the client's
+PDF, spreadsheets (with their text extracted by a script), pasted e-mails and meeting notes. The page is a
+distillate: every criterion and decision links its source, so a later e-mail that changes something is recorded as a
+decision, not lost.
+
+It starts from a description with files or pasted text, from an accepted estimate, from an existing feature (rebuilt
+from the code and archived proposals), or from a legacy documentation folder (each file mapped to a feature and a
+role, moved with `git mv` after your approval). `as:tech-lead docs/features/<slug>` plans the next phase, `as:finish`
+marks it done; `spec_lint.py` checks links, sources and that phase statuses match their proposals.
+
+```text
+/as:feature <description, files, pasted e-mail>
+/as:feature docs/features/cancel-items         # new material or roadmap change
+/as:feature docs/old-specs                     # map a legacy folder
 ```
 
 ### `implement` — execute the approved plan

@@ -19,6 +19,8 @@ API, dependencies, framework conventions. Write the rule behind them only when t
 - `backend/` — <one line>. See `backend/AGENTS.md`.
 - `frontend/` — <one line>. See `frontend/AGENTS.md`.
 - `docs/spec/` — human-readable specification of module contracts; start at `docs/spec/index.md`.
+- `docs/features/` — features: why, acceptance criteria, roadmap and sources; read a feature's `index.md` before
+  working on it.
 
 ## Commands
 

@@ -113,5 +113,7 @@ Set `**Status:**` to `sent`, `accepted` or `rejected` whenever the user says so.
 
 One short block: the files written, what to send (`client.md`) and what stays internal (`analysis.md`), the open
 questions count, and the next step — after the client answers, `as:estimate docs/estimates/<slug>`; after acceptance,
-`as:tech-lead docs/estimates/<slug>` (it starts from the analysis, then `as:implement` and `as:finish`). State what
+`as:tech-lead docs/estimates/<slug>` (it starts from the analysis, then `as:implement` and `as:finish`); a request that
+will ship in several phases → `as:feature docs/estimates/<slug>` first, to keep its sources, acceptance criteria and
+roadmap in one place. State what
 was not checked (e.g. areas not explored, an external API not inspected).

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills Feature"
+  short_description: "Living feature docs: why, acceptance criteria, roadmap, decisions and sources"
+  default_prompt: "Use $as:feature to document this feature and its sources in docs/features/."
+policy:
+  allow_implicit_invocation: false

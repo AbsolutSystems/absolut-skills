@@ -123,6 +123,9 @@ Support handles ~40 requests a week to remove one item; today the whole order mu
   archived as `implemented`. Proposals written before 1.6.0 may carry `` · **Health:** H-007 · `<key>` `` instead.
 - A proposal planned from an `as:estimate` analysis adds `· **Estimate:**` and a link to
   `../../estimates/<slug>/analysis.md` to the meta line.
+- A proposal for a phase of a feature from `as:feature` adds `` · **Feature:** `` with a link to
+  `../../features/<slug>/index.md` (`../../../` in `archive/`), followed by the acceptance criteria it realises
+  (`· AC2, AC3`).
 - `**Status:**` in the meta line is `open`, then `implemented` or `dropped` when archived; `as:finish` updates it.
 - `## Plan` is added by `as:tech-lead` once the user approved the plan (absent until then). One task per independently
   verifiable step: what it delivers, files or modules, scenario IDs it tests (test-first ones first). Large changes

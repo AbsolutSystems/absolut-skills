@@ -35,7 +35,7 @@ Show this table as it is, in the user's language:
 | analyse and price a client's feature request | `as:estimate` |
 | keep a feature's why, acceptance criteria, roadmap and sources (PDF, e-mails) in one place | `as:feature` |
 | continue an approved plan, also in a new session | `as:implement` |
-| deliver a whole documented feature unattended (e.g. overnight) | `as:deliver` |
+| deliver a whole documented feature, or fix all saved problems, unattended (e.g. overnight) | `as:deliver` |
 | wrap up a feature before the PR (simplify, review, spec, tests, docs) | `as:finish` |
 | save a problem to fix later (also findings of `/code-review`) | `as:issue` |
 | fix the saved problems, most important first | `as:fix` |
@@ -67,7 +67,9 @@ Show these as short chains, then point to the sections below for details:
   defer it) → `as:finish` → commit.
 - **Known issues**: problems found by any skill, or by `/code-review` and `/claude-security` saved with `as:issue`,
   wait in `docs/issues/p1…p4-<slug>.md` → `as:fix` (list by priority, fixes the one you choose and deletes its file;
-  larger ones get a proposal → `as:implement`) → `as:finish` → commit.
+  larger ones get a proposal → `as:implement`) → `as:finish` → commit. Unattended: `as:deliver docs/issues [request]`
+  (confirm the selection, then each issue fixed or skipped without asking, local commits, report in
+  `docs/deliveries/`).
 - **Health**: `as:health` (report and snapshot in `docs/health/`, fixes small items you pick, saves larger ones as
   issues) → the Known issues flow; the next `as:health` closes issues it no longer finds.
 - **Parallel work**: `as:worktree-create <name>`, run any flow there in a new session, `as:worktree-close`.
@@ -102,7 +104,7 @@ start in a new session.
   first, ticks each step in `## Plan`, stops to ask when the plan does not fit the code.
 - `/as:deliver docs/features/<slug>` — the whole roadmap unattended: plan, implement, finish and fix per phase,
   taking the recommended option where those skills would ask; local commits; stops at done criteria, human-only
-  decisions or limits.
+  decisions or limits. `/as:deliver docs/issues [request]` does the same for the saved issues.
 - Claude follows `AGENTS.md` and reads `.guidelines/` when the task touches their area — keep them current.
 - UI work: `frontend-design` triggers on its own.
 - Changing a module's observable behaviour: update its spec with `/as:spec-docs <module path>` and tag contract tests

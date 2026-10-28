@@ -1,6 +1,6 @@
 interface:
   display_name: "Absolut Skills Deliver"
-  short_description: "Deliver a documented feature unattended: plan, implement, finish and fix in a loop until done"
-  default_prompt: "Use $as:deliver docs/features/<slug> to deliver the whole feature unattended."
+  short_description: "Deliver a documented feature or the saved issues unattended: plan, implement, finish and fix in a loop until done"
+  default_prompt: "Use $as:deliver docs/features/<slug> to deliver the whole feature unattended, or $as:deliver docs/issues to fix the saved issues."
 policy:
   allow_implicit_invocation: false

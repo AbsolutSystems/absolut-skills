@@ -58,7 +58,7 @@ Point either host at a local clone instead of `AbsolutSystems/absolut-skills`, e
 | analyse and price a client's feature request | `/as:estimate` |
 | keep a feature's why, acceptance criteria, roadmap and sources (PDF, e-mails) in one place | `/as:feature` |
 | continue an approved plan, also in a new session | `/as:implement` |
-| deliver a whole documented feature unattended (e.g. overnight) | `/as:deliver` |
+| deliver a whole documented feature, or fix all saved problems, unattended (e.g. overnight) | `/as:deliver` |
 | wrap up a feature before the PR (simplify, review, spec, tests, docs) | `/as:finish` |
 | save a problem to fix later (also findings of `/code-review`) | `/as:issue` |
 | fix the saved problems, most important first | `/as:fix` |
@@ -76,7 +76,7 @@ Three ideas run through every command:
 - **State lives in files, not in the conversation.** A plan is a checklist in `docs/spec/changes/<slug>.md`, a known
   problem is a file in `docs/issues/`, a health check is a snapshot in `docs/health/<date>.json`. Any step can continue in a new session or with a cheaper model.
 - **Nothing is written to code before you approve a plan**, and nothing is committed by `as` — you commit at the end.
-  The one exception is `as:deliver`: you hand it a whole feature, it decides as you would by the recommended options,
+  The one exception is `as:deliver`: you hand it a whole feature or the saved issues, it decides as you would by the recommended options,
   commits each green stage locally and leaves the review (and the push) to you.
 - **Docs follow the code.** `AGENTS.md` tells agents what the code cannot; `docs/spec/` describes module contracts as
   scenarios with stable IDs (`ORD-003`) that tests refer to; `docs/features/` keeps each feature's why, acceptance
@@ -128,7 +128,7 @@ module gets a short plan without a proposal.
 `as:finish` marks the phase done on the feature page; "read `docs/features/<slug>/index.md`" is the briefing for any
 later session.
 
-Or let `/as:deliver docs/features/cancel-items` run the whole roadmap unattended (see [`deliver`](#deliver--a-whole-feature-unattended)).
+Or let `/as:deliver docs/features/cancel-items` run the whole roadmap unattended (see [`deliver`](#deliver--a-whole-feature-or-all-issues-unattended)).
 
 ### 5. Bug
 
@@ -195,7 +195,8 @@ and PRs, `code-review` on an open PR, `claude-security` for security-sensitive c
 | `docs/spec/changes/archive/` | `finish` | Merged proposals — the decision log |
 | `docs/features/<slug>/` | `feature`; phase status by `tech-lead`, `finish`; `delivery.md` by `deliver` | Feature page (why, acceptance criteria, roadmap, decisions) and `sources/` kept verbatim |
 | `docs/estimates/<slug>/` | `estimate` | Client request analysis and hour estimate: `analysis.md` (internal), `client.md` (to send) |
-| `docs/issues/p<1-4>-<slug>.md` | `issue`, `finish`, `health`, `spec-docs`, `tech-lead`, `implement`, `docs-check`, `spec-tests`; deleted by `fix`, `finish`, `health` | Known problems not fixed yet, one file each, priority in the name |
+| `docs/deliveries/<branch>.md` | `deliver` | Report of an unattended issues run |
+| `docs/issues/p<1-4>-<slug>.md` | `issue`, `finish`, `health`, `spec-docs`, `tech-lead`, `implement`, `docs-check`, `spec-tests`; deleted by `fix`, `finish`, `health`, `deliver` | Known problems not fixed yet, one file each, priority in the name |
 | `docs/health/` | `health` | Dated HTML reports, JSON snapshots, index with trends |
 
 ## Commands
@@ -208,7 +209,7 @@ and PRs, `code-review` on an open PR, `claude-security` for security-sensitive c
 | `/as:estimate` | `<request text or file> [--lang en\|pl]` \| `docs/estimates/<slug>` | Client asks for a feature quote; revision after answers |
 | `/as:feature` | `<description, files>` \| `docs/features/<slug>` \| `docs/estimates/<slug>` \| `<legacy folder>` `[--lang en\|pl]` | A feature spanning several changes, or new client material |
 | `/as:implement` | `[slug] [--step <n>]` | Execute an approved plan, in any session |
-| `/as:deliver` | `docs/features/<slug> [--max-stages <n>]` | A documented feature, delivered unattended |
+| `/as:deliver` | `docs/features/<slug>` \| `docs/issues [request]` `[--max-stages <n>]` | A documented feature or the saved issues, delivered unattended |
 | `/as:finish` | `[base] [--no-simplify] [--no-review] [--no-tests] [--no-docs]` | Feature done, before the PR |
 | `/as:issue` | `[problem description]` | Save a problem you will not fix now |
 | `/as:fix` | `[slug or request]` | Work through `docs/issues/`, most important first |
@@ -339,7 +340,7 @@ stops and proposes an edit to `## Plan` instead of improvising. Nothing is commi
 /as:implement cancel-items --step 3
 ```
 
-### `deliver` — a whole feature, unattended
+### `deliver` — a whole feature or all issues, unattended
 
 Hand it a feature page and leave (overnight): it asks its questions at the start — open questions with a recommended
 answer each, branch, green checks, permissions that will not prompt — then loops without asking. Each stage runs in a
@@ -354,9 +355,18 @@ criteria, data deletion, a new external service, a breaking public contract), at
 changes go to a stash), when it stops making progress, or at `--max-stages`. `docs/features/<slug>/delivery.md` is the
 morning report: criteria, assumptions to review first, stages and commits. Rerunning the command resumes.
 
+Point it at `docs/issues` instead (optionally with a request as in `fix`: `all p1`, `bugs in orders`) and it works
+through the saved problems the same way: you confirm the selection at the start, then each issue gets a Fix stage
+(small ones fixed test-first, larger ones planned, implemented and finished), most important first. Issues are
+independent, so one that needs a human decision or cannot be made green is skipped (its changes go to a stash) and the
+run goes on. `remove-tests` and `docs` issues are left for a human. Done when every selected issue is closed or skipped; the
+report is `docs/deliveries/<branch>.md`, skipped issues with their questions first.
+
 ```text
 /as:deliver docs/features/cancel-items
 /as:deliver docs/features/cancel-items --max-stages 40
+/as:deliver docs/issues
+/as:deliver docs/issues all p1 and p2
 ```
 
 ### `init` — onboard a repository

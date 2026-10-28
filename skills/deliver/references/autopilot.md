@@ -11,9 +11,9 @@ keeps the existing contract — and record it as an assumption:
 
 - in the proposal, as a note under `## Open questions`:
   `> [!NOTE]` / `> Assumed by as:deliver: <question> — <choice>, because <reason>.`
-- outside a proposal (finish, fix, review), in the stage report; the loop writes it to `delivery.md`.
+- outside a proposal (finish, fix, review), in the stage report; the loop writes it to the run report.
 
-Start-up decisions from `delivery.md` and the feature page (acceptance criteria, non-goals, decisions) bind every
+Start-up decisions from the report and the feature page (acceptance criteria, non-goals, decisions) bind every
 choice. An assumption never contradicts them.
 
 ## Human-only decisions
@@ -24,9 +24,10 @@ Do not assume these; return **blocked** with the question, the options and your 
 - a contradiction between the feature page, its sources and the code that the page does not settle;
 - deleting or irreversibly migrating user data;
 - a new external service, paid dependency, licence or credential, or a security or permission model change not
-  named by the feature page;
-- breaking a contract used outside the repository (public API, event, file format) when the phase does not name it;
-- a phase that cannot be delivered without one of the above.
+  named by the feature page or the issue;
+- breaking a contract used outside the repository (public API, event, file format) when the phase or the issue does
+  not name it;
+- a phase or an issue that cannot be delivered without one of the above.
 
 ## Per skill
 
@@ -63,9 +64,11 @@ the assumption; one that changes the scope → blocked. Do not ask between miles
   the proposal can merge; other touched modules without a page → note them for the report.
 - Do not commit — the loop does.
 
-**fix** (Fix stage): the issues the loop selected; no list, no choice. `S` without a contract change → fixed here,
+**fix** (Fix stage): the issues the loop selected; no list, no choice; the evidence re-check as in fix step 3 (a
+misfitting priority → `git mv` without asking). `S` without a contract change → fixed here,
 test-first, issue deleted. `M`/`L` or a contract change → a proposal through the tech-lead path as above (the loop
-implements and finishes it); its `**Issue:**` meta line closes the issue. Evidence gone → delete the issue.
+implements and finishes it); its `**Issue:**` meta line closes the issue. Evidence gone → delete the issue. A fix
+that needs a human-only decision → blocked (an issues run skips the issue and goes on).
 
 **Final review**: review the whole diff from the base with the host review tool or
 [../../finish/references/review.md](../../finish/references/review.md). Fix Must and Should findings as in finish,
@@ -78,11 +81,12 @@ nearby code are saved, never fixed in passing.
 ## Stage brief
 
 ```text
-You are one stage of an unattended feature delivery (as:deliver). Nobody can answer questions.
+You are one stage of an unattended delivery (as:deliver). Nobody can answer questions.
 
 Stage: {stage} — {target: proposal path, milestone, issue files, or base for the final review}
-Feature page: docs/features/{slug}/index.md
-Start-up decisions and earlier assumptions: {from delivery.md}
+Run: {feature page docs/features/{slug}/index.md | issues run}
+Report: {report path}
+Start-up decisions and earlier assumptions: {from the report}
 Checks: {test, lint, type-check, build commands}
 Repair only: failing output of the previous attempt: {output}
 
@@ -101,9 +105,12 @@ Return exactly these sections:
 
 ## Report
 
-`docs/features/<slug>/delivery.md`, in the feature page's language. It is checked by `spec_lint.py` like the page:
-link only files that stay — the feature page, archived proposals, the code; an open proposal (archived later) and
-an issue (deleted when fixed) are named in backticks, not linked.
+Feature run: `docs/features/<slug>/delivery.md`, in the feature page's language. Issues run:
+`docs/deliveries/<branch>.md` (the branch name with `/` → `-`, e.g. `deliver-issues-2026-10-28.md`, so runs on
+parallel branches never collide), in the language of the issues — never inside `docs/issues/`,
+where every file is an issue. Link only files that stay — the feature page, archived proposals, the code; an open
+proposal (archived later) and an issue (deleted when fixed) are named in backticks, not linked (`spec_lint.py`
+checks this for the feature report).
 
 ```markdown
 # Delivery: Partial order cancellation
@@ -141,6 +148,11 @@ an issue (deleted when fixed) are named in backticks, not linked.
 - `**Rollout:**` deploy Billing first. Set aside: none.
 ```
 
-The header (feature, branch, base, start) and the start-up decisions under `## Assumptions to review` are written
+An issues run has the same sections with `**Run:** issues (<request>)` instead of `**Feature:**`, the criterion
+"All selected issues closed or skipped, no open proposal" instead of the phases one, and two more sections after the
+assumptions: `## Selected issues` (file names, in order) and `## Skipped issues` (file name, the question or failing
+check, the options and your recommendation, the stash name) — the loop reads both on every stage.
+
+The header (feature or run, branch, base, start) and the start-up decisions under `## Assumptions to review` are written
 before the first stage; the stages table is appended stage by stage; the result, criteria, the rest of the assumptions
 and open items at the end of the run (rewritten when a run resumes). Commits are in `git log <base>..`.

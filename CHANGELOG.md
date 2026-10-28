@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.9.0
+
+- `deliver` takes `docs/issues [request]` as a second target: an unattended run over the saved issues (request as in
+  `fix`: `all p1`, `bugs in orders`; none → all open). Start-up shows the selection (`remove-tests` and `docs` issues
+  left out) and asks once; the loop runs a Fix stage per issue, most important first, larger ones through
+  plan → implement → finish. A blocked or unrepairable issue is skipped (changes stashed, question in the report) and
+  the run goes on. Done when every selected issue is closed or skipped; report in `docs/deliveries/<branch>.md`;
+  `--max-stages` defaults to 40 for issues.
+
 ## 1.8.0
 
 - New `deliver` skill: delivers a documented feature (`docs/features/<slug>`) unattended, e.g. overnight. Start-up

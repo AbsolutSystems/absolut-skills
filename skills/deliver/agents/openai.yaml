@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills Deliver"
+  short_description: "Deliver a documented feature unattended: plan, implement, finish and fix in a loop until done"
+  default_prompt: "Use $as:deliver docs/features/<slug> to deliver the whole feature unattended."
+policy:
+  allow_implicit_invocation: false

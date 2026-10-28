@@ -189,4 +189,5 @@ Moves use `git mv` (history is kept) and rename to the source naming rule; nothi
 
 `as:feature` writes the page and the catalogue. `as:tech-lead` sets a phase to `in progress` and links its proposal;
 `as:finish` sets it to `done` or `dropped`, relinks it to the archive, fills `**Realised by:**`, the Now line, the
-feature status and the catalogue row. Other skills only read.
+feature status and the catalogue row. `as:deliver` writes its run report to `<slug>/delivery.md`. Other skills only
+read.

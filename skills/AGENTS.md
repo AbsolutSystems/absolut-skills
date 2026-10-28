@@ -17,6 +17,8 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
 - `feature` — living feature docs in `docs/features/<slug>/` (page + `sources/`); owns
   `references/feature-format.md` and `scripts/xlsx_text.py`.
 - `implement` — executes a proposal's approved `## Plan` step by step in any session.
+- `deliver` — unattended loop over a feature's roadmap through `tech-lead`, `implement`, `finish` and `fix`; owns
+  `references/autopilot.md` (the policy that replaces their questions, the stage brief and the report format).
 - `finish` — wraps up a branch; merges and archives change proposals; owns `references/review.md` and
   `references/analysis.md`.
 - `health` — periodic whole-project check; writes HTML to `docs/health/`; owns `assets/health.css`,
@@ -39,6 +41,9 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
   (phase status words, `AC<n>` anchors, `sources/`) — change the format and the script together.
 - Renaming or restructuring a step or reference in one skill means updating every skill that links to it — the
   validator checks link targets and `#anchors`, but not step numbers or section names quoted in prose.
+- `deliver` follows `tech-lead` (From feature), `implement`, `finish`, `fix` and `finish/references/review.md`;
+  `references/autopilot.md` names their questions and gates (finish review, spec drift, contract tests, implement
+  deviations) — a new question or gate in those skills needs a policy line there, or the unattended run stalls on it.
 - `references/recommended-plugins.md` (repo root) is shared by `init` and `help`.
 - `fix` follows `tech-lead`'s `#bug` and `#feature` paths and `tech-lead` routes known-issue requests to `fix/SKILL.md`;
   `docs-check` follows `agent-docs` and `spec-docs` steps 1–4 and `init` step 6 by number — renumbering them means
@@ -59,10 +64,10 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
   the plan or scenarios only after approval), `finish` merges and archives, `spec-docs` only reads (and converts legacy HTML
   proposals); `docs/estimates/` — `estimate` writes, `tech-lead` only sets `**Status:** accepted`; the working
   principles block in a project's root `AGENTS.md` — `init` writes, `agent-docs` preserves; `docs/features/` —
-  `feature` writes, `tech-lead` sets a phase `in progress`, `finish` sets it `done` and updates the page; `sources/`
-  are never edited after saving.
-- `docs/issues/` — any skill that finds a problem writes, only with the user's consent; deleted (with the fix, in the
-  same diff) by `fix`, `tech-lead` (Bug), `finish` (archiving a proposal with `**Issue:**`) and `health` (finding
+  `feature` writes, `tech-lead` sets a phase `in progress`, `finish` sets it `done` and updates the page, `deliver`
+  writes `<slug>/delivery.md`; `sources/` are never edited after saving.
+- `docs/issues/` — any skill that finds a problem writes, only with the user's consent (`deliver` without asking, by
+  its policy); deleted (with the fix, in the same diff) by `fix`, `tech-lead` (Bug), `finish` (archiving a proposal with `**Issue:**`) and `health` (finding
   gone). Never numbered: the priority prefix and slug avoid cross-branch collisions.
 - Files generated in user projects are in English, except spec pages (`spec-docs --lang`) and pages that follow
   their language (`lang` in the marker on the first line of `docs/spec/index.md`): change proposals, health reports,

@@ -11,5 +11,9 @@
 - Simplify and review (`as:finish`): follow `skills/finish/references/review.md`; use subagents for the review if available.
 - Plan mode (`as:tech-lead` handoff) is a Claude Code feature: on Codex, present the plan, wait for
   approval, then implement step by step.
+- Unattended run (`as:deliver`): start Codex with an approval policy that never asks, e.g.
+  `codex --ask-for-approval never --sandbox workspace-write` (tests that need the network fail in that sandbox; use
+  `--sandbox danger-full-access` only in a worktree or container you can throw away). Without subagents the stages run
+  in the main thread, one after another.
 - Worktrees (`as:worktree-create`, `as:worktree-close`): after create, suggest starting Codex in `<path>`; before
   removing a worktree the session is in, run the commands from `<main>` (`git -C <main>` or `cd <main>`).

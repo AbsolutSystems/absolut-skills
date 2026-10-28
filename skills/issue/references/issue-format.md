@@ -2,7 +2,8 @@
 
 Known problems that are not fixed yet live in `docs/issues/`, one Markdown file per problem. The list of open
 problems is the list of files; a fixed problem is a deleted file (git history keeps it). Every skill that finds a
-problem it does not fix now offers to save it here, always with the user's consent.
+problem it does not fix now offers to save it here, always with the user's consent — except an unattended
+`as:deliver` run, which saves them by its policy and lists them in its report.
 
 ## File name
 
@@ -62,7 +63,7 @@ Meta line:
   `review`, `refactor`, `delete`, `add-tests`, `remove-tests`, `deps`, `docs`.
 - `**Priority:**` — as in the file name. `**Effort:**` — `S` (one module, a few files, no contract change), `M`, `L`.
 - `**Module:**` — link to the module's spec page, else the module directory in backticks.
-- `**Found:**` — date. `**Source:**` — who found it: `as:finish review`, `as:health`, `as:spec-docs`, `as:tech-lead`,
+- `**Found:**` — date. `**Source:**` — who found it: `as:finish review`, `as:health`, `as:spec-docs`, `as:tech-lead`, `as:deliver`,
   `/code-review`, `/claude-security`, `user`, …
 - `**Key:**` — only for `as:health` findings: the finding's `key` from the snapshot, so the next run recognises it.
 

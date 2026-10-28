@@ -17,6 +17,11 @@
   the fallback and say so in one line.
 - Plan mode (`as:tech-lead` handoff): switch with the EnterPlanMode tool (the user confirms the switch); in plan mode,
   write the plan to the plan file and request approval with ExitPlanMode.
+- Unattended run (`as:deliver`): permission prompts would stall it overnight — start it in auto mode (Shift+Tab until
+  the indicator shows it), or with `claude --permission-mode bypassPermissions` only in a worktree or container you can
+  throw away; keep the machine awake (`caffeinate -i` on macOS). Stages run as Agent tool subagents on the session
+  model; a subagent cannot start subagents, so a stage's fan-outs run in sequence inside it. A long run gets its
+  context compacted — the loop re-reads its state from the files every stage.
 - Worktrees (`as:worktree-create`, `as:worktree-close`): do not use EnterWorktree/ExitWorktree — they manage their own
   worktrees in `.claude/worktrees`. After create, suggest `cd <path> && claude` in a new terminal. Before removing a
   worktree the session is in, `cd <main>` in Bash first.

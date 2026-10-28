@@ -1,6 +1,6 @@
 ---
 name: help
-description: "Show how to work with Claude Code (or Codex) using the as: commands, the recommended Anthropic plugins and plan mode: confirms the plugin is installed, lists as: skills, reports which recommended plugins are installed, and walks through the task workflow from onboarding to planning, building (implementing an approved plan), review, finishing a feature, commit, docs upkeep, periodic health checks and known issues, and how the commands chain into flows (client request estimate, feature, feature roadmap, bug, known issues, health). Use only when the user explicitly invokes as:help."
+description: "Show how to work with Claude Code (or Codex) using the as: commands, the recommended Anthropic plugins and plan mode: confirms the plugin is installed, lists as: skills, reports which recommended plugins are installed, and walks through the task workflow from onboarding to planning, building (implementing an approved plan), review, finishing a feature, commit, docs upkeep, periodic health checks and known issues, and how the commands chain into flows (client request estimate, feature, feature roadmap, unattended feature delivery, bug, known issues, health). Use only when the user explicitly invokes as:help."
 disable-model-invocation: true
 argument-hint: "[which|flows|onboarding|plan|build|review|finish|commit|worktree|docs|health|issues]"
 ---
@@ -35,6 +35,7 @@ Show this table as it is, in the user's language:
 | analyse and price a client's feature request | `as:estimate` |
 | keep a feature's why, acceptance criteria, roadmap and sources (PDF, e-mails) in one place | `as:feature` |
 | continue an approved plan, also in a new session | `as:implement` |
+| deliver a whole documented feature unattended (e.g. overnight) | `as:deliver` |
 | wrap up a feature before the PR (simplify, review, spec, tests, docs) | `as:finish` |
 | save a problem to fix later (also findings of `/code-review`) | `as:issue` |
 | fix the saved problems, most important first | `as:fix` |
@@ -59,6 +60,9 @@ Show these as short chains, then point to the sections below for details:
   `docs/features/<slug>/` → `as:tech-lead docs/features/<slug>` per phase → the Feature flow (`as:finish` marks the
   phase done); new material → `as:feature docs/features/<slug>`. To brief a new session: "read
   `docs/features/<slug>/index.md`".
+- **Unattended feature**: `as:feature …` → `as:deliver docs/features/<slug>` (questions at the start, then the
+  Feature flow per phase without asking, local commits, report in `docs/features/<slug>/delivery.md`) → review the
+  assumptions and commits → `/commit-commands:commit-push-pr`.
 - **Bug**: `as:tech-lead <symptom>` (root cause, failing test, fix after approval; or saved to `docs/issues/` if you
   defer it) → `as:finish` → commit.
 - **Known issues**: problems found by any skill, or by `/code-review` and `/claude-security` saved with `as:issue`,
@@ -96,6 +100,9 @@ start in a new session.
 
 - `/as:implement` — continues the approved plan of the branch's change proposal, in this or a new session: tests
   first, ticks each step in `## Plan`, stops to ask when the plan does not fit the code.
+- `/as:deliver docs/features/<slug>` — the whole roadmap unattended: plan, implement, finish and fix per phase,
+  taking the recommended option where those skills would ask; local commits; stops at done criteria, human-only
+  decisions or limits.
 - Claude follows `AGENTS.md` and reads `.guidelines/` when the task touches their area — keep them current.
 - UI work: `frontend-design` triggers on its own.
 - Changing a module's observable behaviour: update its spec with `/as:spec-docs <module path>` and tag contract tests

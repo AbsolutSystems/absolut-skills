@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.8.0
+
+- New `deliver` skill: delivers a documented feature (`docs/features/<slug>`) unattended, e.g. overnight. Start-up
+  asks once — open questions with a recommended answer each, branch, green checks, host permissions — then loops
+  without asking: plan the next phase (`tech-lead`), implement a milestone (`implement`), wrap up (`finish`), fix the
+  issues the run saved (`fix`), final review of the whole branch. Each stage runs in a fresh subagent; where the
+  followed skill would ask, the autopilot policy (`deliver/references/autopilot.md`) takes the recommended option and
+  records it as `Assumed by as:deliver`. Commits each green stage locally, never pushes; stops at the done criteria,
+  a human-only decision, checks it cannot repair (changes stashed), no progress or `--max-stages`; resumes on rerun.
+  Morning report in `docs/features/<slug>/delivery.md`.
+- `help`, README: Unattended feature flow; host mappings: permissions and subagents for an unattended run.
+
 ## 1.7.0
 
 - New `feature` skill: living feature docs in `docs/features/<slug>/` — `index.md` with why, users and goals,

@@ -58,6 +58,7 @@ Point either host at a local clone instead of `AbsolutSystems/absolut-skills`, e
 | analyse and price a client's feature request | `/as:estimate` |
 | keep a feature's why, acceptance criteria, roadmap and sources (PDF, e-mails) in one place | `/as:feature` |
 | continue an approved plan, also in a new session | `/as:implement` |
+| deliver a whole documented feature unattended (e.g. overnight) | `/as:deliver` |
 | wrap up a feature before the PR (simplify, review, spec, tests, docs) | `/as:finish` |
 | save a problem to fix later (also findings of `/code-review`) | `/as:issue` |
 | fix the saved problems, most important first | `/as:fix` |
@@ -75,6 +76,8 @@ Three ideas run through every command:
 - **State lives in files, not in the conversation.** A plan is a checklist in `docs/spec/changes/<slug>.md`, a known
   problem is a file in `docs/issues/`, a health check is a snapshot in `docs/health/<date>.json`. Any step can continue in a new session or with a cheaper model.
 - **Nothing is written to code before you approve a plan**, and nothing is committed by `as` — you commit at the end.
+  The one exception is `as:deliver`: you hand it a whole feature, it decides as you would by the recommended options,
+  commits each green stage locally and leaves the review (and the push) to you.
 - **Docs follow the code.** `AGENTS.md` tells agents what the code cannot; `docs/spec/` describes module contracts as
   scenarios with stable IDs (`ORD-003`) that tests refer to; `docs/features/` keeps each feature's why, acceptance
   criteria and roadmap across many changes. `as:finish` keeps them current.
@@ -124,6 +127,8 @@ module gets a short plan without a proposal.
 
 `as:finish` marks the phase done on the feature page; "read `docs/features/<slug>/index.md`" is the briefing for any
 later session.
+
+Or let `/as:deliver docs/features/cancel-items` run the whole roadmap unattended (see [`deliver`](#deliver--a-whole-feature-unattended)).
 
 ### 5. Bug
 
@@ -188,7 +193,7 @@ and PRs, `code-review` on an open PR, `claude-security` for security-sensitive c
 | `docs/spec/**/*.md` | `init`, `spec-docs`, `finish` | Module contracts: requirements and scenarios with IDs |
 | `docs/spec/changes/<slug>.md` | `tech-lead`, `implement` (ticks) | Open change proposal: decision, scenarios, `## Plan` |
 | `docs/spec/changes/archive/` | `finish` | Merged proposals — the decision log |
-| `docs/features/<slug>/` | `feature`; phase status by `tech-lead`, `finish` | Feature page (why, acceptance criteria, roadmap, decisions) and `sources/` kept verbatim |
+| `docs/features/<slug>/` | `feature`; phase status by `tech-lead`, `finish`; `delivery.md` by `deliver` | Feature page (why, acceptance criteria, roadmap, decisions) and `sources/` kept verbatim |
 | `docs/estimates/<slug>/` | `estimate` | Client request analysis and hour estimate: `analysis.md` (internal), `client.md` (to send) |
 | `docs/issues/p<1-4>-<slug>.md` | `issue`, `finish`, `health`, `spec-docs`, `tech-lead`, `implement`, `docs-check`, `spec-tests`; deleted by `fix`, `finish`, `health` | Known problems not fixed yet, one file each, priority in the name |
 | `docs/health/` | `health` | Dated HTML reports, JSON snapshots, index with trends |
@@ -203,6 +208,7 @@ and PRs, `code-review` on an open PR, `claude-security` for security-sensitive c
 | `/as:estimate` | `<request text or file> [--lang en\|pl]` \| `docs/estimates/<slug>` | Client asks for a feature quote; revision after answers |
 | `/as:feature` | `<description, files>` \| `docs/features/<slug>` \| `docs/estimates/<slug>` \| `<legacy folder>` `[--lang en\|pl]` | A feature spanning several changes, or new client material |
 | `/as:implement` | `[slug] [--step <n>]` | Execute an approved plan, in any session |
+| `/as:deliver` | `docs/features/<slug> [--max-stages <n>]` | A documented feature, delivered unattended |
 | `/as:finish` | `[base] [--no-simplify] [--no-review] [--no-tests] [--no-docs]` | Feature done, before the PR |
 | `/as:issue` | `[problem description]` | Save a problem you will not fix now |
 | `/as:fix` | `[slug or request]` | Work through `docs/issues/`, most important first |
@@ -331,6 +337,26 @@ stops and proposes an edit to `## Plan` instead of improvising. Nothing is commi
 ```text
 /as:implement                       # the proposal of this branch, first unticked step
 /as:implement cancel-items --step 3
+```
+
+### `deliver` — a whole feature, unattended
+
+Hand it a feature page and leave (overnight): it asks its questions at the start — open questions with a recommended
+answer each, branch, green checks, permissions that will not prompt — then loops without asking. Each stage runs in a
+fresh subagent and follows an existing skill: `tech-lead` plans the next phase, `implement` builds a milestone,
+`finish` reviews, merges the proposal and adds contract tests, `fix` closes the issues the run saved, and a final review
+covers the whole branch. Where those skills would ask, it takes the recommended option and records it as an
+assumption (`Assumed by as:deliver` in the proposal). Every green stage is a local commit; nothing is pushed.
+
+It stops when all phases are done, checks are green, `spec_lint.py` is OK, the new scenarios have tests, the review has
+no Must finding and no p1–p3 issue from the run is open — or earlier, at a decision only a human may take (acceptance
+criteria, data deletion, a new external service, a breaking public contract), at checks it cannot repair (the stage's
+changes go to a stash), when it stops making progress, or at `--max-stages`. `docs/features/<slug>/delivery.md` is the
+morning report: criteria, assumptions to review first, stages and commits. Rerunning the command resumes.
+
+```text
+/as:deliver docs/features/cancel-items
+/as:deliver docs/features/cancel-items --max-stages 40
 ```
 
 ### `init` — onboard a repository

@@ -137,3 +137,5 @@ docs updated, issues saved and closed, open items (unfixed findings, unclassifie
 `/commit-commands:commit-push-pr` (or `/commit-commands:commit`), then `/code-review:code-review` on the PR — Claude
 Code only, if installed. If the diff touches authentication, authorisation, input handling, secrets or data access,
 first suggest a security scan of the branch's changes with `/claude-security` (Claude Code only, if installed).
+If `docs/qa/` exists and the diff touches the web front end, suggest checking it in a browser with `as:qa branch`
+(the app running).

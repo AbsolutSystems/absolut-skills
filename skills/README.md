@@ -19,6 +19,8 @@
 | `agent-docs` | `/as:agent-docs` | `$as:agent-docs` | Build and update minimal `AGENTS.md`/`CLAUDE.md` docs and `.guidelines/` holding only what the code cannot tell; prunes the rest |
 | `spec-docs` | `/as:spec-docs` | `$as:spec-docs` | Human-readable Markdown spec of module contracts (scenarios with stable IDs) in `docs/spec/`; bugs go to `docs/issues/` |
 | `spec-tests` | `/as:spec-tests` | `$as:spec-tests` | Which spec scenarios are verified by tests (`COVERED` / `PARTIAL` / `MISSING`) |
+| `qa-docs` | `/as:qa-docs` | `$as:qa-docs` | What browser QA checks, in `docs/qa/`: environments, test accounts, roles, app-wide UI rules and cross-feature journeys `J<n>`; reports drift, outdated journeys and the last result per criterion and journey |
+| `qa` | `/as:qa` | `$as:qa` | Checks the running web app in a browser: feature criteria and journeys (or what the branch touches) clicked by an executor subagent per scenario, screenshots judged by a separate agent, report in `docs/qa/runs/`, failures offered as issues; `explore <area>` tries to break one area |
 
 Every skill lives in `skills/<name>/`:
 

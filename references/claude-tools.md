@@ -22,6 +22,16 @@
   throw away; keep the machine awake (`caffeinate -i` on macOS). Stages run as Agent tool subagents on the session
   model; a subagent cannot start subagents, so a stage's fan-outs run in sequence inside it. A long run gets its
   context compacted — the loop re-reads its state from the files every stage.
+- Browser (`as:qa`, `as:qa-docs`): the `playwright` plugin from the official marketplace
+  ([recommended plugins](recommended-plugins.md)) provides the browser tools `mcp__plugin_playwright_playwright__*`:
+  `browser_navigate`, `browser_snapshot` (accessibility tree — find controls here, not by guessing selectors),
+  `browser_click`, `browser_type`, `browser_fill_form`, `browser_resize`, `browser_take_screenshot` (`filename`
+  relative to the project root, e.g. `.qa/<run>/J1-2-mobile.png` — it writes only inside the session's workspace),
+  `browser_console_messages`, `browser_network_requests`, `browser_evaluate` (only to reset test data), `browser_close`.
+  They are deferred tools: a subagent loads them first with ToolSearch (`select:<names>`) — say so in the brief. The
+  tool also leaves logs and page snapshots in `.playwright-mcp/` in the project root: gitignore it with `.qa/`.
+  Missing → `claude plugin install playwright@claude-plugins-official`, then restart the session. Subagents share the
+  session's one browser: run them one after another. The judge reads screenshots with Read (it shows images).
 - Worktrees (`as:worktree-create`, `as:worktree-close`): do not use EnterWorktree/ExitWorktree — they manage their own
   worktrees in `.claude/worktrees`. After create, suggest `cd <path> && claude` in a new terminal. Before removing a
   worktree the session is in, `cd <main>` in Bash first.

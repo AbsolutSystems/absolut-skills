@@ -42,6 +42,8 @@ Show this table as it is, in the user's language:
 | check whether agent docs and spec still match the code (no writes) | `as:docs-check` |
 | update agent docs / the spec | `as:agent-docs` / `as:spec-docs` |
 | see which spec scenarios have no tests | `as:spec-tests` |
+| check the running web app in a browser (criteria, journeys, screenshots judged) | `as:qa` (after `as:qa-docs`) |
+| say what QA checks: environments, accounts, UI rules, cross-feature journeys | `as:qa-docs` |
 | review the health of the whole project | `as:health` |
 | work on several branches at once | `as:worktree-create` / `as:worktree-close` |
 | learn how it all fits together | `as:help flows` |
@@ -61,7 +63,8 @@ Show these as short chains, then point to the sections below for details:
   phase done); new material → `as:feature docs/features/<slug>`. To brief a new session: "read
   `docs/features/<slug>/index.md`".
 - **Unattended feature**: `as:feature …` → `as:deliver docs/features/<slug>` (questions at the start, then the
-  Feature flow per phase without asking, local commits, report in `docs/features/<slug>/delivery.md`) → review the
+  Feature flow per phase without asking, then a browser check with `as:qa` when `docs/qa/` exists, local commits,
+  report in `docs/features/<slug>/delivery.md`) → review the
   assumptions and commits → `/commit-commands:commit-push-pr`.
 - **Bug**: `as:tech-lead <symptom>` (root cause, failing test, fix after approval; or saved to `docs/issues/` if you
   defer it) → `as:finish` → commit.
@@ -72,6 +75,11 @@ Show these as short chains, then point to the sections below for details:
   `docs/deliveries/`).
 - **Health**: `as:health` (report and snapshot in `docs/health/`, fixes small items you pick, saves larger ones as
   issues) → the Known issues flow; the next `as:health` closes issues it no longer finds.
+- **QA**: `as:qa-docs` (once, then after features change: environments, accounts, UI rules and journeys in
+  `docs/qa/`) → with the app running, `as:qa branch` before the PR, `as:qa docs/features/<slug>` or `as:qa journeys`
+  (screenshots judged by a separate agent, report in `docs/qa/runs/`, failures saved as issues) → the Known issues
+  flow; `as:qa explore <area>` tries to break one area. Needs the `playwright` plugin (Claude Code) or the Playwright
+  MCP server (Codex).
 - **Parallel work**: `as:worktree-create <name>`, run any flow there in a new session, `as:worktree-close`.
 - **Upkeep**: `as:docs-check` (docs and spec against the code, no writes), `as:spec-tests` (scenarios without tests).
 
@@ -115,6 +123,8 @@ start in a new session.
 - Default path: `/as:finish` (next section) — it runs simplify and review for you. The items below are for ad-hoc use.
 - Ask Claude to run the `code-simplifier` agent on the recent changes.
 - `/as:spec-tests` — which contract scenarios lack tests (unhappy paths first).
+- `/as:qa branch` — click through the criteria and journeys the branch touches in a browser (needs `docs/qa/` from
+  `/as:qa-docs` and the app running).
 - Findings you do not fix now (from `/code-review`, `/claude-security` or your own review): `/as:issue` saves them to
   `docs/issues/`.
 - Security-sensitive changes or a release: run `/claude-security` (or ask for a security scan).

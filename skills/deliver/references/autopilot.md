@@ -27,6 +27,7 @@ Do not assume these; return **blocked** with the question, the options and your 
   named by the feature page or the issue;
 - breaking a contract used outside the repository (public API, event, file format) when the phase or the issue does
   not name it;
+- opening a URL that is not `localhost` or a `local` environment of `docs/qa/index.md` (QA stage);
 - a phase or an issue that cannot be delivered without one of the above.
 
 ## Per skill
@@ -73,6 +74,14 @@ that needs a human-only decision → blocked (an issues run skips the issue and 
 **Final review**: review the whole diff from the base with the host review tool or
 [../../finish/references/review.md](../../finish/references/review.md). Fix Must and Should findings as in finish,
 rerun the checks; result `clean` only when no Must or Should finding was found.
+
+**qa** (QA stage, run by the loop in the main thread): no target question — the loop names it, always with
+`--env local`; the start question is skipped; an app that does not answer is started with the `local` row's `Start`
+command without asking (still no answer → QA `BLOCKED`, recorded, the run goes on); missing account variables →
+those scenarios `BLOCKED`; `.qa/` is added to `.gitignore` without asking. A `FAIL` or a finding → issue without asking:
+`p2` when it breaks a feature criterion or a main flow, `p1` for data loss or security, else `p3`; one per cause. A
+`FAIL` the judge doubted (FAIL or OUTDATED) is still saved — the fix stage re-checks its evidence. `OUTDATED` and
+`BLOCKED` → report only (for `as:qa-docs`), never fixed by editing `docs/qa/`. The stage's log line names its report.
 
 **Issues** (any stage): saved per [../../issue/references/issue-format.md](../../issue/references/issue-format.md)
 without asking, with `**Source:**` `as:deliver`, duplicates merged into the existing file. Out-of-plan problems in
@@ -129,6 +138,7 @@ checks this for the feature report).
 | Added and changed scenarios tested | ❌ `ORD-016`, issue `p4-ord-016-scenario-unclear` |
 | Final review without Must | ✅ |
 | No p1–p3 issue from this run | ✅ |
+| Last QA run without FAIL | ✅ [run](../../qa/runs/2026-10-28-feature-partial-cancel.md), 2 OUTDATED for `as:qa-docs` |
 
 ## Assumptions to review
 
@@ -147,6 +157,8 @@ checks this for the feature report).
 
 - `**Rollout:**` deploy Billing first. Set aside: none.
 ```
+
+The QA row reads `skipped — <reason>` when start-up skipped QA, and is left out when the project has no `docs/qa/`.
 
 An issues run has the same sections with `**Run:** issues (<request>)` instead of `**Feature:**`, the criterion
 "All selected issues closed or skipped, no open proposal" instead of the phases one, and two more sections after the

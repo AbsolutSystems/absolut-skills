@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills QA"
+  short_description: "Check the web app in a browser: acceptance criteria and journeys, judged screenshots, report"
+  default_prompt: "Use $as:qa to check this web app in a browser against docs/qa/ and the feature criteria."
+policy:
+  allow_implicit_invocation: false

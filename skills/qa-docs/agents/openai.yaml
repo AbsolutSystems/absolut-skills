@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills QA Docs"
+  short_description: "Create and maintain docs/qa/: environments, accounts, UI rules and journeys for browser QA"
+  default_prompt: "Use $as:qa-docs to create or update docs/qa/ for browser checks of this web app."
+policy:
+  allow_implicit_invocation: false

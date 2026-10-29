@@ -65,6 +65,8 @@ Point either host at a local clone instead of `AbsolutSystems/absolut-skills`, e
 | check whether agent docs and spec still match the code (no writes) | `/as:docs-check` |
 | update agent docs / the spec | `/as:agent-docs` / `/as:spec-docs` |
 | see which spec scenarios have no tests | `/as:spec-tests` |
+| check the running web app in a browser (criteria, journeys, screenshots judged) | `/as:qa` |
+| say what QA checks: environments, accounts, UI rules, cross-feature journeys | `/as:qa-docs` |
 | review the health of the whole project | `/as:health` |
 | work on several branches at once | `/as:worktree-create` / `/as:worktree-close` |
 | learn how it all fits together | `/as:help flows` |
@@ -178,12 +180,26 @@ finding is gone.
 /as:spec-tests                      # which scenarios have no tests
 ```
 
+### 10. Checking the app in a browser (web apps)
+
+```text
+/as:qa-docs                         # once: docs/qa/ — environments, test accounts, app-wide UI rules, journeys
+/as:qa branch                       # app running: click through what the branch touches, report in docs/qa/runs/
+/as:qa docs/features/cart           # a feature's acceptance criteria; /as:qa journeys for the cross-feature paths
+/as:qa explore checkout             # try to break one area
+/as:qa-docs                         # later: drift, outdated journeys, last result of every criterion and journey
+```
+
+An executor subagent clicks each scenario and keeps screenshots, console errors and failed requests; a separate judge
+decides from that evidence alone. Failures are offered as issues (the Known issues flow). Needs the `playwright`
+plugin (Claude Code) or the Playwright MCP server (Codex); only local or listed test environments, never production.
+
 ### Plan mode and other plugins
 
 In Claude Code, `as:tech-lead` hands medium and large changes to **plan mode** (Shift+Tab): Claude plans without
 editing and implements after you approve. In Codex, ask for a plan and say not to edit until you approve it.
 `as` works with the recommended Anthropic plugins (`/as:help` shows which are installed): `commit-commands` for commits
-and PRs, `code-review` on an open PR, `claude-security` for security-sensitive changes, `frontend-design` for UI.
+and PRs, `code-review` on an open PR, `claude-security` for security-sensitive changes, `frontend-design` for UI, `playwright` for `as:qa`.
 
 ### What gets written where
 
@@ -196,8 +212,10 @@ and PRs, `code-review` on an open PR, `claude-security` for security-sensitive c
 | `docs/features/<slug>/` | `feature`; phase status by `tech-lead`, `finish`; `delivery.md` by `deliver` | Feature page (why, acceptance criteria, roadmap, decisions) and `sources/` kept verbatim |
 | `docs/estimates/<slug>/` | `estimate` | Client request analysis and hour estimate: `analysis.md` (internal), `client.md` (to send) |
 | `docs/deliveries/<branch>.md` | `deliver` | Report of an unattended issues run |
-| `docs/issues/p<1-4>-<slug>.md` | `issue`, `finish`, `health`, `spec-docs`, `tech-lead`, `implement`, `docs-check`, `spec-tests`; deleted by `fix`, `finish`, `health`, `deliver` | Known problems not fixed yet, one file each, priority in the name |
+| `docs/issues/p<1-4>-<slug>.md` | `issue`, `finish`, `health`, `spec-docs`, `tech-lead`, `implement`, `docs-check`, `spec-tests`, `qa`, `qa-docs`; deleted by `fix`, `finish`, `health`, `deliver` | Known problems not fixed yet, one file each, priority in the name |
 | `docs/health/` | `health` | Dated HTML reports, JSON snapshots, index with trends |
+| `docs/qa/index.md`, `docs/qa/journeys.md` | `qa-docs` | Environments, test accounts (variable names), roles, app-wide UI rules, journeys |
+| `docs/qa/runs/` | `qa` (also inside `deliver`) | Browser run reports with the screenshots of failures; other screenshots in gitignored `.qa/` |
 
 ## Commands
 
@@ -220,6 +238,8 @@ and PRs, `code-review` on an open PR, `claude-security` for security-sensitive c
 | `/as:agent-docs` | `[path] [--depth <n>]` | Agent docs refresh |
 | `/as:spec-docs` | `[path] [--lang en\|pl]` | Spec refresh |
 | `/as:spec-tests` | `[path]` | Scenario test coverage |
+| `/as:qa-docs` | `[area \| path]` | Once, then after features change: what browser QA checks |
+| `/as:qa` | `docs/features/<slug>` \| `journeys` \| `J<n>` \| `branch [base]` \| `explore <area>` `[--env <name>]` | App running: check it in a browser |
 
 ## Skills in detail
 
@@ -346,11 +366,12 @@ Hand it a feature page and leave (overnight): it asks its questions at the start
 answer each, branch, green checks, permissions that will not prompt — then loops without asking. Each stage runs in a
 fresh subagent and follows an existing skill: `tech-lead` plans the next phase, `implement` builds a milestone,
 `finish` reviews, merges the proposal and adds contract tests, `fix` closes the issues the run saved, and a final review
-covers the whole branch. Where those skills would ask, it takes the recommended option and records it as an
+covers the whole branch; when the project has `docs/qa/`, a QA stage then checks the app in a browser with `qa` and
+the failures it finds go back into the loop as issues. Where those skills would ask, it takes the recommended option and records it as an
 assumption (`Assumed by as:deliver` in the proposal). Every green stage is a local commit; nothing is pushed.
 
 It stops when all phases are done, checks are green, `spec_lint.py` is OK, the new scenarios have tests, the review has
-no Must finding and no p1–p3 issue from the run is open — or earlier, at a decision only a human may take (acceptance
+no Must finding, no p1–p3 issue from the run is open and the last QA run has no failure — or earlier, at a decision only a human may take (acceptance
 criteria, data deletion, a new external service, a breaking public contract), at checks it cannot repair (the stage's
 changes go to a stash), when it stops making progress, or at `--max-stages`. `docs/features/<slug>/delivery.md` is the
 morning report: criteria, assumptions to review first, stages and commits. Rerunning the command resumes.
@@ -367,6 +388,31 @@ report is `docs/deliveries/<branch>.md`, skipped issues with their questions fir
 /as:deliver docs/features/cancel-items --max-stages 40
 /as:deliver docs/issues
 /as:deliver docs/issues all p1 and p2
+```
+
+### `qa-docs` and `qa` — the app checked in a browser
+
+Tests check modules; nobody looks at the assembled app. `qa-docs` writes `docs/qa/`: where the app runs and how to
+start it, test accounts (environment variable names, never secrets) and data, roles, app-wide UI rules (viewports,
+empty, error and loading states) and journeys — cross-feature paths `J1…Jn` written as intent ("add the cheapest
+product to the cart") with checkpoints a screenshot can decide. Acceptance criteria stay on the feature pages. On
+later runs it reports drift, journeys a run marked outdated, criteria too vague to check, and the last result of every
+criterion and journey.
+
+`qa` runs them against a local or listed test environment (never production): one executor subagent per scenario,
+in sequence, clicking through the steps and saving screenshots, console errors and failed requests at every
+checkpoint; then a judge subagent that never saw the run decides `PASS`, `FAIL`, `OUTDATED` (the journey lags behind
+an intended change) or `BLOCKED` from that evidence and the app-wide rules. A mismatch with a feature criterion is
+always a failure. The report goes to `docs/qa/runs/` with the screenshots of failures; failures are offered as issues.
+`explore <area>` tries to break one area instead (empty and odd input, double submit, back and refresh, narrow
+screens). Web applications only.
+
+```text
+/as:qa-docs
+/as:qa branch
+/as:qa docs/features/cart --env staging
+/as:qa J2 J5
+/as:qa explore checkout
 ```
 
 ### `init` — onboard a repository

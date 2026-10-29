@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.10.0
+
+- New `qa-docs` skill: writes and maintains `docs/qa/` for a web app — environments and how to start them, test
+  accounts as environment variable names, roles, app-wide UI rules `R<n>` and cross-feature journeys `J<n>` written as
+  intent with checkpoints a screenshot can decide. Drafts it from the code, the feature pages and `AGENTS.md`; later
+  runs report drift, outdated journeys, criteria too vague to check and the last result of every criterion and
+  journey. Acceptance criteria stay on the feature pages.
+- New `qa` skill: checks the running web app in a browser — a feature's criteria, the journeys, or what the branch
+  touches (`branch`). One executor subagent per scenario, in sequence, saves screenshots, console errors and failed
+  requests; a judge subagent that never saw the run decides `PASS` / `FAIL` / `OUTDATED` / `BLOCKED`. Report in
+  `docs/qa/runs/` with the screenshots of failures (the rest in gitignored `.qa/`), failures offered as issues.
+  `explore <area>` tries to break one area. Opens only local or listed test environments, never production.
+- `deliver`: a QA stage after a clean final review when `docs/qa/` exists, run by the loop in the main thread;
+  failures become run issues and are fixed in the run; done needs a QA run without failures (skipped and said so when
+  the browser tool or the app is not available).
+- `finish` suggests `as:qa branch`, `feature` suggests `as:qa-docs` after criteria change, `help` and README gain the
+  QA flow; `playwright` joins the recommended plugins, browser tools in the host mappings.
+
 ## 1.9.0
 
 - `deliver` takes `docs/issues [request]` as a second target: an unattended run over the saved issues (request as in

@@ -63,7 +63,7 @@ Meta line:
   `review`, `refactor`, `delete`, `add-tests`, `remove-tests`, `deps`, `docs`.
 - `**Priority:**` — as in the file name. `**Effort:**` — `S` (one module, a few files, no contract change), `M`, `L`.
 - `**Module:**` — link to the module's spec page, else the module directory in backticks.
-- `**Found:**` — date. `**Source:**` — who found it: `as:finish review`, `as:health`, `as:spec-docs`, `as:tech-lead`, `as:deliver`,
+- `**Found:**` — date. `**Source:**` — who found it: `as:finish review`, `as:health`, `as:spec-docs`, `as:tech-lead`, `as:deliver`, `as:qa`, `as:qa-docs`,
   `/code-review`, `/claude-security`, `user`, …
 - `**Key:**` — only for `as:health` findings: the finding's `key` from the snapshot, so the next run recognises it.
 

@@ -12,9 +12,10 @@
   requests; a judge subagent that never saw the run decides `PASS` / `FAIL` / `OUTDATED` / `BLOCKED`. Report in
   `docs/qa/runs/` with the screenshots of failures (the rest in gitignored `.qa/`), failures offered as issues.
   `explore <area>` tries to break one area. Opens only local or listed test environments, never production.
-- `deliver`: a QA stage after a clean final review when `docs/qa/` exists, run by the loop in the main thread;
+- `deliver`: a QA stage after a clean final review when `docs/qa/` exists, run by the loop in the main thread,
+  always against the `local` environment of `docs/qa/index.md` (started with its command when it does not answer);
   failures become run issues and are fixed in the run; done needs a QA run without failures (skipped and said so when
-  the browser tool or the app is not available).
+  the browser tool, the app or a `local` environment is not available).
 - `finish` suggests `as:qa branch`, `feature` suggests `as:qa-docs` after criteria change, `help` and README gain the
   QA flow; `playwright` joins the recommended plugins, browser tools in the host mappings.
 

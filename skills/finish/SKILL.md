@@ -9,7 +9,8 @@ argument-hint: "[base] [--no-simplify] [--no-review] [--no-tests] [--no-docs]"
 
 Close a feature before committing and opening a PR. This skill owns only the scope, the order and the approval
 gates. Spec rules come from [spec-docs](../spec-docs/SKILL.md), docs rules from [agent-docs](../agent-docs/SKILL.md),
-simplify and review criteria from [references/review.md](references/review.md) — read them and follow them.
+the review from [review](../review/SKILL.md), simplify criteria from [references/review.md](references/review.md) —
+read them and follow them.
 
 Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex):
 
@@ -50,10 +51,9 @@ them and report it.
 
 ### 4. Review
 
-Review the diff from base using the host tool or [references/review.md](references/review.md). Present the findings
-grouped Must / Should / Nice, each with a concrete failure scenario. Ask which to fix, fix only those, rerun the tests.
-Then offer to save the unfixed Must and Should findings as issues (multi-select, all preselected; Nice only on
-request) per [../issue/references/issue-format.md](../issue/references/issue-format.md), `**Source:**` `as:finish review`.
+Follow [review](../review/SKILL.md) in branch mode with this base: from its step 1 only the merge-base, base tip and diff command, then steps 2–7: reviewers,
+verification, merge check, findings, fixes with the checks from step 2 rerun, and unfixed Must and Should findings
+offered as issues.
 
 ### 5. Analysis
 
@@ -134,8 +134,8 @@ descriptions of the new code. This also links new spec pages.
 
 Short summary: code simplified, review fixes, proposals merged or kept open, spec scenarios added/changed/removed, tests added (with scenario IDs),
 docs updated, issues saved and closed, open items (unfixed findings, unclassified drift, failing tests, proposal `**Rollout:**` items). Do not commit. Next steps:
-`/commit-commands:commit-push-pr` (or `/commit-commands:commit`), then `/code-review:code-review` on the PR — Claude
-Code only, if installed. If the diff touches authentication, authorisation, input handling, secrets or data access,
+`/commit-commands:commit-push-pr` (or `/commit-commands:commit`) — Claude Code only, if installed; a teammate reviews the
+PR with `as:review <PR>`. If the diff touches authentication, authorisation, input handling, secrets or data access,
 first suggest a security scan of the branch's changes with `/claude-security` (Claude Code only, if installed).
 If `docs/qa/` exists and the diff touches the web front end, suggest checking it in a browser with `as:qa branch`
 (the app running).

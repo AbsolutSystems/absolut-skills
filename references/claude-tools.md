@@ -7,12 +7,13 @@
 - Subagents: use the Agent tool with `subagent_type: "Explore"` for read-only analysis; several Agent calls in one message run in parallel.
 - Subagent model: read-only briefs that find and classify (Explore, Investigate, `spec-docs`/`agent-docs` analysis,
   coverage, test quality, `finish` analysis, `estimate` Impact, `feature` legacy mapping) pass a smaller model in the Agent tool's `model` parameter (e.g. `sonnet`, or `haiku` for
-  plain searches); Architecture briefs, `estimate` Consistency and review keep the session model.
+  plain searches); Architecture briefs, `estimate` Consistency and `review` reviewers and verifiers keep the session model.
 - Asking the user: use AskUserQuestion (up to 4 questions per call; ask further batches if needed), with concrete options.
 - Simplify (`as:finish`): the built-in `simplify` skill via the Skill tool, or the `code-simplifier` agent if that plugin
   is installed; otherwise follow `skills/finish/references/review.md`.
-- Review (`as:finish`): the built-in `code-review` skill (local diff; not the plugin's `code-review:code-review`, which
-  reviews an open PR) via the Skill tool; otherwise follow `skills/finish/references/review.md` with read-only subagents.
+- Review (`as:review`, also inside `as:finish` and `as:deliver`): reviewers and verifiers are Agent tool subagents
+  with `subagent_type: "general-purpose"` on the session model (Explore reads excerpts, too little to judge a defect),
+  told in the brief to stay read-only; one message with several Agent calls runs them in parallel.
 - Built-in skills depend on the Claude Code version: use one only if it appears in the available skills list, else take
   the fallback and say so in one line.
 - Plan mode (`as:tech-lead` handoff): switch with the EnterPlanMode tool (the user confirms the switch); in plan mode,

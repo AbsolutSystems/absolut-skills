@@ -8,7 +8,9 @@
 - Without subagents, `as:tech-lead` options: one recommended architecture with its main alternative in a line;
   the 2–3 option comparison only when the user asks for it.
 - Asking the user: ask in plain text, numbered, with suggested options, and wait for the answer.
-- Simplify and review (`as:finish`): follow `skills/finish/references/review.md`; use subagents for the review if available.
+- Simplify (`as:finish`): follow `skills/finish/references/review.md`.
+- Review (`as:review`, also inside `as:finish` and `as:deliver`): reviewers and verifiers as subagents if available;
+  otherwise the lenses run one after another, and verification is a separate pass that re-reads the code.
 - Plan mode (`as:tech-lead` handoff) is a Claude Code feature: on Codex, present the plan, wait for
   approval, then implement step by step.
 - Unattended run (`as:deliver`): start Codex with an approval policy that never asks, e.g.

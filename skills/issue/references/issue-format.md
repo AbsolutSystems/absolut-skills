@@ -28,7 +28,7 @@ One rubric, so issues from different sessions and skills compare:
 | `p4` | Cosmetic, technical debt, clean-up |
 
 Mapping from other sources: `as:health` severity `high` → `p2` (`p1` when it is about data or security), `medium` →
-`p3`, `low` → `p4`; `as:finish` review Must → `p1`/`p2`, Should → `p3`, Nice → `p4`; external reviews by the same
+`p3`, `low` → `p4`; `as:review` Must → `p1`/`p2`, Should → `p3`, Nice → `p4`; external reviews by the same
 rubric.
 
 ## Content
@@ -63,7 +63,7 @@ Meta line:
   `review`, `refactor`, `delete`, `add-tests`, `remove-tests`, `deps`, `docs`.
 - `**Priority:**` — as in the file name. `**Effort:**` — `S` (one module, a few files, no contract change), `M`, `L`.
 - `**Module:**` — link to the module's spec page, else the module directory in backticks.
-- `**Found:**` — date. `**Source:**` — who found it: `as:finish review`, `as:health`, `as:spec-docs`, `as:tech-lead`, `as:deliver`, `as:qa`, `as:qa-docs`,
+- `**Found:**` — date. `**Source:**` — who found it: `as:review`, `as:health`, `as:spec-docs`, `as:tech-lead`, `as:deliver`, `as:qa`, `as:qa-docs`,
   `/code-review`, `/claude-security`, `user`, …
 - `**Key:**` — only for `as:health` findings: the finding's `key` from the snapshot, so the next run recognises it.
 

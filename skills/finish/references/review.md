@@ -1,6 +1,7 @@
 # Simplify and review criteria
 
-Used when the host has no dedicated simplify or review tool, and as the bar any tool's output must meet. Scope is always
+Simplify: used when the host has no dedicated simplify tool, and as the bar its output must meet. Review: the bar of
+[as:review](../../review/SKILL.md) and of any change checked against it. Scope is always
 the diff from the base; read the surrounding code and, when a signature or behaviour changes, every caller.
 
 ## Simplify
@@ -26,6 +27,10 @@ Look for, in this order of weight:
 6. Unnecessary code.
 
 Every finding must name a concrete input or situation that produces the wrong outcome; drop findings without one.
+Before reporting, check that the input can reach the code (callers, validation upstream, types, framework guarantees)
+and that no existing guard or test already handles it. Report only what the diff introduces or makes reachable. Not
+findings: style, naming, formatting, alternative designs without a defect, what lint, types or tests already enforce,
+hypothetical future needs. No quota — zero findings is a valid result.
 Propose the smallest fix, preferring deletion. Group findings:
 
 - **Must fix** — bugs, security, data loss.

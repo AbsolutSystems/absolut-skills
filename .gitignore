@@ -1,6 +1,7 @@
 .DS_Store
 *.log
 .idea/
+.openidea/
 .vscode/
 __pycache__/
 *.py[cod]

@@ -50,8 +50,7 @@ the assumption; one that changes the scope → blocked. Do not ask between miles
 **finish** (Finish stage):
 
 - Baseline red → return failed (the loop repairs it).
-- Review: fix every Must and Should finding; save the ones still failing after one fix attempt as issues
-  (Must → `p2`, `p1` for data or security; Should → `p3`); drop Nice findings.
+- Review: as in **review** below.
 - Spec: proposals of this branch are confirmed; ID collision → renumber to the next free IDs; scenarios not
   implemented → keep the proposal open and add an unticked `## Plan` step for each (the loop implements them). Drift explained by the proposal or the
   feature's acceptance criteria → intended; any other drift → unintended: fix the code. Unsure → keep the spec, save a
@@ -71,9 +70,14 @@ test-first, issue deleted. `M`/`L` or a contract change → a proposal through t
 implements and finishes it); its `**Issue:**` meta line closes the issue. Evidence gone → delete the issue. A fix
 that needs a human-only decision → blocked (an issues run skips the issue and goes on).
 
-**Final review**: review the whole diff from the base with the host review tool or
-[../../finish/references/review.md](../../finish/references/review.md). Fix Must and Should findings as in finish,
-rerun the checks; result `clean` only when no Must or Should finding was found.
+**review** (inside the Finish stage, and the Final review stage): [review](../../review/SKILL.md) in branch mode from
+the run's base; inside a stage subagent its reviewers and verifiers run in sequence. Fix every `confirmed` Must and
+Should finding. A `plausible` one → write a test that shows it first: it fails → fix it; it passes, or no test can show it (a race,
+a security path) → drop the test and save the finding as a `p4` issue with "unconfirmed by as:review" in its Problem,
+for a human; it no longer counts as a Must or Should finding. Save the ones still failing after one fix attempt as issues (Must → `p2`,
+`p1` for data or security; Should → `p3`). Drop Nice findings and refuted ones; questions for the author and a failed
+merge check go to the report. The Final review stage reviews the whole diff from the base and returns `clean` only
+when it fixed nothing.
 
 **qa** (QA stage, run by the loop in the main thread): no target question — the loop names it, always with
 `--env local`; the start question is skipped; an app that does not answer is started with the `local` row's `Start`

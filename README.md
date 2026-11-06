@@ -60,6 +60,7 @@ Point either host at a local clone instead of `AbsolutSystems/absolut-skills`, e
 | continue an approved plan, also in a new session | `/as:implement` |
 | deliver a whole documented feature, or fix all saved problems, unattended (e.g. overnight) | `/as:deliver` |
 | wrap up a feature before the PR (simplify, review, spec, tests, docs) | `/as:finish` |
+| review my branch, or a teammate's PR (verified findings, comments on GitHub) | `/as:review` / `/as:review <PR>` |
 | save a problem to fix later (also findings of `/code-review`) | `/as:issue` |
 | fix the saved problems, most important first | `/as:fix` |
 | check whether agent docs and spec still match the code (no writes) | `/as:docs-check` |
@@ -101,6 +102,7 @@ On a large project specify 2–3 central modules first and add more later with `
 /as:implement                       # (new session) continues the first unticked step of the plan
 /as:finish                          # simplify, review, merge the proposal into the spec, missing tests, docs
 /commit-commands:commit-push-pr     # commit, push, open the PR
+/as:review 571                      # a teammate reviews the PR: verified findings as GitHub review comments
 ```
 
 `as:tech-lead` also starts on its own when you describe a feature or ask "how should we…". A small change in one
@@ -149,7 +151,7 @@ Or let `/as:deliver docs/features/cancel-items` run the whole roadmap unattended
 /as:fix 10 most important bugs      # ... or a selection, one by one; larger ones get a proposal → /as:implement
 ```
 
-Every skill that finds a problem it does not fix now (`finish` review, `health`, `spec-docs` "rule or bug?",
+Every skill that finds a problem it does not fix now (`review`, `health`, `spec-docs` "rule or bug?",
 `tech-lead` bug, `implement`) offers to save it as `docs/issues/p<1-4>-<slug>.md` — priority in the file name, so
 `ls docs/issues` is the list. Fixed means deleted, in the same diff as the fix.
 
@@ -199,7 +201,7 @@ plugin (Claude Code) or the Playwright MCP server (Codex); only local or listed 
 In Claude Code, `as:tech-lead` hands medium and large changes to **plan mode** (Shift+Tab): Claude plans without
 editing and implements after you approve. In Codex, ask for a plan and say not to edit until you approve it.
 `as` works with the recommended Anthropic plugins (`/as:help` shows which are installed): `commit-commands` for commits
-and PRs, `code-review` on an open PR, `claude-security` for security-sensitive changes, `frontend-design` for UI, `playwright` for `as:qa`.
+and PRs, `claude-security` for security-sensitive changes, `frontend-design` for UI, `playwright` for `as:qa`.
 
 ### What gets written where
 
@@ -212,7 +214,7 @@ and PRs, `code-review` on an open PR, `claude-security` for security-sensitive c
 | `docs/features/<slug>/` | `feature`; phase status by `tech-lead`, `finish`; `delivery.md` by `deliver` | Feature page (why, acceptance criteria, roadmap, decisions) and `sources/` kept verbatim |
 | `docs/estimates/<slug>/` | `estimate` | Client request analysis and hour estimate: `analysis.md` (internal), `client.md` (to send) |
 | `docs/deliveries/<branch>.md` | `deliver` | Report of an unattended issues run |
-| `docs/issues/p<1-4>-<slug>.md` | `issue`, `finish`, `health`, `spec-docs`, `tech-lead`, `implement`, `docs-check`, `spec-tests`, `qa`, `qa-docs`; deleted by `fix`, `finish`, `health`, `deliver` | Known problems not fixed yet, one file each, priority in the name |
+| `docs/issues/p<1-4>-<slug>.md` | `issue`, `review`, `finish`, `health`, `spec-docs`, `tech-lead`, `implement`, `docs-check`, `spec-tests`, `qa`, `qa-docs`; deleted by `fix`, `finish`, `health`, `deliver` | Known problems not fixed yet, one file each, priority in the name |
 | `docs/health/` | `health` | Dated HTML reports, JSON snapshots, index with trends |
 | `docs/qa/index.md`, `docs/qa/journeys.md` | `qa-docs` | Environments, test accounts (variable names), roles, app-wide UI rules, journeys |
 | `docs/qa/runs/` | `qa` (also inside `deliver`) | Browser run reports with the screenshots of failures; other screenshots in gitignored `.qa/` |
@@ -229,6 +231,7 @@ and PRs, `code-review` on an open PR, `claude-security` for security-sensitive c
 | `/as:implement` | `[slug] [--step <n>]` | Execute an approved plan, in any session |
 | `/as:deliver` | `docs/features/<slug>` \| `docs/issues [request]` `[--max-stages <n>]` | A documented feature or the saved issues, delivered unattended |
 | `/as:finish` | `[base] [--no-simplify] [--no-review] [--no-tests] [--no-docs]` | Feature done, before the PR |
+| `/as:review` | `[<PR number or URL> \| <base>] [context]` | Review your branch, or a teammate's PR |
 | `/as:issue` | `[problem description]` | Save a problem you will not fix now |
 | `/as:fix` | `[slug or request]` | Work through `docs/issues/`, most important first |
 | `/as:health` | `[path] [--quick] [--since <period>]` | Once a sprint or month |
@@ -460,8 +463,31 @@ then drift in touched modules: intended (spec updated) or regression (fixed as a
 8. **Agent docs** — refreshes `AGENTS.md` for touched directories. 9. **Summary** — nothing is committed; suggests
 `/commit-commands:commit-push-pr`, and `/claude-security` when the diff touches security-sensitive code.
 
-Simplify runs before review so the review sees the code that ships. In Claude Code it uses the built-in `/simplify`
-and `/code-review` (local diff, not the `code-review` plugin's PR review) when the version has them; elsewhere the criteria in `skills/finish/references/review.md`.
+Simplify runs before review so the review sees the code that ships. In Claude Code simplify uses the built-in `/simplify`
+when the version has it; elsewhere the criteria in `skills/finish/references/review.md`. The review is
+[`as:review`](#review--verified-findings-for-your-branch-or-a-pr) in branch mode.
+
+### `review` — verified findings for your branch or a PR
+
+```text
+/as:review                          # your branch, from the merge-base with the default branch (finish runs this)
+/as:review develop                  # your branch, from another ref
+/as:review 571                      # a teammate's PR (or its URL), optionally followed by context for the reviewers
+```
+
+1. **Target** — branch mode: the working tree from base. PR mode: base is the PR's real base branch (`gh pr view`), the
+PR head is checked out in a separate worktree `../<repo>-worktrees/review-pr-<N>`; your working copy stays untouched.
+2. **Context** — the goal from the PR description, linked issues, the proposal and commits; `AGENTS.md` and spec rules;
+CI. A description that does not match the diff becomes a question for the author, not a finding.
+3. **Reviewers** — read-only subagents with disjoint scopes: correctness and security, goal and contract, UI (only
+when the diff touches it); large diffs are split into up to 5 packages. Each reports only problems the diff introduces,
+with a concrete failure scenario — no style, naming or "could be cleaner"; zero findings is a valid answer.
+4. **Verify** — a separate sceptical subagent tries to refute every Must and Should finding: `confirmed`, `plausible`
+(kept, marked unverified) or `refuted` (dropped, only counted).
+5. **Merge check** — `git merge-tree` against the base. 6. **Report** — verdict, findings, questions, merge readiness.
+7. **Act** — branch: you pick fixes, then tests; unfixed ones can be saved to `docs/issues/`. PR: drafts of inline
+review comments and a summary, posted to GitHub only after you approve them (`COMMENT` by default); then it offers to
+remove the worktree.
 
 ### `health` — periodic project health check
 

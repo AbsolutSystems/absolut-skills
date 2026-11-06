@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills Review"
+  short_description: "Review your branch or a PR: verified findings, few false positives"
+  default_prompt: "Use $as:review to review the changes on this branch before opening a PR."
+policy:
+  allow_implicit_invocation: false

@@ -82,7 +82,7 @@ Each stage starts from the files, not from memory — re-read them every time (t
    | run proposal, all steps ticked | **Finish** — simplify, review, merge and archive, contract tests, docs | [finish](../finish/SKILL.md) |
    | run issue not named by an open proposal | **Fix** — the first by priority (several `S` of one module together) | [fix](../fix/SKILL.md) |
    | feature run: a `⏳ planned` phase | **Plan** the first one: proposal, scenarios, `## Plan` | [tech-lead From feature](../tech-lead/SKILL.md#from-feature) |
-   | none of the above, and no final review came back clean since the last stage that changed code | **Final review** of the whole branch diff from base | [review](../finish/references/review.md) |
+   | none of the above, and no final review came back clean since the last stage that changed code | **Final review** of the whole branch diff from base | [review](../review/SKILL.md) |
    | none of the above, QA not skipped at start-up, and no QA stage since that clean final review | **QA** — `docs/features/<slug>` (feature run) or `branch <base>` (issues run) | [qa](../qa/SKILL.md) |
    | none | done → [step 4](#4-done) | |
 
@@ -139,7 +139,7 @@ All must hold; check each with its command, not from the stage reports:
 - `spec_lint.py` prints `OK` (when it ran at start-up);
 - every scenario added or changed by this run's proposals (archived since base) has a test with its ID
   (`git grep -n '<ID>'` over the test directories), `error` and `edge` ones included;
-- the final review found no Must finding left unfixed;
+- the final review found no `confirmed` Must finding left unfixed;
 - no `p1`–`p3` issue added on this branch is left open, except skipped ones;
 - when QA was not skipped: the report written by the run's last QA stage (named in its log line) has no `FAIL`.
 

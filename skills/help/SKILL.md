@@ -37,6 +37,7 @@ Show this table as it is, in the user's language:
 | continue an approved plan, also in a new session | `as:implement` |
 | deliver a whole documented feature, or fix all saved problems, unattended (e.g. overnight) | `as:deliver` |
 | wrap up a feature before the PR (simplify, review, spec, tests, docs) | `as:finish` |
+| review my branch, or a teammate's PR (verified findings, comments on GitHub) | `as:review` / `as:review <PR>` |
 | save a problem to fix later (also findings of `/code-review`) | `as:issue` |
 | fix the saved problems, most important first | `as:fix` |
 | check whether agent docs and spec still match the code (no writes) | `as:docs-check` |
@@ -125,10 +126,11 @@ start in a new session.
 - `/as:spec-tests` — which contract scenarios lack tests (unhappy paths first).
 - `/as:qa branch` — click through the criteria and journeys the branch touches in a browser (needs `docs/qa/` from
   `/as:qa-docs` and the app running).
-- Findings you do not fix now (from `/code-review`, `/claude-security` or your own review): `/as:issue` saves them to
+- Findings you do not fix now (from `/as:review`, `/claude-security` or your own review): `/as:issue` saves them to
   `docs/issues/`.
 - Security-sensitive changes or a release: run `/claude-security` (or ask for a security scan).
-- PR open: `/code-review:code-review`.
+- Your branch on its own: `/as:review` (`/as:finish` runs it for you). A teammate's PR: `/as:review <number or URL>` —
+  reviews it in a separate worktree against the PR's base and posts the findings you approve as GitHub review comments.
 
 ### finish — after delivering a feature
 

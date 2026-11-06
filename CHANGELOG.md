@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.11.0
+
+- New `review` skill: reviews your branch from its base, or a teammate's pull request (number or URL) in a separate
+  worktree against the PR's real base branch. Three read-only reviewers with disjoint scopes (correctness and
+  security, goal and contract, UI only when the diff touches it; large diffs split into up to 5 packages) report only
+  problems the diff introduces, each with a concrete failure scenario — no style or "could be cleaner" findings. A
+  separate sceptical verifier then tries to refute every Must and Should finding: refuted ones are dropped and only
+  counted, unrefuted but unproven ones are kept as `plausible`. Also turns a PR description that does not match the
+  diff into questions for the author and checks with `git merge-tree` that the branch merges cleanly. Branch: you pick
+  fixes, the rest can be saved as issues. PR: inline GitHub review comments, posted only after you approve them.
+- `finish` step 4 and `deliver` (the review in the Finish stage and the Final review) run `review` instead of the
+  built-in `code-review` skill, on both hosts. Unattended, `deliver` fixes `confirmed` findings and fixes a `plausible`
+  one only when a failing test shows it first (else a `p4` issue marked unconfirmed).
+- `finish/references/review.md` gains the false-positive rules (reachability, introduced by the diff, no quota) and
+  stays the shared review bar, also for `health`. Issues from reviews have `**Source:**` `as:review`.
+
 ## 1.10.0
 
 - New `qa-docs` skill: writes and maintains `docs/qa/` for a web app — environments and how to start them, test

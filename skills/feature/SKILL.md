@@ -104,7 +104,8 @@ not checked (sources not readable, areas not explored). Next: `as:tech-lead docs
 `planned` phase as a change proposal (then `as:implement` and `as:finish`, which updates this roadmap); a new e-mail
 or document → `as:feature docs/features/<slug>` with it. If the repository has `AGENTS.md` files and the catalogue is
 new, suggest `as:agent-docs` so the root `AGENTS.md` links it. If acceptance criteria were added or changed and
-`docs/qa/` exists, suggest `as:qa-docs` to bring the journeys in line. Do not commit.
+`docs/qa/` exists, suggest `as:qa-docs` to bring the journeys in line. When the criteria involve calculations or
+thresholds, suggest `as:explain docs/features/<slug>` to check the logic with the business on worked examples. Do not commit.
 
 ## Legacy
 

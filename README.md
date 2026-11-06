@@ -61,6 +61,7 @@ Point either host at a local clone instead of `AbsolutSystems/absolut-skills`, e
 | deliver a whole documented feature, or fix all saved problems, unattended (e.g. overnight) | `/as:deliver` |
 | wrap up a feature before the PR (simplify, review, spec, tests, docs) | `/as:finish` |
 | review my branch, or a teammate's PR (verified findings, comments on GitHub) | `/as:review` / `/as:review <PR>` |
+| explain a change, a module or a feature's logic to a person (HTML with diagrams, worked examples) | `/as:explain` |
 | save a problem to fix later (also findings of `/code-review`) | `/as:issue` |
 | fix the saved problems, most important first | `/as:fix` |
 | check whether agent docs and spec still match the code (no writes) | `/as:docs-check` |
@@ -214,7 +215,8 @@ and PRs, `claude-security` for security-sensitive changes, `frontend-design` for
 | `docs/features/<slug>/` | `feature`; phase status by `tech-lead`, `finish`; `delivery.md` by `deliver` | Feature page (why, acceptance criteria, roadmap, decisions) and `sources/` kept verbatim |
 | `docs/estimates/<slug>/` | `estimate` | Client request analysis and hour estimate: `analysis.md` (internal), `client.md` (to send) |
 | `docs/deliveries/<branch>.md` | `deliver` | Report of an unattended issues run |
-| `docs/issues/p<1-4>-<slug>.md` | `issue`, `review`, `finish`, `health`, `spec-docs`, `tech-lead`, `implement`, `docs-check`, `spec-tests`, `qa`, `qa-docs`; deleted by `fix`, `finish`, `health`, `deliver` | Known problems not fixed yet, one file each, priority in the name |
+| `docs/issues/p<1-4>-<slug>.md` | `issue`, `review`, `explain`, `finish`, `health`, `spec-docs`, `tech-lead`, `implement`, `docs-check`, `spec-tests`, `qa`, `qa-docs`; deleted by `fix`, `finish`, `health`, `deliver` | Known problems not fixed yet, one file each, priority in the name |
+| `docs/explain/` | `explain` | HTML pages explaining a change, a module or a feature's logic, with `explain.css` |
 | `docs/health/` | `health` | Dated HTML reports, JSON snapshots, index with trends |
 | `docs/qa/index.md`, `docs/qa/journeys.md` | `qa-docs` | Environments, test accounts (variable names), roles, app-wide UI rules, journeys |
 | `docs/qa/runs/` | `qa` (also inside `deliver`) | Browser run reports with the screenshots of failures; other screenshots in gitignored `.qa/` |
@@ -232,6 +234,7 @@ and PRs, `claude-security` for security-sensitive changes, `frontend-design` for
 | `/as:deliver` | `docs/features/<slug>` \| `docs/issues [request]` `[--max-stages <n>]` | A documented feature or the saved issues, delivered unattended |
 | `/as:finish` | `[base] [--no-simplify] [--no-review] [--no-tests] [--no-docs]` | Feature done, before the PR |
 | `/as:review` | `[<PR number or URL> \| <base>] [context]` | Review your branch, or a teammate's PR |
+| `/as:explain` | `[branch [base] \| <PR> \| <path> \| docs/features/<slug> \| "<question>"] [--for dev\|business] [--lang en\|pl]` | Explain code to someone who did not write it |
 | `/as:issue` | `[problem description]` | Save a problem you will not fix now |
 | `/as:fix` | `[slug or request]` | Work through `docs/issues/`, most important first |
 | `/as:health` | `[path] [--quick] [--since <period>]` | Once a sprint or month |
@@ -488,6 +491,37 @@ with a concrete failure scenario — no style, naming or "could be cleaner"; zer
 7. **Act** — branch: you pick fixes, then tests; unfixed ones can be saved to `docs/issues/`. PR: drafts of inline
 review comments and a summary, posted to GitHub only after you approve them (`COMMENT` by default); then it offers to
 remove the worktree.
+
+### `explain` — code explained to a person
+
+```text
+/as:explain                         # the current branch's change, for a reviewer
+/as:explain 571                     # a pull request: code read in a separate worktree, page written here
+/as:explain src/billing             # how a module works, for a newcomer
+/as:explain "how is the invoice total calculated?"
+/as:explain docs/features/fees --for business   # the feature's logic on worked examples, to check with the client
+```
+
+Writes one HTML page to `docs/explain/<kind>-<slug>.html` (styled by `explain.css`, Mermaid diagrams rendered in the
+browser; print to PDF to send it). Read-only subagents research in parallel — one structure inventory per touched
+module (cheap model, every item with a quoted line as evidence) and one tracer per flow; diagrams are drawn only from
+evidenced items. A separate fact-check subagent then checks every claim on the written page against the code and the
+sources: refuted claims are removed or corrected, unclear ones reworded or moved to open questions. The page follows
+fixed sections per kind:
+
+- **change** — what and why, scope and what is not covered, before/after, an architecture delta when the structure
+  changes (one diagram of both states: added, removed, moved and changed components marked), how it works, worked
+  examples when the change calculates or decides by thresholds, data and migrations, tests, risks. It explains, never
+  judges: findings belong to `as:review`. For a PR it offers to remove the worktree at the end, after you confirm.
+- **module** — context, main flow, rules with scenario IDs, examples, errors, a code map.
+- **feature** — cards with concrete numbers (basic cases, changes after entry, edge cases), a matrix of all of them,
+  validation messages, a diagram of how the number is made, open questions.
+
+Every number names its source: a test's expected value, a value from `sources/`, or a calculation written as a
+spreadsheet cell formula; the fact check also recomputes the formulas and checks each status. A hand calculation is
+`to-confirm`; a code result that disagrees with a source or a
+criterion is `differs` and is offered as an issue. Labels are in the language of the problem ("Reserves the contract's
+pool"), never method names; developer detail on a business page is folded away.
 
 ### `health` — periodic project health check
 

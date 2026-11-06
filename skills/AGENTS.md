@@ -23,6 +23,8 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
   `references/analysis.md`.
 - `review` — reviewers and verifier for a branch or a PR; owns `references/briefs.md`; criteria in
   `finish/references/review.md`.
+- `explain` — HTML pages for people in `docs/explain/`; owns `assets/explain.css` (base copied from `health.css`),
+  `references/page-format.md` and `references/briefs.md`.
 - `health` — periodic whole-project check; writes HTML to `docs/health/`; owns `assets/health.css`,
   `references/html-format.md` and `scripts/git_signals.py`.
 - `issue` — saves known problems to `docs/issues/`; owns `references/issue-format.md` (file name, priority rubric,
@@ -45,7 +47,8 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
   (phase status words, `AC<n>` anchors, `sources/`) — change the format and the script together.
 - Renaming or restructuring a step or reference in one skill means updating every skill that links to it — the
   validator checks link targets and `#anchors`, but not step numbers or section names quoted in prose.
-- `finish` (step 4) and `deliver` follow `review` in branch mode; `finish` names its steps 2–7 by number.
+- `finish` (step 4) and `deliver` follow `review` in branch mode; `finish` names its steps 2–7 by number; `explain`
+  takes a change's target and context from `review` steps 1–2, and runs `feature`'s `xlsx_text.py` (step 1).
 - `deliver` follows `tech-lead` (From feature, Feature), `implement`, `finish`, `fix` (steps 2–3 by number) and
   `review`; `references/autopilot.md` names their questions and gates (review, spec
   drift, contract tests, implement deviations) — a new question or gate in those skills needs a policy line there, or the unattended run stalls on it.
@@ -66,6 +69,8 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
 - `finish` step 5 uses its own diff-anchored brief (`finish/references/analysis.md`), not the full `spec-docs` and
   `agent-docs` briefs: one stance per prompt, sized for a smaller model. Steps 6–8 quote its section names
   (Proposal, Spec drift, New behaviour, Tests, Docs) — rename them together.
+- `health.css` and `explain.css` share their base (variables, typography, tables): change it in both. `explain.css`
+  changes: add classes to `explain/references/page-format.md` and bump the version in its first line.
 - `health.css` changes: add classes to `health/references/html-format.md` and bump the version in the file's first
   line (`health` asks before overwriting a project's copy).
 - Spec format changes: update the skeletons in `markdown-format.md` and `change-format.md` together, and the "Legacy
@@ -82,4 +87,4 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
   gone). Never numbered: the priority prefix and slug avoid cross-branch collisions.
 - Files generated in user projects are in English, except spec pages (`spec-docs --lang`) and pages that follow
   their language (`lang` in the marker on the first line of `docs/spec/index.md`): change proposals, health reports,
-  issues, estimate analyses, feature pages and `docs/qa/` (sources keep their own); an estimate's `client.md` follows the client's request (`estimate --lang`).
+  issues, estimate analyses, feature pages, `docs/explain/` pages and `docs/qa/` (sources keep their own); an estimate's `client.md` follows the client's request (`estimate --lang`).

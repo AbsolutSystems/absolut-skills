@@ -13,6 +13,7 @@
 | `review` | `/as:review` | `$as:review` | Review the branch (from base) or a teammate's PR (in a worktree, against its real base): three reviewers with disjoint scopes, a sceptical verifier drops refuted findings, merge check; fixes and issues for your branch, approved GitHub review comments for a PR |
 | `issue` | `/as:issue` | `$as:issue` | Save known problems (described, or found earlier in the conversation, e.g. by `/code-review`) to `docs/issues/p<1-4>-<slug>.md` with evidence |
 | `fix` | `/as:fix` | `$as:fix` | Work through `docs/issues/` by priority: re-check, fix test-first and delete the issue, or plan larger ones as a proposal |
+| `explain` | `/as:explain` | `$as:explain` | Explain a change (branch or PR), a module or a question, or a feature's logic on worked examples, to a person: HTML with Mermaid diagrams in `docs/explain/`; every number from a test, a source or a shown formula; mismatches offered as issues |
 | `health` | `/as:health` | `$as:health` | Periodic project health: hotspots, coupling, coverage and test quality, dead code, deps, docs drift; report with trends in `docs/health/`; larger findings go to `docs/issues/` |
 | `worktree-create` | `/as:worktree-create` | `$as:worktree-create` | New branch and git worktree in `../<repo>-worktrees/<name>`, from the current branch or `from <branch>`; optionally copies `.env*` and installs dependencies |
 | `worktree-close` | `/as:worktree-close` | `$as:worktree-close` | Offers to commit leftovers, then removes the worktree folder; the branch stays |

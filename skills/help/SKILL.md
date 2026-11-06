@@ -38,6 +38,7 @@ Show this table as it is, in the user's language:
 | deliver a whole documented feature, or fix all saved problems, unattended (e.g. overnight) | `as:deliver` |
 | wrap up a feature before the PR (simplify, review, spec, tests, docs) | `as:finish` |
 | review my branch, or a teammate's PR (verified findings, comments on GitHub) | `as:review` / `as:review <PR>` |
+| explain a change, a module or a feature's logic to a person (HTML with diagrams, worked examples) | `as:explain` |
 | save a problem to fix later (also findings of `/code-review`) | `as:issue` |
 | fix the saved problems, most important first | `as:fix` |
 | check whether agent docs and spec still match the code (no writes) | `as:docs-check` |
@@ -128,6 +129,8 @@ start in a new session.
   `/as:qa-docs` and the app running).
 - Findings you do not fix now (from `/as:review`, `/claude-security` or your own review): `/as:issue` saves them to
   `docs/issues/`.
+- Explaining a change, a module or a feature's logic to someone else (reviewer, newcomer, client): `/as:explain`
+  writes an HTML page with diagrams and worked examples to `docs/explain/`.
 - Security-sensitive changes or a release: run `/claude-security` (or ask for a security scan).
 - Your branch on its own: `/as:review` (`/as:finish` runs it for you). A teammate's PR: `/as:review <number or URL>` —
   reviews it in a separate worktree against the PR's base and posts the findings you approve as GitHub review comments.

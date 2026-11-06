@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.12.0
+
+- New `explain` skill: explains code to a person who did not write it, as an HTML page with Mermaid diagrams in
+  `docs/explain/` — a change (the current branch, or a PR whose code is read in a separate worktree as in `review`,
+  the page written to your working copy and the worktree offered for removal) for a reviewer or stakeholder, a module
+  or a question for a newcomer, or a documented feature's logic on worked examples for the business (cards with
+  concrete numbers, a matrix, edge cases, validation messages, open questions). A change that calculates or decides by
+  thresholds gets example cards too.
+- Every number names its source (a test's expected value, a value from `sources/`, or a formula written as a
+  spreadsheet cell); hand calculations are `to-confirm`, mismatches `differs` and are offered as issues.
+- Research fans out — a structure inventory per touched module (small model, every item with a quoted line as
+  evidence) and a tracer per flow; diagrams use only evidenced items. A separate fact-check subagent then checks every
+  claim of the written page against the code (the PR head for a PR) and the sources — nodes, edges, delta marks,
+  rules, references, test values, card formulas and statuses: refuted claims are removed or corrected, unclear ones
+  reworded or moved to open questions.
+- A change that alters the structure (files added or removed, code moved between modules, two or more modules, a
+  public API removed) gets an architecture delta: one Mermaid diagram of both states with added, removed, moved and
+  changed components marked. Labels use the language of the problem, never method names; Mermaid quoting rules and a
+  browser render check keep diagrams from failing.
+- Ships `explain.css` (base shared with `health.css`, print styles for PDF); Mermaid loads from a CDN. Built from the
+  `explain` generator of review-pr-kit, without its project-specific palette and without archify.
+- `feature` suggests `as:explain docs/features/<slug>` when criteria involve calculations or thresholds.
+
 ## 1.11.0
 
 - New `review` skill: reviews your branch from its base, or a teammate's pull request (number or URL) in a separate

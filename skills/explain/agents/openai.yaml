@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills Explain"
+  short_description: "Explain a change, module or feature to a person, as HTML with diagrams"
+  default_prompt: "Use $as:explain to explain the changes on this branch to a reviewer."
+policy:
+  allow_implicit_invocation: false

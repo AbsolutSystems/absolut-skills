@@ -1,6 +1,6 @@
 ---
 name: agent-docs
-description: "Build or update minimal documentation for coding agents that holds only what the code cannot tell: a short repo-root AGENTS.md, per-application AGENTS.md (commands, unenforced rules, internal libraries, target vs legacy) with on-demand .guidelines/, and module AGENTS.md only where a module has pitfalls or rules, each with a CLAUDE.md that imports it. Analyses the code to ask the team the right questions, detects drift, prunes lines the code already shows, recommends improvements. Use only when the user explicitly invokes as:agent-docs."
+description: "Build or update minimal documentation for coding agents that holds only what the code cannot tell: a short repo-root AGENTS.md, per-application AGENTS.md (commands, unenforced rules, internal libraries, target vs legacy) with an index of the app's .guidelines/, and module AGENTS.md only where a module has pitfalls or rules, each with a CLAUDE.md that imports it. Analyses the code to ask the team the right questions, detects drift, prunes lines the code already shows, recommends improvements. Use only when the user explicitly invokes as:agent-docs."
 disable-model-invocation: true
 argument-hint: "[path] [--depth N]"
 ---
@@ -31,7 +31,7 @@ Host-specific mechanics (subagents, asking questions): [Claude Code](../../refer
 | Level | What it is | Files |
 |-------|------------|-------|
 | Repo root | Git root | `AGENTS.md` (≤ ~25 lines): one sentence on the product, map of apps (one line each), repo-wide commands, shared rules |
-| App root | Directory with an application manifest (`pom.xml`, `build.gradle*`, app `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, …) | `AGENTS.md` (≤ ~50 lines): commands (including a single test), rules the code does not enforce, internal libraries and what not to re-implement, target vs legacy, reference module, index of `.guidelines/`, spec links; plus `.guidelines/*-guideline.md` |
+| App root | Directory with an application manifest (`pom.xml`, `build.gradle*`, app `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, …) | `AGENTS.md` (≤ ~50 lines): commands (including a single test), rules the code does not enforce, internal libraries and what not to re-implement, target vs legacy, reference module, index of `.guidelines/` (written by `as:guidelines`), spec links |
 | Module | Module of a modular monolith, workspace package, or directory with a clear responsibility | `AGENTS.md` (≤ ~20 lines) **only when the module has pitfalls or rules** (invariants, "do not call X from outside", legacy parts, a module-specific command) |
 
 - A single-application repository merges repo root and app root into one file.
@@ -72,7 +72,7 @@ followed but not enforced, invariants and traps, missing or non-obvious commands
 repeat the code. Fan out one read-only subagent per directory (batch tiny sibling modules into one subagent). Go **bottom-up**:
 
 1. modules,
-2. app roots — they receive the module reports instead of re-reading module code, and also collect guideline candidates,
+2. app roots — they receive the module reports instead of re-reading module code, and note topics that need a guideline,
 3. repo root — it receives the app reports.
 
 Run independent subagents of the same wave in parallel. Each gets the brief from [references/analysis.md](references/analysis.md)
@@ -90,7 +90,6 @@ options derived from the code when possible. Typical questions:
 - What an internal library (for example `preboot`) provides and what must not be re-implemented by hand.
 - Conflicting conventions (two test frameworks, two HTTP clients) — which one is the target, which is legacy.
 - Unclear purpose of a directory, or whether it is deprecated.
-- Testing strategy when the code does not reveal it (what level of tests a new feature needs).
 
 Record answers as facts in the files they belong to. Unanswered questions are left out of the docs, not guessed.
 
@@ -109,7 +108,8 @@ Present one table, one row per file to be touched:
 
 Then a **Recommendations** section: what would make a coding agent more effective, beyond documentation. Examples: no
 command to run a single test, no lint/format script, undocumented environment variables or missing `.env.example`, no
-reference module to copy when adding a new one, inconsistent naming, a detected area without a guideline.
+reference module to copy when adding a new one, inconsistent naming, a detected area without a guideline
+(→ `as:guidelines <app> <topic>`).
 
 Ask for approval: all, a selected subset, or cancel.
 
@@ -117,8 +117,9 @@ Ask for approval: all, a selected subset, or cancel.
 
 - New files from the templates. Existing files: minimal edits — keep hand-written sections, fix only false or missing facts.
 - `PRUNE`: remove only the lines the user approved; a line that may hold team knowledge is kept and asked about.
-- Create or update `.guidelines/` files only for rules the user confirmed or a tool enforces; keep the app `AGENTS.md`
-  index in sync.
+- `.guidelines/` files are written by `as:guidelines`: here only fix their drift (a false claim, a moved reference
+  path) with minimal edits, and keep the app `AGENTS.md` index in sync. A confirmed rule with no guideline file yet
+  goes into the app `AGENTS.md` rules, or is recommended as an `as:guidelines` topic.
 - Keep the `<!-- as:working-principles … -->` block (or its `off` marker) in the root `AGENTS.md` untouched: it is owned
   by `as:init`, is not drift, and does not count toward the line budget.
 - `CLAUDE.md` next to each `AGENTS.md` contains exactly `@AGENTS.md`. For `MIGRATE`, move the content first. If

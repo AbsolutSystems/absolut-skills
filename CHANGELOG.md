@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.13.0
+
+- New `doctor` skill: a read-only check in seconds of how a repository stands against `as` — working principles
+  block (missing, older version, customised, declined), `AGENTS.md`/`CLAUDE.md` pairs and symlinks, the `.guidelines/`
+  index, outdated `health.css`/`explain.css` copies, spec and feature lint, change proposals untouched for 30+ days,
+  issues per priority and misnamed issue files, apps without guidelines, the last `as:health` run, the CLI tools the
+  skills use, and the recommended plugins on Claude Code — each with the command that fixes it. Deterministic part in the tested stdlib script `doctor/scripts/doctor.py`.
+  It takes over the plugin status from `help` and `docs-check`.
+- New `guidelines` skill: writes an app's `.guidelines/<topic>-guideline.md` (testing, architecture, api, data,
+  frontend, libraries, code-style, security) from the conventions its code follows. One subagent per topic counts how
+  consistently each convention is followed and which variant the last six months of changes use; the team settles
+  conflicts (target vs legacy) and confirms rules; the file holds short rules for new code and reference files to
+  copy, nothing a tool already enforces. `agent-docs` no longer creates guideline files or asks about the testing
+  strategy: it fixes guideline drift, keeps the index, and recommends `as:guidelines` for a topic without one.
+- `finish` step 3 finds **new clones** after simplify: for a diff of 30+ lines, `npx jscpd@5 --similarity
+  --baseline-from-ref <base>` lists copies the branch added of code that already exists, which a diff review cannot
+  see. Step 4 passes them to `review` as context, where a clone is reported as unnecessary code whose copies a later
+  fix would miss; nothing fails on the tool alone. `deliver` runs it without asking.
+- `health` reports a project without coverage in its build as a medium finding with the concrete change (JaCoCo or
+  Kover plugin, a coverage script with the `lcov` reporter).
+- Working principles block **v2**: five one-line rules against structural bugs (parse and validate outside data once,
+  where it enters; new business decisions in I/O-free code; illegal states unrepresentable in new code; retried or
+  re-run operations idempotent; one owner per piece of state, derived rather than copied, concurrent writers guarded).
+  The rules that could invite a refactor apply to new code only. `as:init` offers the update to repositories holding
+  v1. The rules and the clone check are adapted from [ub-mode](https://github.com/unclebob/ub-mode).
+
 ## 1.12.0
 
 - New `explain` skill: explains code to a person who did not write it, as an HTML page with Mermaid diagrams in

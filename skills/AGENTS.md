@@ -6,7 +6,7 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
 
 ## Contents
 
-- `help` — installation check, plugin status, workflow guide.
+- `help` — installation check, workflow guide.
 - `init` — orchestrates `agent-docs` → `spec-docs` → links → working principles → recommended plugins.
 - `agent-docs` — `AGENTS.md`/`CLAUDE.md` hierarchy and `.guidelines/`.
 - `spec-docs` — Markdown module contracts in `docs/spec/` (migrates legacy HTML); owns `references/markdown-format.md`
@@ -30,7 +30,11 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
 - `issue` — saves known problems to `docs/issues/`; owns `references/issue-format.md` (file name, priority rubric,
   lifecycle), which every skill that saves or closes issues links.
 - `fix` — works through `docs/issues/`; reuses the `tech-lead` Bug and Feature paths.
-- `docs-check` — read-only audit: `agent-docs` and `spec-docs` steps 1–4, plugin status.
+- `docs-check` — read-only audit: `agent-docs` and `spec-docs` steps 1–4.
+- `doctor` — quick read-only check of the repository against `as` (principles version, agent docs pairs, guidelines
+  index, stylesheet versions, spec lint, stale proposals, issues, tools, plugins); owns `scripts/doctor.py`.
+- `guidelines` — `.guidelines/<topic>-guideline.md` for an app, from the conventions its code follows; owns
+  `references/topics.md` and `references/briefs.md`.
 - `spec-tests` — scenario test coverage report; the brief lives in `spec-docs/references/analysis.md`.
 - `qa-docs` — what browser QA checks, in `docs/qa/`; owns `references/qa-format.md` (also the run report format).
 - `qa` — runs criteria and journeys in a browser with executor and judge subagents; owns `references/briefs.md`.
@@ -47,20 +51,22 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
   (phase status words, `AC<n>` anchors, `sources/`) — change the format and the script together.
 - Renaming or restructuring a step or reference in one skill means updating every skill that links to it — the
   validator checks link targets and `#anchors`, but not step numbers or section names quoted in prose.
-- `finish` (step 4) and `deliver` follow `review` in branch mode; `finish` names its steps 2–7 by number; `explain`
+- `finish` (step 4) and `deliver` follow `review` in branch mode (`finish` passes its step 3 new clones as the
+  review's `[context]`); `finish` names its steps 2–7 by number; `explain`
   takes a change's target and context from `review` steps 1–2, and runs `feature`'s `xlsx_text.py` (step 1).
 - `deliver` follows `tech-lead` (From feature, Feature), `implement`, `finish`, `fix` (steps 2–3 by number) and
   `review`; `references/autopilot.md` names their questions and gates (review, spec
   drift, contract tests, implement deviations) — a new question or gate in those skills needs a policy line there, or the unattended run stalls on it.
-- `references/recommended-plugins.md` (repo root) is shared by `init` and `help`.
+- `references/recommended-plugins.md` (repo root) is shared by `init` (installs) and `doctor` (reports).
 - `qa` and `qa-docs` follow `qa-docs/references/qa-format.md` and read feature pages by
   `feature/references/feature-format.md` (`AC<n>` anchors, `**Realised by:**`, `**Modules:**`); `qa` selects `branch`
   scenarios like `finish` step 1. `deliver` runs `qa` as its QA stage in the main thread (a stage subagent cannot start
   the executor and judge) — `autopilot.md` holds its policy, so a new question in `qa` needs a line there. The browser
   tool names live only in the host mappings.
 - `fix` follows `tech-lead`'s `#bug` and `#feature` paths and `tech-lead` routes known-issue requests to `fix/SKILL.md`;
-  `docs-check` follows `agent-docs` and `spec-docs` steps 1–4 and `init` step 6 by number — renumbering them means
-  updating it. `health` closes issues by their `**Key:**`, so the snapshot `key` format and `issue-format.md` change together.
+  `docs-check` follows `agent-docs` and `spec-docs` steps 1–4 by number — renumbering them means updating it.
+  `doctor` reads the marker of `init/references/working-principles.md` and the first line of `health.css` and
+  `explain.css`, and runs `spec_lint.py` — change the marker or the version line format together with `doctor.py`. `health` closes issues by their `**Key:**`, so the snapshot `key` format and `issue-format.md` change together.
 
 ## Pitfalls
 
@@ -78,7 +84,8 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
 - Ownership of generated files: `docs/spec/changes/` — `tech-lead` writes, `implement` ticks `## Plan` steps (and edits
   the plan or scenarios only after approval), `finish` merges and archives, `spec-docs` only reads (and converts legacy HTML
   proposals); `docs/estimates/` — `estimate` writes, `tech-lead` only sets `**Status:** accepted`; the working
-  principles block in a project's root `AGENTS.md` — `init` writes, `agent-docs` preserves; `docs/features/` —
+  principles block in a project's root `AGENTS.md` — `init` writes, `agent-docs` preserves, `doctor` reports its version;
+  `.guidelines/` — `guidelines` writes, `agent-docs` fixes drift and keeps the app `AGENTS.md` index; `docs/features/` —
   `feature` writes, `tech-lead` sets a phase `in progress`, `finish` sets it `done` and updates the page, `deliver`
   writes `<slug>/delivery.md` (and `docs/deliveries/` for issues runs); `sources/` are never edited after saving;
   `docs/qa/` — `qa-docs` writes `index.md` and `journeys.md`, `qa` writes `runs/` (also inside `deliver`).

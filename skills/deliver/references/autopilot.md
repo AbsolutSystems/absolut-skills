@@ -50,6 +50,7 @@ the assumption; one that changes the scope → blocked. Do not ask between miles
 **finish** (Finish stage):
 
 - Baseline red → return failed (the loop repairs it).
+- New clones: run jscpd ephemerally without asking; if it cannot run, skip it and note it.
 - Review: as in **review** below.
 - Spec: proposals of this branch are confirmed; ID collision → renumber to the next free IDs; scenarios not
   implemented → keep the proposal open and add an unticked `## Plan` step for each (the loop implements them). Drift explained by the proposal or the

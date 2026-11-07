@@ -1,6 +1,6 @@
 ---
 name: help
-description: "Show how to work with Claude Code (or Codex) using the as: commands, the recommended Anthropic plugins and plan mode: confirms the plugin is installed, lists as: skills, reports which recommended plugins are installed, and walks through the task workflow from onboarding to planning, building (implementing an approved plan), review, finishing a feature, commit, docs upkeep, periodic health checks and known issues, and how the commands chain into flows (client request estimate, feature, feature roadmap, unattended feature delivery, bug, known issues, health). Use only when the user explicitly invokes as:help."
+description: "Show how to work with Claude Code (or Codex) using the as: commands, the recommended Anthropic plugins and plan mode: confirms the plugin is installed, lists as: skills, and walks through the task workflow from onboarding to planning, building (implementing an approved plan), review, finishing a feature, commit, docs upkeep, periodic health checks and known issues, and how the commands chain into flows (client request estimate, feature, feature roadmap, unattended feature delivery, bug, known issues, health). Use only when the user explicitly invokes as:help."
 disable-model-invocation: true
 argument-hint: "[which|flows|onboarding|plan|build|review|finish|commit|worktree|docs|health|issues]"
 ---
@@ -15,12 +15,8 @@ With a topic argument, show only that section of the guide. Without one, show:
 1. **Installed** — one line confirming that `as` is installed (skills from `skills/*/SKILL.md` next to this file that
    are missing from the table below are listed with a one-line summary of their `description`).
 2. **Which command** — the [which](#which--which-command-for-what) table.
-3. **Recommended plugins** — on Claude Code, check them as described in
-   [references/recommended-plugins.md](../../references/recommended-plugins.md) and show `INSTALLED` / `DISABLED` /
-   `MISSING` per plugin. For missing or disabled ones, suggest `/as:init` or the `claude plugin` command. On Codex, say
-   these are Claude Code plugins and skip.
-4. **Guide** — the sections below, concise, as a numbered workflow. Commands of plugins that are not installed are
-   marked "(not installed)".
+3. **Guide** — the sections below, concise, as a numbered workflow. For which recommended plugins are installed and
+   how this repository stands against `as`, point to `as:doctor`.
 
 ## Guide
 
@@ -42,6 +38,8 @@ Show this table as it is, in the user's language:
 | save a problem to fix later (also findings of `/code-review`) | `as:issue` |
 | fix the saved problems, most important first | `as:fix` |
 | check whether agent docs and spec still match the code (no writes) | `as:docs-check` |
+| quick check that this repository is set up and up to date for `as`, and the recommended plugins | `as:doctor` |
+| write an app's guidelines (testing, architecture, api…) from the conventions its code follows | `as:guidelines` |
 | update agent docs / the spec | `as:agent-docs` / `as:spec-docs` |
 | see which spec scenarios have no tests | `as:spec-tests` |
 | check the running web app in a browser (criteria, journeys, screenshots judged) | `as:qa` (after `as:qa-docs`) |
@@ -83,7 +81,8 @@ Show these as short chains, then point to the sections below for details:
   flow; `as:qa explore <area>` tries to break one area. Needs the `playwright` plugin (Claude Code) or the Playwright
   MCP server (Codex).
 - **Parallel work**: `as:worktree-create <name>`, run any flow there in a new session, `as:worktree-close`.
-- **Upkeep**: `as:docs-check` (docs and spec against the code, no writes), `as:spec-tests` (scenarios without tests).
+- **Upkeep**: `as:doctor` (setup and versions, seconds), `as:docs-check` (docs and spec against the code, no writes),
+  `as:spec-tests` (scenarios without tests), `as:guidelines <app> <topic>` (rules and reference files per topic).
 
 Every step writes its state to files (proposal `## Plan` checklist, `docs/issues/`, `docs/health/*.json`), so each can
 start in a new session.
@@ -92,6 +91,9 @@ start in a new session.
 
 - `/as:init` — builds the `AGENTS.md` hierarchy, the Markdown spec for chosen modules, links between them, and checks the
   recommended plugins. Rerun parts later with `/as:agent-docs` and `/as:spec-docs`.
+- Then `/as:guidelines <app> testing` — the app's testing guideline from how its tests are written; other topics
+  (architecture, api, data, frontend…) when needed.
+- After each plugin update: `/as:doctor` — what in the repository is out of date, with the command that fixes it.
 
 ### plan — before non-trivial changes
 
@@ -115,7 +117,8 @@ start in a new session.
 - `/as:deliver docs/features/<slug>` — the whole roadmap unattended: plan, implement, finish and fix per phase,
   taking the recommended option where those skills would ask; local commits; stops at done criteria, human-only
   decisions or limits. `/as:deliver docs/issues [request]` does the same for the saved issues.
-- Claude follows `AGENTS.md` and reads `.guidelines/` when the task touches their area — keep them current.
+- Claude follows `AGENTS.md` and reads `.guidelines/` when the task touches their area — keep them current with
+  `/as:guidelines <app> <topic>`.
 - UI work: `frontend-design` triggers on its own.
 - Changing a module's observable behaviour: update its spec with `/as:spec-docs <module path>` and tag contract tests
   with scenario IDs.
@@ -159,6 +162,11 @@ start in a new session.
 
 - Periodically, or after larger refactors: `/as:docs-check` audits `AGENTS.md` and the spec against the code without
   writing; `/as:agent-docs` and `/as:spec-docs` apply the fixes (they ask before writing).
+- After updating the plugin, or when unsure: `/as:doctor` — seconds, no writes: working principles version, agent docs
+  pairs, guidelines index, stylesheet versions, spec lint, stale proposals, issues, tools and recommended plugins, each
+  with the command that fixes it.
+- `/as:guidelines <app> [topic]` — measures how the app's code does one thing (tests, endpoints, migrations, state),
+  asks which variant is the target, and writes `.guidelines/<topic>-guideline.md` with rules and reference files.
 - Feature pages (`docs/features/`): `/as:feature docs/features/<slug>` with a new e-mail or document records it and
   what it changes; `as:finish` updates the roadmap when a phase's proposal is merged.
 

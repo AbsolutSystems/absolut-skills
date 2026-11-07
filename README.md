@@ -65,6 +65,8 @@ Point either host at a local clone instead of `AbsolutSystems/absolut-skills`, e
 | save a problem to fix later (also findings of `/code-review`) | `/as:issue` |
 | fix the saved problems, most important first | `/as:fix` |
 | check whether agent docs and spec still match the code (no writes) | `/as:docs-check` |
+| quick check that this repository is set up and up to date for `as`, and the recommended plugins | `/as:doctor` |
+| write an app's guidelines (testing, architecture, api…) from the conventions its code follows | `/as:guidelines` |
 | update agent docs / the spec | `/as:agent-docs` / `/as:spec-docs` |
 | see which spec scenarios have no tests | `/as:spec-tests` |
 | check the running web app in a browser (criteria, journeys, screenshots judged) | `/as:qa` |
@@ -177,7 +179,9 @@ finding is gone.
 ### 9. Keeping docs true
 
 ```text
+/as:doctor                          # seconds: principles version, agent docs pairs, guideline index, spec lint, plugins
 /as:docs-check                      # audit AGENTS.md, .guidelines and the spec against the code, no writes
+/as:guidelines backend testing      # the testing guideline from how the backend's tests are written
 /as:agent-docs                      # apply: refresh AGENTS.md / .guidelines (asks before writing)
 /as:spec-docs                       # apply: refresh the spec (asks before writing)
 /as:spec-tests                      # which scenarios have no tests
@@ -208,14 +212,15 @@ and PRs, `claude-security` for security-sensitive changes, `frontend-design` for
 
 | Path | Written by | Contents |
 |------|------------|----------|
-| `AGENTS.md`, `CLAUDE.md`, `.guidelines/` | `init`, `agent-docs`, `finish` | What agents must know that the code does not say |
+| `AGENTS.md`, `CLAUDE.md` | `init`, `agent-docs`, `finish` | What agents must know that the code does not say |
+| `<app>/.guidelines/` | `guidelines`; drift fixes and the index by `agent-docs` | Per-topic rules for new code and reference files to copy |
 | `docs/spec/**/*.md` | `init`, `spec-docs`, `finish` | Module contracts: requirements and scenarios with IDs |
 | `docs/spec/changes/<slug>.md` | `tech-lead`, `implement` (ticks) | Open change proposal: decision, scenarios, `## Plan` |
 | `docs/spec/changes/archive/` | `finish` | Merged proposals — the decision log |
 | `docs/features/<slug>/` | `feature`; phase status by `tech-lead`, `finish`; `delivery.md` by `deliver` | Feature page (why, acceptance criteria, roadmap, decisions) and `sources/` kept verbatim |
 | `docs/estimates/<slug>/` | `estimate` | Client request analysis and hour estimate: `analysis.md` (internal), `client.md` (to send) |
 | `docs/deliveries/<branch>.md` | `deliver` | Report of an unattended issues run |
-| `docs/issues/p<1-4>-<slug>.md` | `issue`, `review`, `explain`, `finish`, `health`, `spec-docs`, `tech-lead`, `implement`, `docs-check`, `spec-tests`, `qa`, `qa-docs`; deleted by `fix`, `finish`, `health`, `deliver` | Known problems not fixed yet, one file each, priority in the name |
+| `docs/issues/p<1-4>-<slug>.md` | `issue`, `review`, `explain`, `finish`, `health`, `spec-docs`, `tech-lead`, `implement`, `docs-check`, `spec-tests`, `qa`, `qa-docs`, `guidelines`; deleted by `fix`, `finish`, `health`, `deliver` | Known problems not fixed yet, one file each, priority in the name |
 | `docs/explain/` | `explain` | HTML pages explaining a change, a module or a feature's logic, with `explain.css` |
 | `docs/health/` | `health` | Dated HTML reports, JSON snapshots, index with trends |
 | `docs/qa/index.md`, `docs/qa/journeys.md` | `qa-docs` | Environments, test accounts (variable names), roles, app-wide UI rules, journeys |
@@ -225,7 +230,7 @@ and PRs, `claude-security` for security-sensitive changes, `frontend-design` for
 
 | Command | Arguments | When |
 |---------|-----------|------|
-| `/as:help` | `[which\|flows\|onboarding\|plan\|build\|review\|finish\|commit\|worktree\|docs\|health\|issues]` | How to work with `as`, installed plugins |
+| `/as:help` | `[which\|flows\|onboarding\|plan\|build\|review\|finish\|commit\|worktree\|docs\|health\|issues]` | How to work with `as` |
 | `/as:init` | `[path] [--spec <path>… \| all] [--no-spec] [--lang en\|pl]` | Once per repository |
 | `/as:tech-lead` | `<feature, bug or question>` \| `docs/estimates/<slug>` \| `docs/features/<slug>` | Before any non-trivial change |
 | `/as:estimate` | `<request text or file> [--lang en\|pl]` \| `docs/estimates/<slug>` | Client asks for a feature quote; revision after answers |
@@ -240,8 +245,10 @@ and PRs, `claude-security` for security-sensitive changes, `frontend-design` for
 | `/as:health` | `[path] [--quick] [--since <period>]` | Once a sprint or month |
 | `/as:worktree-create` | `<name> [from <branch>]` | Start parallel work |
 | `/as:worktree-close` | `[<name>]` | Parallel work done |
+| `/as:doctor` | — | After updating `as`, or when unsure the repository is up to date |
 | `/as:docs-check` | `[path]` | Audit agent docs and spec, no writes |
 | `/as:agent-docs` | `[path] [--depth <n>]` | Agent docs refresh |
+| `/as:guidelines` | `[app path] [topic …]` | An app without guidelines, or ones that no longer match the code |
 | `/as:spec-docs` | `[path] [--lang en\|pl]` | Spec refresh |
 | `/as:spec-tests` | `[path]` | Scenario test coverage |
 | `/as:qa-docs` | `[area \| path]` | Once, then after features change: what browser QA checks |
@@ -251,15 +258,30 @@ and PRs, `claude-security` for security-sensitive changes, `frontend-design` for
 
 ### `help` — how to work with `as`
 
-Confirms the plugin is installed, lists `as` skills, shows which recommended Anthropic plugins are installed
-([`references/recommended-plugins.md`](references/recommended-plugins.md): `feature-dev`, `frontend-design`,
-`code-simplifier`, `code-review`, `commit-commands`, `claude-security`), and walks through the workflow: onboarding,
-planning in plan mode, building, review, commit, keeping docs true, and how the commands chain into flows.
+Confirms the plugin is installed, lists `as` skills, and walks through the workflow: onboarding, planning in plan
+mode, building, review, commit, keeping docs true, and how the commands chain into flows. Which recommended plugins
+are installed is reported by [`doctor`](#doctor--is-this-repository-up-to-date-with-as).
 
 ```text
 /as:help                            # everything
 /as:help flows                      # one topic: which | flows | onboarding | plan | build | review | finish | commit | worktree | docs | health | issues
 ```
+
+### `doctor` — is this repository up to date with `as`?
+
+A read-only check that takes seconds: no subagents, no analysis of the code. It reports, each with the command that
+fixes it: the working principles block (missing, older version → `as:init`, customised, declined), `AGENTS.md`
+without `CLAUDE.md` or with a symlink, `.guidelines/` files missing from the app index or listed but absent,
+outdated copies of `health.css` / `explain.css`, spec and feature page lint errors, change proposals untouched for 30+
+days, open issues per priority, when `as:health` last ran, the CLI tools the skills use (`gh`, `uvx`, `npx`), and on
+Claude Code the recommended Anthropic plugins
+([`references/recommended-plugins.md`](references/recommended-plugins.md)) with the install command.
+
+```text
+/as:doctor
+```
+
+Whether the docs tell the truth about the code is `docs-check`; the state of the code itself is `health`.
 
 ### `tech-lead` — design partner (starts on its own)
 
@@ -435,10 +457,13 @@ modules and extend it later with `spec-docs`.
 
 With your consent it adds a fixed **Working principles** block to the repo root `AGENTS.md` — rules that keep agents
 from over-engineering (reuse before writing, no speculative abstractions, root-cause fixes, tests for non-trivial
-logic, never cutting validation or security). The text lives in
+logic, never cutting validation or security) and from the structural mistakes behind data bugs (validate once at the
+boundary, new business decisions free of I/O, no illegal states in new models, idempotent re-runs, one owner per
+piece of state). The text lives in
 [`skills/init/references/working-principles.md`](skills/init/references/working-principles.md) and is updated when its
 version changes; declining leaves an `off` marker so you are not asked again; `agent-docs` keeps the block untouched.
-Inspired by [ponytail](https://github.com/DietrichGebert/ponytail).
+Inspired by [ponytail](https://github.com/DietrichGebert/ponytail); the architecture rules and the clone check in
+`finish` by [ub-mode](https://github.com/unclebob/ub-mode).
 
 At the end it checks the recommended Anthropic plugins (see `help` below) and installs missing ones after you
 agree.
@@ -457,7 +482,8 @@ The counterpart of `init`, run after delivering a feature and before the PR. Wor
 ```
 
 1. **Scope** — changed files → touched modules. 2. **Baseline checks** — tests, lint, type-check, build; stops if red.
-3. **Simplify**, then tests. 4. **Review** — findings Must / Should / Nice, you pick fixes, then tests; unfixed ones can be saved to `docs/issues/`.
+3. **Simplify**, then tests, then clones new since the base (`jscpd`, diffs of 30+ lines). 4. **Review** — also of
+those clones; findings Must / Should / Nice, you pick fixes, then tests; unfixed ones can be saved to `docs/issues/`.
 5. **Analysis** — one read-only subagent per touched module reports only what the diff changed: proposal status, spec
 drift, new behaviour, its tests, stale docs.
 6. **Spec** — merges the branch's change proposal (plan, scenarios, `Verify`, IDs still free on the default branch),
@@ -585,7 +611,7 @@ AGENTS.md                           # one sentence + map: backend/, frontend/, .
 CLAUDE.md                           # @AGENTS.md
 backend/AGENTS.md                   # commands, unenforced rules, internal libraries (e.g. preboot), pitfalls, spec links, guideline index
 backend/CLAUDE.md                   # @AGENTS.md
-backend/.guidelines/                # only rules the team confirmed or a tool enforces
+backend/.guidelines/                # written by as:guidelines: rules for new code, reference files
   testing-guideline.md              # what a feature ships with, which test level for what, helpers to use
   architecture-guideline.md         # where new code goes, allowed communication
 backend/src/.../modules/orders/AGENTS.md   # only because it has pitfalls or rules
@@ -600,7 +626,7 @@ How a run works:
    wrong (conflicts, unenforced rules, pitfalls, missing commands) with evidence, lines to prune, drift, open questions
    and recommendations.
 3. **Questions** — asks you about what code cannot tell (role of an internal library, conflicting conventions,
-   unclear or legacy directories, testing strategy).
+   unclear or legacy directories); the testing strategy and other topics go to `as:guidelines`.
 4. **Report** — one row per file: `NEW` / `UPDATE` (with drift list) / `PRUNE` / `OK` / `STALE` / `MIGRATE`, plus
    recommendations that would make an agent more effective (missing scripts, env docs, reference examples…).
 5. **Write** (after your approval) — minimal edits that keep hand-written sections; never deletes files without consent.
@@ -608,6 +634,24 @@ How a run works:
 
 Generated docs are in English. `.guidelines/` files are referenced from the app `AGENTS.md`, not `@`-imported, so they
 do not fill the context until the agent needs them. Review the result with `git diff`; re-running should report `OK`.
+
+### `guidelines` — rules for new code, from the code you have
+
+`.guidelines/<topic>-guideline.md` tells an agent how the team writes one kind of code. `guidelines` measures the
+app first — for each convention of the topic, how many places follow it and which variant the last six months of
+changes use — then asks the team only what the counts cannot settle: which of two ways is the target (the other
+becomes legacy: not used in new code, not migrated unless a task asks), which conventions are rules, and what the
+code cannot show (what test level a feature must ship with). The file holds short imperative rules and 2–4
+reference files to copy; nothing a linter, formatter or architecture test already enforces. Rules worth enforcing
+with a tool are offered as issues.
+
+```text
+/as:guidelines                      # asks for the app and the topics (testing recommended first)
+/as:guidelines backend testing api  # topics: testing, architecture, api, data, frontend, libraries, code-style, security
+```
+
+`agent-docs` keeps the guideline index in the app `AGENTS.md` and fixes drift in existing guidelines; `doctor`
+reports an index that drifted.
 
 ### `spec-docs` — Markdown specification of module contracts
 

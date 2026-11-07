@@ -1,6 +1,6 @@
 ---
 name: finish
-description: "Wrap up a delivered feature on the current branch: simplify the changed code, review it, check the touched modules against the Markdown spec (intended change vs regression), write missing contract tests tagged with scenario IDs, and refresh AGENTS.md docs — only for what the branch changed, with tests after every code change and approval before each write. Does not commit. Use only when the user explicitly invokes as:finish."
+description: "Wrap up a delivered feature on the current branch: simplify the changed code, review it with the clones the branch added to the codebase as evidence, check the touched modules against the Markdown spec (intended change vs regression), write missing contract tests tagged with scenario IDs, and refresh AGENTS.md docs — only for what the branch changed, with tests after every code change and approval before each write. Does not commit. Use only when the user explicitly invokes as:finish."
 disable-model-invocation: true
 argument-hint: "[base] [--no-simplify] [--no-review] [--no-tests] [--no-docs]"
 ---
@@ -49,9 +49,17 @@ Simplify only the changed code, without changing behaviour, using the host tool 
 [references/review.md](references/review.md). Then rerun the tests. If they fail, revert the simplification that broke
 them and report it.
 
+**New clones** — a copy of code that already exists elsewhere is invisible in the diff. Only when the diff adds 30
+lines or more, run `npx -y jscpd@5 --similarity --baseline-from-ref <base> --reporters json --output
+"${TMPDIR:-/tmp}/as-finish" <the app's source directories>` (ephemeral, with consent as in
+[../health/references/tools.md](../health/references/tools.md); declined or failing → skip and say so). Keep the
+clones with `"isNew": true` in `jscpd-report.json` (new since the base), except those in tests and generated code.
+They fail nothing on their own: step 4 receives them as context.
+
 ### 4. Review
 
-Follow [review](../review/SKILL.md) in branch mode with this base: from its step 1 only the merge-base, base tip and diff command, then steps 2–7: reviewers,
+Follow [review](../review/SKILL.md) in branch mode with this base and the new clones of step 3 as `[context]`
+(both locations of each pair; a reviewer reports one only as unnecessary code whose copies a later fix would miss): from its step 1 only the merge-base, base tip and diff command, then steps 2–7: reviewers,
 verification, merge check, findings, fixes with the checks from step 2 rerun, and unfixed Must and Should findings
 offered as issues.
 

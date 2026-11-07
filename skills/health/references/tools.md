@@ -49,6 +49,9 @@ boundaries (from `AGENTS.md`/`architecture-guideline.md`).
 | .NET | coverlet | `dotnet test --collect:"XPlat Code Coverage" --results-directory <tmp>` |
 
 Prefer a fresh existing report. Running the suite is "runs the test suite" cost — ask first.
+No coverage configured in the build (no JaCoCo/Kover task, no coverage script or setting) → a **medium** finding,
+effort **S**: add it, with the concrete change (the JaCoCo or Kover plugin with its XML report, a `test:coverage`
+script with the `lcov` reporter) and the report path, so coverage is there for later runs and reviews.
 Contract coverage comes from `as:spec-tests` when `docs/spec/` exists.
 
 ## Dead code and unused dependencies

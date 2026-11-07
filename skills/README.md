@@ -9,7 +9,7 @@
 | `implement` | `/as:implement` | `$as:implement` | Executes the approved `## Plan` of the branch's change proposal step by step in any session: tests first, tick, stop on deviations |
 | `deliver` | `/as:deliver` | `$as:deliver` | A documented feature, or the saved issues (`docs/issues [request]`), delivered unattended (e.g. overnight): start-up questions, then a loop of `tech-lead` → `implement` → `finish` → `fix` per phase or issue and a final review, taking the recommended option at every question; local commits per stage, stops at done criteria, human-only decisions or limits (an issues run skips a blocked issue and goes on); report in `delivery.md` or `docs/deliveries/` |
 | `init` | `/as:init` | `$as:init` | Onboard a repo: `agent-docs`, then `spec-docs` for a chosen scope, then links between them |
-| `finish` | `/as:finish` | `$as:finish` | Wrap up a feature: simplify, review, spec drift check, missing contract tests, docs refresh — for the branch's changes |
+| `finish` | `/as:finish` | `$as:finish` | Wrap up a feature: simplify, review (with the clones the branch added as evidence), spec drift check, missing contract tests, docs refresh — for the branch's changes |
 | `review` | `/as:review` | `$as:review` | Review the branch (from base) or a teammate's PR (in a worktree, against its real base): three reviewers with disjoint scopes, a sceptical verifier drops refuted findings, merge check; fixes and issues for your branch, approved GitHub review comments for a PR |
 | `issue` | `/as:issue` | `$as:issue` | Save known problems (described, or found earlier in the conversation, e.g. by `/code-review`) to `docs/issues/p<1-4>-<slug>.md` with evidence |
 | `fix` | `/as:fix` | `$as:fix` | Work through `docs/issues/` by priority: re-check, fix test-first and delete the issue, or plan larger ones as a proposal |
@@ -18,7 +18,9 @@
 | `worktree-create` | `/as:worktree-create` | `$as:worktree-create` | New branch and git worktree in `../<repo>-worktrees/<name>`, from the current branch or `from <branch>`; optionally copies `.env*` and installs dependencies |
 | `worktree-close` | `/as:worktree-close` | `$as:worktree-close` | Offers to commit leftovers, then removes the worktree folder; the branch stays |
 | `docs-check` | `/as:docs-check` | `$as:docs-check` | Audit agent docs and the spec against the code without writing; offers to save problems as issues |
-| `agent-docs` | `/as:agent-docs` | `$as:agent-docs` | Build and update minimal `AGENTS.md`/`CLAUDE.md` docs and `.guidelines/` holding only what the code cannot tell; prunes the rest |
+| `doctor` | `/as:doctor` | `$as:doctor` | Quick read-only check of the repository against `as`: working principles version, agent docs pairs, guideline index, stylesheet versions, spec lint, stale proposals, issues, last health check, tools and recommended plugins — each with the fixing command |
+| `guidelines` | `/as:guidelines` | `$as:guidelines` | Writes an app's `.guidelines/<topic>-guideline.md` from the conventions its code follows: counts and recent-change variants, target vs legacy settled with the team, reference files, approval before writing |
+| `agent-docs` | `/as:agent-docs` | `$as:agent-docs` | Build and update minimal `AGENTS.md`/`CLAUDE.md` docs (and the `.guidelines/` index) holding only what the code cannot tell; prunes the rest |
 | `spec-docs` | `/as:spec-docs` | `$as:spec-docs` | Human-readable Markdown spec of module contracts (scenarios with stable IDs) in `docs/spec/`; bugs go to `docs/issues/` |
 | `spec-tests` | `/as:spec-tests` | `$as:spec-tests` | Which spec scenarios are verified by tests (`COVERED` / `PARTIAL` / `MISSING`) |
 | `qa-docs` | `/as:qa-docs` | `$as:qa-docs` | What browser QA checks, in `docs/qa/`: environments, test accounts, roles, app-wide UI rules and cross-feature journeys `J<n>`; reports drift, outdated journeys and the last result per criterion and journey |

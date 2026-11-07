@@ -34,7 +34,7 @@ Read the relevant file before working in that area:
 - `.guidelines/skill-authoring-guideline.md` — read before adding or editing a skill or a reference file.
 - `.guidelines/testing-guideline.md` — read before changing the validator or verifying a skill change.
 
-<!-- as:working-principles v1 -->
+<!-- as:working-principles v2 -->
 ## Working principles
 
 Solve the whole task with the least new code.
@@ -49,5 +49,11 @@ Solve the whole task with the least new code.
 - A deliberate shortcut gets a comment: `shortcut: <limit>, <when to upgrade>`.
 - Never cut validation at trust boundaries, error handling that prevents data loss, security, accessibility, or anything
   the user asked for.
+- Parse and validate outside data once, where it enters; inside, trust it.
+- Keep new business decisions in I/O-free code the caller loads and saves for; do not restructure existing code for it.
+- In new code, make illegal states unrepresentable (enum or union type, not a free string); never silence the compiler.
+- Anything that can be retried or re-run (import, job, webhook, migration) is idempotent, also after a crash halfway.
+- State has one owner that writes it: no second write path, derive instead of copying (snapshots aside); concurrent
+  writers need a version check, lock or unique constraint.
 - End with one or two lines: what was skipped or not checked, and any risk.
 <!-- /as:working-principles -->

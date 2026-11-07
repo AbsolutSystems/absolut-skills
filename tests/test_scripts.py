@@ -1,5 +1,7 @@
+import os
 import subprocess
 import sys
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -7,7 +9,9 @@ sys.path.insert(0, str(ROOT / "skills/health/scripts"))
 sys.path.insert(0, str(ROOT / "skills/spec-docs/scripts"))
 sys.path.insert(0, str(ROOT / "skills/estimate/scripts"))
 sys.path.insert(0, str(ROOT / "skills/feature/scripts"))
+sys.path.insert(0, str(ROOT / "skills/doctor/scripts"))
 
+from doctor import doctor  # noqa: E402
 from estimate_totals import check, totals  # noqa: E402
 from git_signals import signals  # noqa: E402
 from spec_lint import lint, lint_features  # noqa: E402
@@ -270,3 +274,70 @@ def test_estimate_totals_reports_bad_rows_and_client_mismatch():
     ]
     _, errors = totals(ANALYSIS.replace("| Step | Block | Min |", "| Step | Area | Min |", 1))
     assert errors[0].startswith("step '1.1 Cancel operation': no column block")
+
+
+def test_doctor_reports_outdated_and_broken_setup(tmp_path, monkeypatch):
+    (tmp_path / "AGENTS.md").write_text("# Repo\n\n<!-- as:working-principles v1 -->\n## Working principles\n"
+                                        "<!-- /as:working-principles -->\n")
+    (tmp_path / "CLAUDE.md").write_text("@AGENTS.md\n")
+    (tmp_path / "app/.guidelines").mkdir(parents=True)
+    (tmp_path / "app/AGENTS.md").write_text("- `.guidelines/api-guideline.md` — read before an endpoint.\n")
+    (tmp_path / "app/CLAUDE.md").write_text("see AGENTS.md\n")
+    (tmp_path / "app/.guidelines/testing-guideline.md").write_text("# Testing guideline\n")
+    (tmp_path / "docs/health").mkdir(parents=True)
+    (tmp_path / "docs/health/health.css").write_text("/* as:health css v1 — old */\n")
+    (tmp_path / "docs/health/2026-01-10.json").write_text("{}")
+    (tmp_path / "docs/spec/changes").mkdir(parents=True)
+    (tmp_path / "docs/spec/changes/cancel-items.md").write_text("# Cancel items\n")
+    (tmp_path / "docs/issues").mkdir(parents=True)
+    (tmp_path / "docs/issues/p1-crash.md").write_text("x")
+    (tmp_path / "docs/issues/p3-slow.md").write_text("x")
+    git(tmp_path, "init", "-q", "-b", "main")
+    git(tmp_path, "add", ".")
+    git(tmp_path, "-c", "core.hooksPath=/dev/null", "commit", "-qm", "base", "--date", "2026-01-01T00:00:00")
+    subprocess.run(["git", "commit", "--amend", "-qC", "HEAD"], cwd=tmp_path, check=True,
+                   env={**os.environ, "GIT_COMMITTER_DATE": "2026-01-01T00:00:00", "GIT_COMMITTER_NAME": "t",
+                        "GIT_COMMITTER_EMAIL": "t@t", "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t"})
+    monkeypatch.chdir(tmp_path)
+    checks = doctor(tmp_path, date(2026, 6, 1))["checks"]
+    found = {(c["area"], c["status"], c["detail"]) for c in checks}
+    assert ("working principles", "WARN", "v1, current is v2") in found
+    assert ("agent docs", "WARN", "app: CLAUDE.md is not exactly @AGENTS.md") in found
+    assert ("guidelines", "WARN", "app: .guidelines/testing-guideline.md not listed in AGENTS.md") in found
+    assert ("guidelines", "WARN", "app: AGENTS.md lists missing .guidelines/api-guideline.md") in found
+    assert any(c["area"] == "assets" and c["detail"].startswith("docs/health/health.css: v1") for c in checks)
+    assert ("change proposals", "WARN", "cancel-items.md: untouched for 151 days") in found
+    assert ("issues", "WARN", "p1: 1, p3: 1") in found
+    assert ("health", "WARN", "last run 142 days ago") in found
+
+
+def test_doctor_edge_cases_from_review(tmp_path, monkeypatch):
+    (tmp_path / "AGENTS.md").write_text("<!-- as:working-principles v9 -->\n<!-- /as:working-principles -->\n"
+                                        "Backend rules: `backend/.guidelines/testing-guideline.md`.\n")
+    (tmp_path / "CLAUDE.md").write_text("@AGENTS.md\n")
+    for app in ("backend", "frontend"):
+        (tmp_path / app).mkdir()
+        (tmp_path / app / "CLAUDE.md").write_text("@AGENTS.md\n")
+    (tmp_path / "backend/pom.xml").write_text("<project/>")
+    (tmp_path / "frontend/package.json").write_text("{}")
+    (tmp_path / "backend/.guidelines/api").mkdir(parents=True)
+    (tmp_path / "backend/.guidelines/testing-guideline.md").write_text("x")
+    (tmp_path / "backend/.guidelines/api/errors.md").write_text("x")
+    (tmp_path / "backend/AGENTS.md").write_text("- `.guidelines/testing-guideline.md`\n- `.guidelines/api/errors.md`\n")
+    (tmp_path / "frontend/AGENTS.md").write_text("# Frontend\n")
+    (tmp_path / "docs/spec/changes").mkdir(parents=True)
+    (tmp_path / "docs/spec/changes/new.md").write_text("x")
+    (tmp_path / "docs/issues").mkdir(parents=True)
+    (tmp_path / "docs/issues/P1-crash.md").write_text("x")
+    (tmp_path / "docs/health").mkdir(parents=True)
+    (tmp_path / "docs/health/2026-99-01.json").write_text("{}")
+    git(tmp_path, "init", "-q", "-b", "main")  # no commits yet
+    monkeypatch.chdir(tmp_path)
+    checks = doctor(tmp_path, date(2026, 6, 1))["checks"]
+    found = {(c["area"], c["status"], c["detail"]) for c in checks}
+    assert ("working principles", "WARN", "v9, newer than this plugin's v2") in found
+    assert not [c for c in checks if c["area"] == "guidelines" and c["status"] == "WARN"]
+    assert ("guidelines", "INFO", "frontend: app without guidelines") in found
+    assert not [c for c in checks if c["area"] == "change proposals"]
+    assert ("issues", "WARN", "not named p<1-4>-<slug>.md: P1-crash.md") in found
+    assert ("health", "INFO", "never run") in found

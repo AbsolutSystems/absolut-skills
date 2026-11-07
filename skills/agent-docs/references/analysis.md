@@ -41,8 +41,8 @@ Read code to find candidates and questions, not to describe it. Each candidate n
   silently, required env or services.
 - **Commands** — how to build, test, run a single test, run locally and lint; flag the ones missing or non-obvious
   (profiles, env, wrappers).
-- **Testing strategy** — what level of tests a new feature needs, when the code does not make it clear; a reference test
-  per kind to copy.
+- **Guideline topics** — testing strategy, endpoint, migration or component conventions the code leaves unclear: not
+  asked here; recommend `as:guidelines <app> <topic>` (testing first when the app has no testing guideline).
 - **Existing docs** — lines that only repeat what the code shows (stack, directory contents, public API, dependencies):
   `PRUNE` candidates.
 
@@ -63,7 +63,7 @@ Existing AGENTS.md / CLAUDE.md / .guidelines content: {content or "none"}
 
 Read manifests, build and CI files, configuration, and a representative sample of code and tests. Cite file paths.
 Look for conflicts between conventions, rules followed but not enforced, internal libraries, pitfalls, missing or
-non-obvious commands, and the testing strategy.
+non-obvious commands, and topics that need a guideline (testing first).
 
 Return exactly these sections:
 1. Map — (repo-root only) apps and top-level directories, one line each.

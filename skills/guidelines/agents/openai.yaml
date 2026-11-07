@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills Guidelines"
+  short_description: "Write an app's .guidelines/ from the conventions its code follows"
+  default_prompt: "Use $as:guidelines to write the testing guideline for this application."
+policy:
+  allow_implicit_invocation: false

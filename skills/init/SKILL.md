@@ -81,11 +81,14 @@ next steps:
 
 - `as:spec-docs <path>` — extend the spec to further modules, then `as:agent-docs` to link them.
 - `as:spec-tests` — scenario test coverage report for the specified modules.
+- `as:guidelines <app> testing` — the app's testing guideline from the conventions its tests follow; other topics
+  later.
 - `as:fix` — works through the issues saved in `docs/issues/` (bugs found while specifying), most important first.
 - Review `git diff` and read `docs/spec/index.md` in the repository browser or the IDE's Markdown preview.
 - `as:tech-lead` — starts on its own when you discuss a feature or a bug: design, decision, spec change, plan.
 - `as:finish` — after each feature: simplify, review, spec and contract tests, docs for what changed.
 - `as:health` — once a sprint or month: hotspots, coupling, tests, dead code, dependencies.
+- `as:doctor` — later, a quick check that the repository is still up to date with `as`.
 - `as:help` — how to work day to day with these commands, the recommended plugins and plan mode.
 
 ### 6. Recommended plugins

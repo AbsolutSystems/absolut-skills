@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills Doctor"
+  short_description: "Quick check of how the repository stands against the as plugin, no writes"
+  default_prompt: "Use $as:doctor to check whether this repository is set up for the as plugin and up to date."
+policy:
+  allow_implicit_invocation: false

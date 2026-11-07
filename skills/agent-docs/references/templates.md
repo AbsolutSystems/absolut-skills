@@ -95,7 +95,8 @@ Read the relevant file before working in that area:
 
 ## Guidelines (`<app>/.guidelines/<topic>-guideline.md`)
 
-Only rules the user confirmed or a tool enforces, plus reference files to copy. Common shape:
+Written by `as:guidelines`: rules for new code the team confirmed (not what a tool already enforces), plus reference
+files to copy. Common shape:
 
 ```markdown
 # <Topic> guideline

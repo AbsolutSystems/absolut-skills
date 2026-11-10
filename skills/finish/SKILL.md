@@ -59,8 +59,8 @@ They fail nothing on their own: step 4 receives them as context.
 ### 4. Review
 
 Follow [review](../review/SKILL.md) in branch mode with this base and the new clones of step 3 as `[context]`
-(both locations of each pair; a reviewer reports one only as unnecessary code whose copies a later fix would miss): from its step 1 only the merge-base, base tip and diff command, then steps 2–7: reviewers,
-verification, merge check, findings, fixes with the checks from step 2 rerun, and unfixed Must and Should findings
+(both locations of each pair; a reviewer reports one only as unnecessary code whose copies a later fix would miss): from its step 1 only the merge-base, base tip and diff command, then steps 2–7: merge check and packages, reviewers,
+verification, findings, fixes with the checks from step 2 rerun, and unfixed Must and Should findings
 offered as issues.
 
 ### 5. Analysis

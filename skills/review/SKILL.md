@@ -1,6 +1,6 @@
 ---
 name: review
-description: "Review a change for real defects with few false positives: your own branch before the PR (diff from base), or someone else's pull request (number or URL, checked out in a separate worktree against the PR's real base branch). Three read-only reviewers with disjoint scopes — correctness and security, goal and contract, UI only when the diff touches it — report only findings with a concrete failure scenario; a separate sceptical verifier then tries to refute each Must and Should finding and drops the ones it refutes. Also checks the PR description against the diff and whether the branch merges cleanly into its base. Own branch: you pick fixes, the rest can be saved to docs/issues/. Pull request: findings become inline GitHub review comments, posted only after you approve them. Use only when the user explicitly invokes as:review."
+description: "Review a change for real defects with few false positives: your own branch before the PR (diff from base), or someone else's pull request (number or URL, checked out in a separate worktree against the PR's real base branch). Three read-only reviewers with disjoint scopes — correctness and security, goal and contract, UI only when the diff touches it — report only findings with a concrete failure scenario; a separate verifier then checks every statement of each Must and Should finding against the code, corrects false details, settles the severity and drops the findings it refutes. Large diffs are split into packages by size, and you decide before any is left out. Also checks the PR description against the diff and whether the branch merges cleanly into its base. Own branch: you pick fixes, the rest can be saved to docs/issues/. Pull request: findings become inline GitHub review comments, posted only after you approve them. Use only when the user explicitly invokes as:review."
 disable-model-invocation: true
 argument-hint: "[<PR number or URL> | <base>] [context]"
 ---
@@ -8,7 +8,7 @@ argument-hint: "[<PR number or URL> | <base>] [context]"
 # Review
 
 Find the defects a change introduces, and only those. A finding is worth the reader's time only when it names an input
-or situation that produces a wrong outcome and survives an attempt to refute it. Criteria and severity groups:
+or situation that produces a wrong outcome, and every statement it rests on holds in the code. Criteria and severity groups:
 [../finish/references/review.md](../finish/references/review.md#review). Subagent briefs:
 [references/briefs.md](references/briefs.md). Converse in the user's language. Host mechanics (subagents, asking):
 [Claude Code](../../references/claude-tools.md), [Codex](../../references/codex-tools.md).
@@ -62,11 +62,39 @@ Ignore generated files, lockfiles, `docs/issues/`. Show base tip, head, files an
   reach, become **questions for the author**, not findings. An imperfect description is normal; raise it only when it
   hides a change or makes the goal impossible to judge.
 
-### 3. Reviewers
+### 3. Merge check and packages
 
-Diff of 1500 or more changed lines, or 20 or more files → split it into packages of related files by module or layer
-(a file with its test together, at most 5 packages; more → say the PR should be split and review the riskiest 5).
+**Merge check** — `git merge-tree --write-tree --name-only <base tip> <head>` (git 2.38+; `<head>` = `headRefOid`, or
+`HEAD` in branch mode — committed work only, say so when there are uncommitted changes). Exit 0 → merges cleanly;
+exit 1 → the lines after the first (the tree ID) up to the first blank line are the conflicting files; any other exit
+or an error message → merge check not run, say why. Older git → skip and say so. This is merge readiness, not a
+finding; the conflicting files are a risk signal for the choice of packages below.
+
+**Packages** — a diff of 1500 or more changed lines, or 20 or more files → split it into packages of related files by
+module or layer: a file with its test together, a file never split between packages, each package under 1500 changed
+lines (a single larger file is its own package). The size limits a package; the number of packages follows from it.
 Smaller diffs are one package.
+
+More than 5 packages → do not choose alone. Show every package (name, files, `+/-` lines, UI or not) and the number of
+subagents a full review takes (two per package, one more per package with UI files, plus the verifiers); they run in
+parallel, so a full review costs tokens rather than time. Ask the user:
+
+1. **Review all packages.**
+2. **Review a selection** — show the one you propose, by the ranking below; the user can change it.
+3. **Stop, the change should be split** — report the packages as the proposed split; nothing is reviewed.
+
+Ranking for a selection, in this order:
+
+1. packages of new code (files only added): nothing of them was ever reviewed;
+2. a trust boundary: authentication and authorization, outside input, a payload sent to an external API, an
+   irreversible write (migration, delete);
+3. packages that other packages call into, and packages holding a conflicting file of the merge check;
+4. size — last: it is only a proxy for the above.
+
+A package that reviewed packages call into is left out only when the user says so. Every package left out is named
+to the reviewers, and a finding that relies on how its code behaves is marked `rests on unreviewed <package>`.
+
+### 4. Reviewers
 
 For each package, in parallel, one read-only subagent per lens with the
 [reviewer brief](references/briefs.md#reviewer):
@@ -79,36 +107,45 @@ For each package, in parallel, one read-only subagent per lens with the
 
 Without subagents, run the lenses one after another in the main thread, each on its own pass over the diff.
 
-### 4. Verify
+### 5. Verify
 
-Merge the candidates: same place and same cause → one finding (raised by two lenses → note it). Re-grade severity by
-the criteria, not by the reviewer's label. Then send every **Must** and **Should** candidate to a sceptical
-subagent with the [verifier brief](references/briefs.md#verifier) — one per file or module group, in parallel, never
-the subagent that raised it. Without subagents, verify in a separate pass that re-reads the code from scratch.
+Merge the candidates: same place and same cause → one finding; keep the lenses that raised it and the severity each
+gave. Merge the questions the same way (same subject → one question); a question about a finding is attached to that
+finding. Re-grade severity by the criteria, not by the reviewer's label; Nice is cost or clutter with no wrong
+outcome — a candidate graded Nice only out of doubt is regraded or becomes a question.
+
+Send to a verifier subagent with the [verifier brief](references/briefs.md#verifier) — one per file or module group,
+in parallel, never the subagent that raised the finding:
+
+- every **Must** and **Should** candidate;
+- a **Nice** candidate that two lenses raised, or that one lens raised and another dismissed.
+
+Without subagents, verify in a separate pass that re-reads the code from scratch.
 
 - `confirmed` — keep.
 - `plausible` — the verifier could not refute it, nor confirm it without running the code: keep, marked unverified.
 - `refuted` — drop; keep only the count and a one-line reason for the summary.
+- `correction` — rewrite the finding with the corrected fact; the report shows the corrected version only.
+- The verifier's severity stands. When the final severity differs from the reviewers' label, record the move and who
+  made it (`Should ← Must, lowered by the verifier`; `Should ← Nice, raised on re-grade`).
 
-**Nice** candidates are not verified; show their count and list them only on request.
-
-### 5. Merge check
-
-`git merge-tree --write-tree --name-only <base tip> <head>` (git 2.38+; `<head>` = `headRefOid`, or `HEAD` in branch
-mode — committed work only, say so when there are uncommitted changes). Exit 0 → merges cleanly; exit 1 → the lines
-after the first (the tree ID) up to the first blank line are the conflicting files; any other exit or an error
-message → merge check not run, say why. Older git → skip and say so. This is merge readiness, not a finding.
+The other **Nice** candidates are not verified.
 
 ### 6. Report
 
 In the conversation:
 
-- base ← head (PR: number, title, link), goal, scale, packages, CI;
-- **verdict** — `ship` (no Must or Should), `fix first` (confirmed Must), or `fix or answer` (the rest);
-- **Must** and **Should** findings: file and line, what the code does, the failure scenario, the smallest fix,
-  `confirmed` or `plausible`;
-- questions for the author; merge check result;
-- not checked: lenses skipped (no UI files), packages left out, `N` findings refuted, `N` Nice findings.
+- base ← head (PR: number, title, link), goal, scale, CI, merge check result;
+- **coverage** — packages reviewed `N of M`; each package left out with its files and `+/-` lines;
+- **verdict** — `ship` (no Must or Should, every package reviewed), `fix first` (confirmed Must), `fix or answer`
+  (other Must or Should), or `partial` (no Must or Should, packages left out). With packages left out the verdict
+  line repeats the coverage (`fix or answer — 5 of 9 packages`);
+- **Must** and **Should** findings: file and line, the lens or lenses that raised it, what the code does, the failure
+  scenario, the smallest fix, `confirmed` or `plausible`, the severity move if any, `rests on unreviewed <package>`
+  if so, and the questions attached to it;
+- **Nice** findings, one line each;
+- the remaining questions for the author;
+- not checked: lenses skipped (no UI files), `N` findings refuted.
 
 ### 7. Act
 
@@ -122,13 +159,13 @@ on request) per [../issue/references/issue-format.md](../issue/references/issue-
 **PR mode** — never edit the PR's code. Draft one review:
 
 - an inline comment per Must and Should finding, on the line of the new side of the diff: severity, the problem, the
-  failure scenario, the suggested fix; a `plausible` finding is phrased as a question. Written in the language of the PR
-  description;
-- the review body: goal as understood, verdict, questions for the author, merge check result, and the findings whose
-  line is outside the diff.
+  failure scenario, the suggested fix, with its attached questions; a `plausible` finding is phrased as a question.
+  Written in the language of the PR description;
+- the review body: goal as understood, verdict with coverage, the remaining questions for the author, merge check
+  result, and the findings whose line is outside the diff.
 
 Show the drafts and ask which comments to post (multi-select, all preselected) and the review event: `COMMENT`
-(default), `REQUEST_CHANGES` (offered only with a confirmed Must), or `APPROVE` (offered only with no Must or Should).
+(default), `REQUEST_CHANGES` (offered only with a confirmed Must), or `APPROVE` (offered only with verdict `ship`).
 Posting is public — nothing is sent without this approval. Write the payload to a temporary file outside the
 repository and post it in one call:
 
@@ -146,6 +183,6 @@ the worktree (`git worktree remove <path>`) — only after the user confirms.
 
 ### 8. Summary
 
-Findings per severity (fixed, saved as issues, or posted), refuted count, merge check, and what was not checked. Branch
+Findings per severity (fixed, saved as issues, or posted), refuted count, merge check, coverage, and what was not checked. Branch
 mode, next steps: `/commit-commands:commit-push-pr` (Claude Code, if installed); if the diff touches authentication,
 authorisation, input handling, secrets or data access, suggest `/claude-security` on the branch's changes.

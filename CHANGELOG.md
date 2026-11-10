@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.14.0
+
+- `review`, from a pilot on three pull requests (17 verified findings: none refuted, 10 with a false supporting
+  detail, severity moved on about half):
+  - The verifier checks every statement of a finding, not only whether it can be refuted: its line gains
+    `correction:`, the report shows the corrected finding, and the brief no longer tells it to assume the finding is
+    wrong. A Nice finding that two lenses raised, or that one raised and another dismissed, is verified too;
+    reviewers return a `Dismissed` section for that. Nice is defined as cost or clutter with no wrong outcome — doubt
+    is a question.
+  - Packages are limited by size (under 1500 changed lines each) instead of by number. More than 5 packages → the
+    skill asks: review all, review a selection, or stop because the change should be split; the selection follows a
+    written ranking (new code, trust boundary, called-into and conflicting packages, size last). `deliver` reviews
+    all. Reviewers are told which packages were left out, and a finding relying on one is marked.
+  - The merge check runs before the packages are chosen (step 3; reviewers and verify are now steps 4 and 5), so
+    conflicting files count as risk.
+  - The report leads with coverage; `ship` needs every package reviewed, and `partial` is the verdict of a review
+    that left packages out and found nothing. Findings carry their lens and any severity move; questions are merged
+    like findings and attached to the finding they belong to; Nice findings are listed, one line each.
+
 ## 1.13.0
 
 - New `doctor` skill: a read-only check in seconds of how a repository stands against `as` — working principles

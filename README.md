@@ -508,12 +508,17 @@ when the version has it; elsewhere the criteria in `skills/finish/references/rev
 PR head is checked out in a separate worktree `../<repo>-worktrees/review-pr-<N>`; your working copy stays untouched.
 2. **Context** — the goal from the PR description, linked issues, the proposal and commits; `AGENTS.md` and spec rules;
 CI. A description that does not match the diff becomes a question for the author, not a finding.
-3. **Reviewers** — read-only subagents with disjoint scopes: correctness and security, goal and contract, UI (only
-when the diff touches it); large diffs are split into up to 5 packages. Each reports only problems the diff introduces,
-with a concrete failure scenario — no style, naming or "could be cleaner"; zero findings is a valid answer.
-4. **Verify** — a separate sceptical subagent tries to refute every Must and Should finding: `confirmed`, `plausible`
-(kept, marked unverified) or `refuted` (dropped, only counted).
-5. **Merge check** — `git merge-tree` against the base. 6. **Report** — verdict, findings, questions, merge readiness.
+3. **Merge check and packages** — `git merge-tree` against the base; large diffs are split into packages of under 1500
+changed lines each. More than 5 packages → you choose: review all, review a selection (new code, trust boundaries and
+called-into packages first), or stop because the change should be split.
+4. **Reviewers** — read-only subagents with disjoint scopes: correctness and security, goal and contract, UI (only
+when the diff touches it). Each reports only problems the diff introduces, with a concrete failure scenario — no
+style, naming or "could be cleaner"; zero findings is a valid answer.
+5. **Verify** — a separate subagent checks every statement of each Must and Should finding against the code (and of a
+Nice finding two lenses raised or disagreed on): `confirmed`, `plausible` (kept, marked unverified) or `refuted`
+(dropped, only counted), with a correction when a detail was false and the final severity.
+6. **Report** — coverage (packages reviewed of all), verdict (`ship` only with every package reviewed), findings with
+their lens, severity moves and attached questions, Nice findings, questions, merge readiness.
 7. **Act** — branch: you pick fixes, then tests; unfixed ones can be saved to `docs/issues/`. PR: drafts of inline
 review comments and a summary, posted to GitHub only after you approve them (`COMMENT` by default); then it offers to
 remove the worktree.

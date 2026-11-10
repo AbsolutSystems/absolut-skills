@@ -72,7 +72,8 @@ implements and finishes it); its `**Issue:**` meta line closes the issue. Eviden
 that needs a human-only decision → blocked (an issues run skips the issue and goes on).
 
 **review** (inside the Finish stage, and the Final review stage): [review](../../review/SKILL.md) in branch mode from
-the run's base; inside a stage subagent its reviewers and verifiers run in sequence. Fix every `confirmed` Must and
+the run's base; inside a stage subagent its reviewers and verifiers run in sequence. More than 5
+packages → review all of them. Fix every `confirmed` Must and
 Should finding. A `plausible` one → write a test that shows it first: it fails → fix it; it passes, or no test can show it (a race,
 a security path) → drop the test and save the finding as a `p4` issue with "unconfirmed by as:review" in its Problem,
 for a human; it no longer counts as a Must or Should finding. Save the ones still failing after one fix attempt as issues (Must → `p2`,

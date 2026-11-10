@@ -35,7 +35,8 @@ Propose the smallest fix, preferring deletion. Group findings:
 
 - **Must fix** — bugs, security, data loss.
 - **Should fix** — load problems, untested risky logic.
-- **Nice to have** — speed, unnecessary code.
+- **Nice to have** — speed, unnecessary code: no wrong outcome, only cost or clutter. Doubt about whether a problem
+  matters is a question, not a severity.
 
 Each finding: file and line, what the code does, the failure scenario, the fix. End with a verdict: ship, or the list
 of fixes needed first, and what was not checked.

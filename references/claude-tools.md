@@ -9,6 +9,14 @@
   coverage, test quality, `finish` analysis, `estimate` Impact, `feature` legacy mapping) pass a smaller model in the Agent tool's `model` parameter (e.g. `sonnet`, or `haiku` for
   plain searches); Architecture briefs, `estimate` Consistency, `review` reviewers and verifiers and the `explain` fact check keep the
   session model; the `explain` inventory may use `haiku`, its tracing `sonnet`.
+- Stronger model (opt-in): the subagents that keep the session model above are the judgement subagents. Before a
+  skill starts the first of them, unless the session already runs on Fable, ask with AskUserQuestion whether to run
+  them on Fable (better judgement, more tokens) — as one more question in a batch the skill asks at that point, when
+  it has one. Yes → pass `model: "fable"` in those Agent calls. Ask once per run: the answer also covers a skill
+  followed inside it (`finish` → `review`); a run that starts no judgement subagent asks nothing. `as:deliver` asks
+  at start-up and records the answer with the start-up decisions; yes → the Plan and Final review stage subagents
+  get `model: "fable"` (the other stages, and the review inside the Finish stage, stay on the session model). An
+  Agent call refused because of the model → repeat it without `model` and say so in one line.
 - Asking the user: use AskUserQuestion (up to 4 questions per call; ask further batches if needed), with concrete options.
 - Simplify (`as:finish`): the built-in `simplify` skill via the Skill tool, or the `code-simplifier` agent if that plugin
   is installed; otherwise follow `skills/finish/references/review.md`.

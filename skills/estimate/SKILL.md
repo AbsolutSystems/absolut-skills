@@ -53,7 +53,8 @@ language. Check `docs/estimates/` for an existing estimate of the same request â
 ### 3. Consistency review
 
 Review the request as an analyst against the code and the spec â€” with brief "Consistency" for anything beyond one
-module, inline otherwise. Each finding: type (`gap`, `conflict`, `alternative`, `addition`, `risk`), evidence, effect
+module, inline otherwise (a judgement subagent: where the host mapping offers a stronger model for it, ask the user
+first). Each finding: type (`gap`, `conflict`, `alternative`, `addition`, `risk`), evidence, effect
 on the estimate, and the client question or suggestion it becomes. Keep only findings that matter for this client
 and this request; drop generic advice.
 

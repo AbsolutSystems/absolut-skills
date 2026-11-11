@@ -105,6 +105,9 @@ For each package, in parallel, one read-only subagent per lens with the
 | Goal and contract | the goal is reached, callers and consumers still work, spec scenarios and public API kept or intentionally changed, risky logic without a test | always |
 | UI | loading, error and empty states, dead controls, rendering of missing data, double submit and stale state, accessibility that blocks use | the package has UI files |
 
+Reviewers and verifiers are judgement subagents: where the host mapping offers a stronger model for them, ask the
+user first, once — not when the skill that follows this one (`finish`, `deliver`) already has the answer.
+
 Without subagents, run the lenses one after another in the main thread, each on its own pass over the diff.
 
 ### 5. Verify

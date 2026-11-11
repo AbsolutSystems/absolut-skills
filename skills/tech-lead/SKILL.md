@@ -66,7 +66,8 @@ performance, security, permissions), how success is checked. Stop when you could
 
 For anything beyond a small change, run 2–3 architecture subagents in parallel, each with a different priority
 (brief "Architecture" in [references/briefs.md](references/briefs.md)): **minimal change**, **clean boundaries**, and,
-when relevant, **scale / future needs**. Present one comparison table — approach, touched modules, contract changes,
+when relevant, **scale / future needs**. They are judgement subagents: where the host mapping offers a stronger model
+for them, ask the user first. Present one comparison table — approach, touched modules, contract changes,
 data/migration, risks, effort — then your recommendation and why. Include "do nothing / reuse X" when it is viable.
 
 ### 4. Decide

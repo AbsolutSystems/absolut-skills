@@ -89,7 +89,8 @@ overwriting — compare the version in its first line.
 ### 5. Fact check
 
 Send the written page to one read-only subagent with the [fact-check brief](references/briefs.md#fact-check), on the
-session model, never one of the researchers. It checks every claim the page makes about the code — diagram nodes and
+session model — or, where the host mapping offers a stronger model for judgement subagents, the one the user chose
+when asked — never one of the researchers. It checks every claim the page makes about the code — diagram nodes and
 edges, delta marks, before/after rows, rules and their scenario IDs, `path:symbol` references, test names and their
 expected values, values quoted from `sources/` — against the code and the sources. Then:
 

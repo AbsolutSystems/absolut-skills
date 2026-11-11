@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.15.0
+
+- Stronger model for judgement subagents, opt-in (Claude Code): when the session is not on Fable, `tech-lead`
+  (architecture options), `review` (reviewers and verifiers, also inside `finish`), `estimate` (consistency review)
+  and `explain` (fact check) ask once per run whether to run those subagents on Fable; everything else stays on the
+  session model. `deliver` asks at start-up, records the answer as a start-up decision and applies it to the Plan
+  and Final review stages; its stages never ask. A refused model falls back to the session model. The rule lives in
+  `references/claude-tools.md`; Codex does not ask.
+
 ## 1.14.0
 
 - `review`, from a pilot on three pull requests (17 verified findings: none refuted, 10 with a false supporting

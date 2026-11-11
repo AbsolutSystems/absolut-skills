@@ -75,6 +75,8 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
 - `finish` step 5 uses its own diff-anchored brief (`finish/references/analysis.md`), not the full `spec-docs` and
   `agent-docs` briefs: one stance per prompt, sized for a smaller model. Steps 6–8 quote its section names
   (Proposal, Spec drift, New behaviour, Tests, Docs) — rename them together.
+- Which subagents are judgement subagents (session model, or the stronger one the user opted into) is listed only in
+  `references/claude-tools.md`: a new one is added there, and its skill says "ask the user first" without naming a model.
 - `health.css` and `explain.css` share their base (variables, typography, tables): change it in both. `explain.css`
   changes: add classes to `explain/references/page-format.md` and bump the version in its first line.
 - `health.css` changes: add classes to `health/references/html-format.md` and bump the version in the file's first

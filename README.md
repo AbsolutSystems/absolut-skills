@@ -81,6 +81,10 @@ Three ideas run through every command:
 
 - **State lives in files, not in the conversation.** A plan is a checklist in `docs/spec/changes/<slug>.md`, a known
   problem is a file in `docs/issues/`, a health check is a snapshot in `docs/health/<date>.json`. Any step can continue in a new session or with a cheaper model.
+  In Claude Code, when the session is not on Fable, `tech-lead`, `review` (also inside `finish`), `estimate`, `explain`
+  and `deliver` ask once whether their judgement subagents — architecture options, reviewers and verifiers, the
+  consistency review, the fact check, the Plan and Final review stages — should run on Fable; the rest stays on the
+  session model.
 - **Nothing is written to code before you approve a plan**, and nothing is committed by `as` — you commit at the end.
   The one exception is `as:deliver`: you hand it a whole feature or the saved issues, it decides as you would by the recommended options,
   commits each green stage locally and leaves the review (and the push) to you.

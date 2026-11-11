@@ -52,7 +52,8 @@ The user is still here: settle everything now, then never ask again.
 - **Checks** — the test, lint, type-check and build commands from the relevant `AGENTS.md` files; none documented →
   ask for them. Run them: anything red → stop. A run that starts on red cannot tell its own breakage from the old.
 - **Host** — the run must not stall on permission prompts: check the setup described in the host mapping and tell the
-  user what is missing.
+  user what is missing. Where the host mapping offers a stronger model for judgement subagents, ask now whether the
+  Plan and Final review stages use it; the answer is a start-up decision (a resume reads it from the report).
 - **QA** — when `docs/qa/index.md` exists ([qa](../qa/SKILL.md) step 1): the host has a browser tool, the app
   answers on the `local` environment of `index.md` or its `Start` command brings it up, and the accounts' environment
   variables are set. The QA stage always uses `--env local`; no `local` row → QA is skipped. Anything missing → say that QA will be skipped and why; the report marks the QA criterion

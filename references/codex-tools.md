@@ -5,6 +5,7 @@
 - `policy.allow_implicit_invocation: false` in `agents/openai.yaml` restricts a skill to explicit invocation.
 - Arguments are passed as plain text after the skill mention.
 - Subagents: use them if the host provides them; otherwise run the same analysis sequentially in the main thread.
+- Stronger model for judgement subagents: not available — do not ask, they run on the session model.
 - Without subagents, `as:tech-lead` options: one recommended architecture with its main alternative in a line;
   the 2–3 option comparison only when the user asks for it.
 - Asking the user: ask in plain text, numbered, with suggested options, and wait for the answer.

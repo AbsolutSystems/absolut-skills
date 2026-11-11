@@ -1,7 +1,6 @@
 ---
 name: issue
-description: "Save known problems to docs/issues/ so they survive the session: one Markdown file per problem with priority (p1-p4) in the file name, kind, effort, evidence and a suggested fix. Takes a description, or collects the problems found earlier in the conversation (for example by /code-review, /claude-security or a manual review) and asks which to save. Checks the code read-only for evidence, merges duplicates, writes nothing else. Fix them later with as:fix. Use only when the user explicitly invokes as:issue."
-disable-model-invocation: true
+description: "Save known problems to docs/issues/ so they survive the session: one Markdown file per problem with priority (p1-p4) in the file name, kind, effort, evidence and a suggested fix. Takes a description, or collects the problems found earlier in the conversation (for example by /code-review, /claude-security or a manual review) and asks which to save. Checks the code read-only for evidence, merges duplicates, writes nothing else. Fix them later with as:fix. Use when the user invokes as:issue, or asks to save, record or park problems for later, or agrees to save problems found in this session that will not be fixed now."
 argument-hint: "[problem description]"
 ---
 

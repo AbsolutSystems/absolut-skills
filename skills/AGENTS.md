@@ -71,7 +71,8 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
 ## Pitfalls
 
 - Skills with `disable-model-invocation: true` cannot be invoked by another skill; orchestrators read the other
-  `SKILL.md` as instructions instead. `tech-lead` is the only model-invocable skill — keep its `description` narrow.
+  `SKILL.md` as instructions instead. Model-invocable skills are `tech-lead`, `implement`, `finish`, `review` and `issue` — keep
+  their `description` narrow; `deliver` still reads their `SKILL.md` rather than invoking them.
 - `finish` step 5 uses its own diff-anchored brief (`finish/references/analysis.md`), not the full `spec-docs` and
   `agent-docs` briefs: one stance per prompt, sized for a smaller model. Steps 6–8 quote its section names
   (Proposal, Spec drift, New behaviour, Tests, Docs) — rename them together.

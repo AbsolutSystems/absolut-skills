@@ -31,8 +31,10 @@ Every skill lives in `skills/<name>/`:
 - `SKILL.md` — frontmatter (`name` = directory name, `description`) plus host-agnostic instructions.
 - `agents/openai.yaml` — Codex interface (display name, short description, default prompt) and invocation policy.
 
-`tech-lead` is the only skill the model may invoke on its own; keep its `description` narrow so it does not trigger on
-small edits.
+The model may invoke five skills on its own: `tech-lead`, `implement`, `finish`, `review` and `issue` — each sits at a
+point an agent reaches by itself (planning, carrying out an approved plan, wrapping up, reviewing, parking a problem)
+and writes only what the user approved. Keep their
+`description` narrow so they do not trigger on small edits; the rest are commands only.
 
 A command-like skill, one the user invokes explicitly and the model should not trigger on its own, sets
 `disable-model-invocation: true` in `SKILL.md` and `policy.allow_implicit_invocation: false` in `agents/openai.yaml`.

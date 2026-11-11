@@ -1,7 +1,6 @@
 ---
 name: finish
-description: "Wrap up a delivered feature on the current branch: simplify the changed code, review it with the clones the branch added to the codebase as evidence, check the touched modules against the Markdown spec (intended change vs regression), write missing contract tests tagged with scenario IDs, and refresh AGENTS.md docs — only for what the branch changed, with tests after every code change and approval before each write. Does not commit. Use only when the user explicitly invokes as:finish."
-disable-model-invocation: true
+description: "Wrap up a delivered feature on the current branch: simplify the changed code, review it with the clones the branch added to the codebase as evidence, check the touched modules against the Markdown spec (intended change vs regression), write missing contract tests tagged with scenario IDs, and refresh AGENTS.md docs — only for what the branch changed, with tests after every code change and approval before each write. Does not commit. Use when the user invokes as:finish, or when every step of the branch's change proposal plan is done (for example after as:implement) and the user asks to wrap up the feature or get the branch ready for a PR; not for a single small edit."
 argument-hint: "[base] [--no-simplify] [--no-review] [--no-tests] [--no-docs]"
 ---
 

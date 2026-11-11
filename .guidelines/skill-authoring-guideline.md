@@ -8,7 +8,9 @@ How to write and change skills, references and assets in `skills/` and `referenc
   `user-invocable`, `allowed-tools`, `argument-hint`, `model`). `description` ≤ 1024 characters, double-quoted as in the existing skills.
 - `description` says what the skill does and when to use it. Command-like skills end with "Use only when the user
   explicitly invokes as:<name>." and set `disable-model-invocation: true` plus `policy.allow_implicit_invocation: false`
-  in `agents/openai.yaml`.
+  in `agents/openai.yaml`. A skill the model may invoke on its own (only `tech-lead`, `implement`, `finish`, `review`,
+  `issue`) ends with a narrow "Use when …; not for …" trigger instead, has `policy.allow_implicit_invocation: true`,
+  and writes only what the user approved (an approval gate, or an approved plan for `implement`).
 - Keep `SKILL.md` a procedure: numbered steps, approval gates before writes, "never delete without consent", a verify
   step, a short summary. Move long material (templates, briefs, tool tables) to `references/` and link it.
 - Host-agnostic text only: refer to "subagents" and "ask the user"; put tool names (AskUserQuestion, EnterPlanMode,

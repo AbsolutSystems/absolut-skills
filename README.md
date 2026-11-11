@@ -57,12 +57,12 @@ Point either host at a local clone instead of `AbsolutSystems/absolut-skills`, e
 | design a feature, investigate a bug, choose between options | `/as:tech-lead` (also starts on its own) |
 | analyse and price a client's feature request | `/as:estimate` |
 | keep a feature's why, acceptance criteria, roadmap and sources (PDF, e-mails) in one place | `/as:feature` |
-| continue an approved plan, also in a new session | `/as:implement` |
+| continue an approved plan, also in a new session | `/as:implement` (also starts on its own) |
 | deliver a whole documented feature, or fix all saved problems, unattended (e.g. overnight) | `/as:deliver` |
-| wrap up a feature before the PR (simplify, review, spec, tests, docs) | `/as:finish` |
-| review my branch, or a teammate's PR (verified findings, comments on GitHub) | `/as:review` / `/as:review <PR>` |
+| wrap up a feature before the PR (simplify, review, spec, tests, docs) | `/as:finish` (also starts on its own) |
+| review my branch, or a teammate's PR (verified findings, comments on GitHub) | `/as:review` / `/as:review <PR>` (also starts on its own) |
 | explain a change, a module or a feature's logic to a person (HTML with diagrams, worked examples) | `/as:explain` |
-| save a problem to fix later (also findings of `/code-review`) | `/as:issue` |
+| save a problem to fix later (also findings of `/code-review`) | `/as:issue` (also starts on its own) |
 | fix the saved problems, most important first | `/as:fix` |
 | check whether agent docs and spec still match the code (no writes) | `/as:docs-check` |
 | quick check that this repository is set up and up to date for `as`, and the recommended plugins | `/as:doctor` |

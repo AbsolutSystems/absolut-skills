@@ -1,7 +1,6 @@
 ---
 name: implement
-description: "Implement the approved plan of a change proposal (docs/spec/changes/<slug>.md, written by as:tech-lead), resuming in any session: finds the branch's proposal, takes the first unticked step of its ## Plan, writes tests first for error and edge scenarios, implements, runs the checks, ticks the step and continues; stops and asks before deviating from the plan. Does not commit. Use only when the user explicitly invokes as:implement."
-disable-model-invocation: true
+description: "Implement the approved plan of a change proposal (docs/spec/changes/<slug>.md, written by as:tech-lead), resuming in any session: finds the branch's proposal, takes the first unticked step of its ## Plan, writes tests first for error and edge scenarios, implements, runs the checks, ticks the step and continues; stops and asks before deviating from the plan. Does not commit. Use when the user invokes as:implement, or tells you to carry out or continue the approved ## Plan of an existing change proposal; not for a code change without such a proposal."
 argument-hint: "[slug] [--step <n>]"
 ---
 

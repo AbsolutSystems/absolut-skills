@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.16.0
+
+- `implement`, `finish`, `review` and `issue` may now be invoked by the model, not only by the user: an agent (or a
+  subagent) told to carry out an approved plan, done with a change proposal's plan, asked to review a branch or PR,
+  or agreeing with the user to park a problem for later loads the skill itself instead of asking the user to type the
+  command. Their descriptions end with a narrow "Use when …; not for …" trigger, `agents/openai.yaml` allows implicit
+  invocation, and every write still waits for the user's approval — for `implement` that approval is the proposal's
+  approved `## Plan`, and its description excludes code changes without one. `deliver` keeps reading their
+  `SKILL.md` as before. The other skills stay commands only.
+
 ## 1.15.0
 
 - Stronger model for judgement subagents, opt-in (Claude Code): when the session is not on Fable, `tech-lead`

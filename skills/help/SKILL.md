@@ -106,8 +106,6 @@ start in a new session.
   questions and proposes a plan without editing; you approve it or ask for changes, then it implements.
   Use it for multi-file changes, unclear requirements, and anything that changes a module's contract — ask Claude to
   read the module's spec page (linked from its `AGENTS.md`) while planning.
-- **Larger features without `as:tech-lead`**: `/feature-dev:feature-dev <description>` — explores the codebase,
-  designs the architecture, implements and reviews in guided phases.
 - On Codex: ask for a plan first and say not to edit until you approve it.
 
 ### build — implementing

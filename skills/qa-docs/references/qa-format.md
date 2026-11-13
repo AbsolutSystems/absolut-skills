@@ -16,7 +16,10 @@ docs/qa/
     2026-10-29-journeys.md          # report of one run (target after the date)
     2026-10-29-journeys/            # screenshots of FAIL and OUTDATED checkpoints only
       J2-3-mobile.png               # <checkpoint>[-<viewport>].png, '/' in an ID becomes '-'
-.qa/                                # working screenshots of every checkpoint — gitignored, never committed
+.qa/                                # working files of every run — gitignored, never committed
+  2026-10-29-journeys/
+    J1-2.png, J1-s2.png             # screenshots of every checkpoint and every step (<scenario>-s<n>.png)
+    run.json, report.html           # the run's data and its evidence page
 ```
 
 Same rules as spec pages ([../../spec-docs/references/markdown-format.md](../../spec-docs/references/markdown-format.md)):
@@ -159,8 +162,50 @@ Saved: `p2-cart-add-returns-500` (J1-2). Suggested for `as:qa-docs`: J2-1.
 - Only the screenshots of `FAIL` and `OUTDATED` checkpoints are moved next to the report; the rest stay in `.qa/`.
   Issues link the report, not `.qa/`.
 
+## Evidence page
+
+`.qa/<run>/report.html` — one self-contained HTML file for the person who wants to see what QA did: a summary
+(counts, everything that is not `PASS` with links, broken rules, what was not checked), then every scenario with its
+steps and, under each step, its screenshot and the checkpoints checked after it — expected outcome, result, the
+judge's reason, screenshot, console errors and failed requests per viewport. A `FAIL` carries a red `FAILED` banner;
+a filter hides the scenarios without problems. `skills/qa/scripts/qa_report.py` renders it from `.qa/<run>/run.json`
+and embeds the images, so the file can be moved or sent; it is not committed (the Markdown report is the record).
+
+```json
+{
+  "title": "journeys", "date": "2026-10-29", "url": "http://localhost:5173", "commit": "a1b2c3d",
+  "host": "Claude Code", "judge": "independent", "report": "docs/qa/runs/2026-10-29-journeys.md", "lang": "en",
+  "scenarios": [{
+    "id": "J1", "name": "First order", "role": "customer", "given": "a logged-out customer, the QA seed loaded",
+    "steps": [
+      {"action": "Add the cheapest product to the cart", "observed": "badge stayed 0", "screenshot": "J1-s2.png"},
+      {"action": "Check out with the test card", "observed": "the cart is empty", "not_done": true}
+    ],
+    "checkpoints": [{
+      "id": "J1-2", "after_step": 1, "expected": "the cart badge shows 1 and the cart lists the product",
+      "results": [{"viewport": "desktop", "result": "FAIL", "reason": "badge shows 0 after adding",
+                   "screenshot": "J1-2.png", "console": ["TypeError: cart is undefined"],
+                   "requests": ["POST /api/cart 500"]}]
+    }],
+    "not_executed": ["step 2 — nothing to check out"]
+  }],
+  "rules": [{"id": "R4", "checkpoint": "J1-2", "viewport": "desktop", "what": "POST /api/cart returned 500"}],
+  "skipped": ["cart/AC4 — planned, phase 2"],
+  "notes": ["J2-1 desktop: price label truncated"],
+  "issues": ["p2-cart-add-returns-500 (J1-2)"],
+  "findings": [{"id": "F1", "title": "…", "priority": "p2", "steps": ["…"], "expected": "…", "actual": "…",
+                "screenshots": ["F1.png"], "console": [], "requests": []}],
+  "tried": ["double submit of the address form — one order"]
+}
+```
+
+- Screenshot paths are relative to `run.json`. `after_step` is the 1-based step a checkpoint follows (a criterion
+  without steps leaves it out). Every checkpoint has one result per viewport, with `result` one of the four values;
+  a scenario shows its worst one. `rules` lists only broken rules; `findings` and `tried` are for exploratory runs.
+- Required: `scenarios` or `findings`, each scenario's and checkpoint's `id`, and `results`. The rest may be left out.
+
 ## Ownership
 
-`as:qa-docs` writes `index.md` and `journeys.md`. `as:qa` writes `runs/` and adds `.qa/` to `.gitignore` (with
+`as:qa-docs` writes `index.md` and `journeys.md`. `as:qa` writes `runs/`, `.qa/` (with the evidence page) and adds `.qa/` to `.gitignore` (with
 consent). Feature pages, the spec and `docs/issues/` keep their own owners; `as:qa` and `as:qa-docs` only offer
 issues there.

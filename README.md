@@ -81,10 +81,10 @@ Three ideas run through every command:
 
 - **State lives in files, not in the conversation.** A plan is a checklist in `docs/spec/changes/<slug>.md`, a known
   problem is a file in `docs/issues/`, a health check is a snapshot in `docs/health/<date>.json`. Any step can continue in a new session or with a cheaper model.
-  In Claude Code, when the session is not on Fable, `tech-lead`, `review` (also inside `finish`), `estimate`, `explain`
-  and `deliver` ask once whether their judgement subagents — architecture options, reviewers and verifiers, the
-  consistency review, the fact check, the Plan and Final review stages — should run on Fable; the rest stays on the
-  session model.
+  In Claude Code, when the session is not on Fable, `review` (also inside `finish`), `estimate`, `explain` and
+  `deliver` ask once whether their judgement subagents — reviewers and verifiers, the consistency review, the fact
+  check, the Plan and Final review stages — should run on Fable; the rest stays on the session model. The
+  architecture options of `tech-lead` always run on Opus, without a question.
 - **Nothing is written to code before you approve a plan**, and nothing is committed by `as` — you commit at the end.
   The one exception is `as:deliver`: you hand it a whole feature or the saved issues, it decides as you would by the recommended options,
   commits each green stage locally and leaves the review (and the push) to you.
@@ -228,7 +228,7 @@ and PRs, `claude-security` for security-sensitive changes, `frontend-design` for
 | `docs/explain/` | `explain` | HTML pages explaining a change, a module or a feature's logic, with `explain.css` |
 | `docs/health/` | `health` | Dated HTML reports, JSON snapshots, index with trends |
 | `docs/qa/index.md`, `docs/qa/journeys.md` | `qa-docs` | Environments, test accounts (variable names), roles, app-wide UI rules, journeys |
-| `docs/qa/runs/` | `qa` (also inside `deliver`) | Browser run reports with the screenshots of failures; other screenshots in gitignored `.qa/` |
+| `docs/qa/runs/` | `qa` (also inside `deliver`) | Browser run reports with the screenshots of failures; other screenshots and the HTML evidence page in gitignored `.qa/` |
 
 ## Commands
 
@@ -292,15 +292,15 @@ Whether the docs tell the truth about the code is `docs-check`; the state of the
 The only `as` skill Claude may start by itself: when you want to discuss a feature, investigate a bug, or choose
 between technical options. It behaves like a tech lead:
 
-1. **Grounds** the topic in code, `AGENTS.md` and the spec (parallel exploration subagents) before asking anything.
+1. **Grounds** the topic in code, `AGENTS.md` and the spec before asking anything: parallel exploration subagents
+   trace the flow and name the key files, which it then reads itself.
 2. **Clarifies** with targeted questions, and challenges the request when a smaller or existing solution fits.
 3. **Compares** 2–3 architectures from parallel subagents (minimal change / clean boundaries / scale) and recommends one.
 4. Records the **decision and proposed scenarios** in `docs/spec/changes/<slug>.md` — module pages keep describing
    current behaviour until `as:finish` merges the proposal and archives it in `docs/spec/changes/archive/` (decision log).
 5. Writes the **plan** (steps, tests per scenario ID, risks), saves it as a checklist in the proposal's `## Plan`
    section (ticked as steps are done; `as:finish` checks it), and offers the **handoff**: implement directly (small),
-   or switch to plan mode (medium; large gets milestones). It does not hand off to `/feature-dev:feature-dev`, which
-   would redo the exploration and architecture already done.
+   or switch to plan mode (medium; large gets milestones).
 
 It sizes the task first: a small change in one module gets one recommendation and a short plan, without subagents or
 a change proposal.
@@ -436,6 +436,9 @@ in sequence, clicking through the steps and saving screenshots, console errors a
 checkpoint; then a judge subagent that never saw the run decides `PASS`, `FAIL`, `OUTDATED` (the journey lags behind
 an intended change) or `BLOCKED` from that evidence and the app-wide rules. A mismatch with a feature criterion is
 always a failure. The report goes to `docs/qa/runs/` with the screenshots of failures; failures are offered as issues.
+For the person who wants to see what was checked, every run also writes `.qa/<run>/report.html`: one self-contained
+file with a summary, every scenario, its steps and the screenshot of each step and checkpoint — failures under a red
+`FAILED` banner, linked from the top, with a filter that hides the scenarios without problems.
 `explore <area>` tries to break one area instead (empty and odd input, double submit, back and refresh, narrow
 screens). Web applications only.
 
@@ -517,7 +520,8 @@ changed lines each. More than 5 packages → you choose: review all, review a se
 called-into packages first), or stop because the change should be split.
 4. **Reviewers** — read-only subagents with disjoint scopes: correctness and security, goal and contract, UI (only
 when the diff touches it). Each reports only problems the diff introduces, with a concrete failure scenario — no
-style, naming or "could be cleaner"; zero findings is a valid answer.
+style, naming or "could be cleaner"; zero findings is a valid answer. The one exception: a rule written in
+`AGENTS.md` or `.guidelines/` that the diff breaks is a Should finding, quoted with its file and line.
 5. **Verify** — a separate subagent checks every statement of each Must and Should finding against the code (and of a
 Nice finding two lenses raised or disagreed on): `confirmed`, `plausible` (kept, marked unverified) or `refuted`
 (dropped, only counted), with a correction when a detail was false and the final severity.

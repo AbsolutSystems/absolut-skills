@@ -37,7 +37,8 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
   `references/topics.md` and `references/briefs.md`.
 - `spec-tests` — scenario test coverage report; the brief lives in `spec-docs/references/analysis.md`.
 - `qa-docs` — what browser QA checks, in `docs/qa/`; owns `references/qa-format.md` (also the run report format).
-- `qa` — runs criteria and journeys in a browser with executor and judge subagents; owns `references/briefs.md`.
+- `qa` — runs criteria and journeys in a browser with executor and judge subagents; owns `references/briefs.md` and
+  `scripts/qa_report.py` (the HTML evidence page; its input format is in `qa-format.md` — change them together).
 - `worktree-create`, `worktree-close` — branch + git worktree in `../<repo>-worktrees/`; close keeps the branch.
 
 ## Dependencies between skills

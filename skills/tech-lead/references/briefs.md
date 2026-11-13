@@ -13,12 +13,16 @@ Relevant AGENTS.md and spec excerpts: {excerpts or "none"}
 
 Find and report, each with file paths:
 1. Entry points involved today (endpoints, facades, handlers, jobs, UI routes).
-2. Existing code that already does part of this or something similar — candidates to reuse or extend.
-3. Data model and persistence involved; migrations tool in use.
-4. Tests covering this area and their level (unit, integration, contract), one representative path each.
-5. Constraints visible in code: boundaries, permissions, validation, feature flags, configuration.
-6. Surprises: inconsistencies, legacy paths, behaviour that contradicts the spec.
-Keep it under 40 lines.
+2. Flow — for the entry point closest to the change, the call chain from entry to storage or output: each step with
+   file:line, what happens to the data, and the state changes and side effects (events, external calls) on the way.
+3. Existing code that already does part of this or something similar — candidates to reuse or extend.
+4. Data model and persistence involved; migrations tool in use.
+5. Tests covering this area and their level (unit, integration, contract), one representative path each.
+6. Constraints visible in code: boundaries, permissions, validation, feature flags, configuration.
+7. Surprises: inconsistencies, legacy paths, behaviour that contradicts the spec.
+8. Key files — the 5–10 files a person must read in full to design this change, most important first, with one
+   line each on why.
+Keep it under 60 lines.
 ```
 
 ## Architecture

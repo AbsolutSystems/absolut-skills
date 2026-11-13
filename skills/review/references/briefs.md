@@ -27,13 +27,18 @@ caller. Report a problem only when all of these hold:
 - you can name a concrete input or situation that produces a wrong outcome, and the path by which it gets there;
 - you checked that validation upstream, types, framework guarantees or an existing test do not already prevent it.
 
-Never report: style, naming, formatting, comment wording, "could be cleaner", alternative designs without a defect,
-anything lint, the type checker or the tests already enforce, hypothetical future requirements. Zero findings is a
+Only if your lens covers written project rules: a rule stated in a file under Rules, which applies to the changed
+path and which the diff breaks, is a finding without a failure scenario. Quote the rule with its file:line and the
+code that breaks it; severity Should. A convention you only infer from the surrounding code is not a rule.
+
+Never report: style, naming, formatting, comment wording, "could be cleaner", alternative designs without a defect
+(unless a written rule states it, as above), anything lint, the type checker or the tests already enforce,
+hypothetical future requirements. Zero findings is a
 valid and common result; do not search for something to report.
 
 Return exactly these sections:
 - Findings: for each — severity (Must | Should | Nice), file:line, what the code does, failure scenario (input →
-  wrong outcome, and the path), smallest fix
+  wrong outcome, and the path; for a broken rule: the rule quoted with its file:line), smallest fix
 - Questions: things outside your lens, that only the author can answer, or that you could not decide from the code
   (one line each; name the finding it belongs to, if any). Doubt about whether a problem matters goes here, not into
   a Nice finding
@@ -65,6 +70,9 @@ lives, what a function returns, who calls it, what happens next), then decide wh
 - Is the outcome really wrong, given the goal, the spec and the code's own contract?
 - Is the severity right? A real problem that only degrades an edge case is Should, not Must; Nice is cost or clutter
   with no wrong outcome.
+- A finding about a broken written rule has no failure scenario; check instead: does the rule stand at the quoted
+  file:line, does it apply to this path, does the changed code break it as written (not only in spirit), and does
+  lint or a test not enforce it already? All four hold → confirmed; otherwise refuted.
 
 Return exactly one line per finding:
 <number> — confirmed | plausible | refuted — severity (Must | Should | Nice) — evidence (file:line of the path that

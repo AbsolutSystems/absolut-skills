@@ -6,7 +6,6 @@ Codex, skip any step that checks or installs them and say so in one sentence.
 
 | Plugin | Provides | Invoke | Use when |
 |--------|----------|--------|----------|
-| `feature-dev` | Guided feature workflow; agents `code-explorer`, `code-architect`, `code-reviewer` | `/feature-dev:feature-dev [description]` | Building a multi-module feature without a prior `as:tech-lead` session (it would redo the design) |
 | `frontend-design` | Skill for distinctive, production-grade UI | Triggers automatically on UI work | Building pages, components, frontend apps |
 | `code-simplifier` | Agent that simplifies recently changed code without changing behaviour | Ask Claude to run the `code-simplifier` agent | After implementing, before committing |
 | `code-review` | Multi-agent pull request review with confidence scoring | `/code-review:code-review` | A second, independent opinion on an open PR (`as:review <PR>` is the default) |

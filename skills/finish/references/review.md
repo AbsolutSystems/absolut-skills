@@ -23,20 +23,24 @@ Look for, in this order of weight:
 2. Security and data loss — injection, missing authorization, secrets, destructive operations without guards.
 3. Behaviour under expected load — N+1 queries, unbounded loops or memory, missing pagination or timeouts.
 4. Risky logic without a test.
-5. Needless slowness.
-6. Unnecessary code.
+5. A written project rule broken.
+6. Needless slowness.
+7. Unnecessary code.
 
 Every finding must name a concrete input or situation that produces the wrong outcome; drop findings without one.
+The one exception is a written project rule: a rule stated in an `AGENTS.md` or `.guidelines/` file that applies to
+the changed path, which the diff breaks — quote the rule with its file and line, and the code that breaks it. A
+convention only inferred from the surrounding code is not a rule.
 Before reporting, check that the input can reach the code (callers, validation upstream, types, framework guarantees)
 and that no existing guard or test already handles it. Report only what the diff introduces or makes reachable. Not
-findings: style, naming, formatting, alternative designs without a defect, what lint, types or tests already enforce,
-hypothetical future needs. No quota — zero findings is a valid result.
+findings: style, naming, formatting and alternative designs without a defect (unless a written rule states it), what
+lint, types or tests already enforce, hypothetical future needs. No quota — zero findings is a valid result.
 Propose the smallest fix, preferring deletion. Group findings:
 
 - **Must fix** — bugs, security, data loss.
-- **Should fix** — load problems, untested risky logic.
+- **Should fix** — load problems, untested risky logic, a written project rule broken.
 - **Nice to have** — speed, unnecessary code: no wrong outcome, only cost or clutter. Doubt about whether a problem
   matters is a question, not a severity.
 
-Each finding: file and line, what the code does, the failure scenario, the fix. End with a verdict: ship, or the list
+Each finding: file and line, what the code does, the failure scenario (or the broken rule), the fix. End with a verdict: ship, or the list
 of fixes needed first, and what was not checked.

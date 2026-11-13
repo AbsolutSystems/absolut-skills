@@ -53,7 +53,10 @@ Say the size in one line; the user may override it.
   those modules (the change may fix or collide with one), and the feature pages in `docs/features/` that link those
   modules (`git grep -l 'spec/<module page path under docs/spec>' docs/features`, e.g. `spec/backend/orders.md`) — their acceptance criteria and decisions bind the change.
 - Fan out read-only exploration subagents (brief "Explore" in [references/briefs.md](references/briefs.md)) to find the
-  entry points, similar features to reuse, data model and tests involved. Run them in parallel when the areas are independent.
+  entry points and the flow through them, similar features to reuse, data model and tests involved. Run them in
+  parallel when the areas are independent.
+- Read the key files they name, in full, yourself: a subagent's summary locates the code, it does not replace reading
+  it. The options, the scenarios and the plan name only files and functions you have read.
 - Summarise "what exists today" in a few lines with paths before asking anything.
 
 ### 2. Clarify
@@ -66,8 +69,8 @@ performance, security, permissions), how success is checked. Stop when you could
 
 For anything beyond a small change, run 2–3 architecture subagents in parallel, each with a different priority
 (brief "Architecture" in [references/briefs.md](references/briefs.md)): **minimal change**, **clean boundaries**, and,
-when relevant, **scale / future needs**. They are judgement subagents: where the host mapping offers a stronger model
-for them, ask the user first. Present one comparison table — approach, touched modules, contract changes,
+when relevant, **scale / future needs**. They run on the model the host mapping names for them; do not ask the user
+about it. Present one comparison table — approach, touched modules, contract changes,
 data/migration, risks, effort — then your recommendation and why. Include "do nothing / reuse X" when it is viable.
 
 ### 4. Decide
@@ -110,8 +113,7 @@ the host mapping — always with the user's consent):
 - **Medium** (several files or a contract change, design settled): switch to plan mode — or, if already in it, write
   the plan to the plan file — and request approval there.
 - **Large** (several modules, new components, or many unknowns in the implementation): plan mode as for medium, with
-  the plan split into milestones that each end with passing tests. Do not hand off to `/feature-dev:feature-dev` — it
-  has no way to skip its exploration and architecture phases, so it would redo steps 1–3 at full cost.
+  the plan split into milestones that each end with passing tests.
 
 With a proposal and plan mode, the plan file links `docs/spec/changes/<slug>.md` and repeats the plan; after approval,
 write the approved plan (with any changes made during approval) to the proposal's `## Plan`. During implementation,

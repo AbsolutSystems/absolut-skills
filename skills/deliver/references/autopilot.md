@@ -16,7 +16,7 @@ keeps the existing contract — and record it as an assumption:
 Start-up decisions from the report and the feature page (acceptance criteria, non-goals, decisions) bind every
 choice. An assumption never contradicts them.
 
-The stronger-model question of a followed skill (`tech-lead`, `review`, see the host mapping) is never asked in a
+The stronger-model question of a followed skill (`review`, see the host mapping) is never asked in a
 stage: the answer given at start-up decides which stages get the stronger model.
 
 ## Human-only decisions

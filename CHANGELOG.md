@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.17.0
+
+- `qa` writes an HTML evidence page next to its working screenshots (`.qa/<run>/report.html`): a summary with the
+  counts, every result that is not `PASS` linked, broken app-wide rules and what was not checked; then every scenario
+  with its steps, what the executor saw, and the screenshot of every step and checkpoint — also the ones that passed —
+  with the expected outcome, the judge's reason, console errors and failed requests. A `FAIL` carries a red `FAILED`
+  banner and a filter hides the scenarios without problems. The file embeds its images, so it can be moved or sent;
+  it is not committed. The executor now takes a screenshot after every step, and the new `scripts/qa_report.py`
+  renders the page from `.qa/<run>/run.json` (format in `qa-format.md`) and prints the counts the Markdown report must
+  match. Screenshots of failures are copied to `docs/qa/runs/` instead of moved.
+- `tech-lead` grounds itself in the code, not in summaries of it: the Explore brief also traces the flow from the
+  entry point to storage or output (data, state changes, side effects) and names the 5–10 key files, which the tech
+  lead then reads in full before the options, the scenarios and the plan.
+- `review` (also inside `finish` and `deliver`): a rule written in `AGENTS.md` or `.guidelines/` that the diff breaks
+  is a Should finding without a failure scenario — raised by the goal and contract lens, quoted with its file and
+  line, and checked by the verifier (the rule exists, applies to the path, is broken as written, is not enforced by
+  lint already). Conventions only inferred from the surrounding code are still not findings.
+- `tech-lead` architecture subagents run on Opus whatever the session model (Claude Code), and `tech-lead` no longer
+  asks about Fable: the options are short and compared by the main thread and the user, so the stronger model is
+  kept for `review`, `estimate`, `explain` and the `deliver` stages, which still ask.
+- `feature-dev` is no longer a recommended plugin: `init` does not install it, `doctor` does not report it and `help`
+  does not point to it. `tech-lead` → `implement` → `finish` covers its phases; the three points above are what it
+  did and `as` did not.
+
 ## 1.16.0
 
 - `implement`, `finish`, `review` and `issue` may now be invoked by the model, not only by the user: an agent (or a

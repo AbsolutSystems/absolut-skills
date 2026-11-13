@@ -7,7 +7,8 @@
 - Subagents: use the Agent tool with `subagent_type: "Explore"` for read-only analysis; several Agent calls in one message run in parallel.
 - Subagent model: read-only briefs that find and classify (Explore, Investigate, `spec-docs`/`agent-docs` analysis,
   coverage, test quality, `finish` analysis, `estimate` Impact, `feature` legacy mapping) pass a smaller model in the Agent tool's `model` parameter (e.g. `sonnet`, or `haiku` for
-  plain searches); Architecture briefs, `estimate` Consistency, `review` reviewers and verifiers and the `explain` fact check keep the
+  plain searches); `tech-lead` Architecture briefs pass `model: "opus"` whatever the session model, and are not part
+  of the opt-in below; `estimate` Consistency, `review` reviewers and verifiers and the `explain` fact check keep the
   session model; the `explain` inventory may use `haiku`, its tracing `sonnet`.
 - Stronger model (opt-in): the subagents that keep the session model above are the judgement subagents. Before a
   skill starts the first of them, unless the session already runs on Fable, ask with AskUserQuestion whether to run

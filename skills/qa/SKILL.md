@@ -1,6 +1,6 @@
 ---
 name: qa
-description: "Check a running web application in a real browser the way a user does: executes the acceptance criteria of a feature page and the journeys in docs/qa/ (or the ones the branch's changes touch), one executor subagent per scenario in sequence collecting screenshots, console errors and failed requests at every checkpoint, then a separate judge subagent with fresh context decides PASS, FAIL, OUTDATED or BLOCKED from the evidence and the app-wide UI rules alone. An exploratory mode tries to break one area. Writes a run report to docs/qa/runs/ with the screenshots of failures, and offers failures as issues. Opens only local or listed test environments, never production. Requires docs/qa/ from as:qa-docs. Web applications only. Use only when the user explicitly invokes as:qa."
+description: "Check a running web application in a real browser the way a user does: executes the acceptance criteria of a feature page and the journeys in docs/qa/ (or the ones the branch's changes touch), one executor subagent per scenario in sequence collecting screenshots, console errors and failed requests at every checkpoint, then a separate judge subagent with fresh context decides PASS, FAIL, OUTDATED or BLOCKED from the evidence and the app-wide UI rules alone. An exploratory mode tries to break one area. Writes a run report to docs/qa/runs/ with the screenshots of failures, a self-contained HTML evidence page (every scenario, step and screenshot, failures marked FAILED) to .qa/, and offers failures as issues. Opens only local or listed test environments, never production. Requires docs/qa/ from as:qa-docs. Web applications only. Use only when the user explicitly invokes as:qa."
 disable-model-invocation: true
 argument-hint: "docs/features/<slug> | journeys | J<n> | branch [base] | explore <area>"
 ---
@@ -9,7 +9,7 @@ argument-hint: "docs/features/<slug> | journeys | J<n> | branch [base] | explore
 
 Confirm that the application works for a user: click through the scenarios in a browser, keep the evidence, and let
 someone who did not click judge it. The executor never judges its own run. Reads `docs/qa/` and the feature pages;
-writes only the run report, its screenshots, and — with consent — `.gitignore` and issues. Does not fix code.
+writes only the run report, its screenshots, the evidence page, and — with consent — `.gitignore` and issues. Does not fix code.
 Converse in the user's language. Format of `docs/qa/` and the report:
 [../qa-docs/references/qa-format.md](../qa-docs/references/qa-format.md). Briefs:
 [references/briefs.md](references/briefs.md). Host mechanics (subagents, asking questions, the browser tool):
@@ -48,7 +48,8 @@ Stop at the first failure, with what to do:
 - **Accounts** — the environment variables named for the roles the selected scenarios need are set; missing → ask
   for them or skip those scenarios as `BLOCKED`.
 - **Working directory** — `.qa/` (and the browser tool's own output directory, if the host mapping names one) not in
-  `.gitignore` → ask once to add them (no → delete them after the run, once the report has its screenshots).
+  `.gitignore` → ask once to add them (no → delete them after the run, once the report has its screenshots; say
+  that the evidence page goes with them unless the user moves it out first).
 
 ### 2. Select
 
@@ -69,7 +70,8 @@ Show the list (scenario, checkpoints, role, viewports) with the URL, and ask onc
 Run the scenarios **one after another** — one browser is shared state. For each, a fresh executor subagent with the
 Executor brief from [references/briefs.md](references/briefs.md): the scenario, its checkpoints, the URL, role,
 account variable names, data, viewports, the screenshot directory `.qa/<run>/` (`<run>` as the report's file name
-without `.md`). Keep only its returned sections. Data the scenario needs and the seed cannot give (an order to
+without `.md`). Keep only its returned sections: Checkpoints and Not executed go to the judge, Steps (with the step screenshots)
+only to the evidence page. Data the scenario needs and the seed cannot give (an order to
 cancel) is prepared through the app itself by the executor, as a user would; when it cannot be, the scenario is
 `BLOCKED`.
 
@@ -96,8 +98,17 @@ you cannot confirm becomes `BLOCKED` with a note.
 
 Write `docs/qa/runs/<YYYY-MM-DD>-<target>.md` per the format: header (target, URL, commit, host, judge), result
 counts, one row per checkpoint and viewport, broken app-wide rules, visual notes from the judges (as a short list),
-explorer findings. Move the screenshots of `FAIL` and `OUTDATED` checkpoints and of findings from `.qa/<run>/` to
+explorer findings. Copy the screenshots of `FAIL` and `OUTDATED` checkpoints and of findings from `.qa/<run>/` to
 `docs/qa/runs/<run>/` and link them; leave the rest in `.qa/`.
+
+**Evidence page** — the proof a person reads: every scenario with its steps, what the executor saw, and the
+screenshot of every step and checkpoint, also the ones that passed. Write `.qa/<run>/run.json` per the
+[format](../qa-docs/references/qa-format.md#evidence-page) — steps from the executors, results and reasons from the
+judges (after your own check of the `FAIL`s), nothing reworded into a better outcome — and run
+`python3 <this skill's directory>/scripts/qa_report.py .qa/<run>/run.json`. It writes `.qa/<run>/report.html` with
+the images embedded and prints the result counts: the Markdown report's counts must equal them. `ERROR` lines → fix
+`run.json` and rerun. A path under `missing_screenshots` → a `PASS` or `FAIL` without its screenshot becomes
+`BLOCKED` in both reports. No `python3` → skip the page and say so in the summary.
 
 ### 6. Issues and summary
 
@@ -108,6 +119,6 @@ explorer findings. Move the screenshots of `FAIL` and `OUTDATED` checkpoints and
 - **OUTDATED** — list them; suggest `as:qa-docs` to correct the journeys.
 - **BLOCKED** — list them with the reason (missing data, account, unreachable step).
 
-Summary: the result counts, failures with their issues, outdated and blocked checkpoints, the report path. Do not
-commit. Next: `as:fix` for the saved issues, `as:qa-docs` for outdated journeys, and the same `as:qa` command after a
+Summary: the result counts, failures with their issues, outdated and blocked checkpoints, the report path and the
+evidence page path (to open in a browser). Do not commit. Next: `as:fix` for the saved issues, `as:qa-docs` for outdated journeys, and the same `as:qa` command after a
 fix to confirm it.

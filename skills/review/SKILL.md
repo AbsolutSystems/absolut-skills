@@ -7,7 +7,8 @@ argument-hint: "[<PR number or URL> | <base>] [context]"
 # Review
 
 Find the defects a change introduces, and only those. A finding is worth the reader's time only when it names an input
-or situation that produces a wrong outcome, and every statement it rests on holds in the code. Criteria and severity groups:
+or situation that produces a wrong outcome — or a written project rule the diff breaks — and every statement it
+rests on holds in the code. Criteria and severity groups:
 [../finish/references/review.md](../finish/references/review.md#review). Subagent briefs:
 [references/briefs.md](references/briefs.md). Converse in the user's language. Host mechanics (subagents, asking):
 [Claude Code](../../references/claude-tools.md), [Codex](../../references/codex-tools.md).
@@ -101,7 +102,7 @@ For each package, in parallel, one read-only subagent per lens with the
 | Lens | Covers | When |
 |------|--------|------|
 | Correctness and security | bugs, edge cases, error handling, concurrency and transactions, injection, authorization, secrets, data loss, behaviour under load | always |
-| Goal and contract | the goal is reached, callers and consumers still work, spec scenarios and public API kept or intentionally changed, risky logic without a test | always |
+| Goal and contract | the goal is reached, callers and consumers still work, spec scenarios and public API kept or intentionally changed, risky logic without a test, written project rules (`AGENTS.md`, `.guidelines/`) kept | always |
 | UI | loading, error and empty states, dead controls, rendering of missing data, double submit and stale state, accessibility that blocks use | the package has UI files |
 
 Reviewers and verifiers are judgement subagents: where the host mapping offers a stronger model for them, ask the
@@ -143,7 +144,7 @@ In the conversation:
   (other Must or Should), or `partial` (no Must or Should, packages left out). With packages left out the verdict
   line repeats the coverage (`fix or answer — 5 of 9 packages`);
 - **Must** and **Should** findings: file and line, the lens or lenses that raised it, what the code does, the failure
-  scenario, the smallest fix, `confirmed` or `plausible`, the severity move if any, `rests on unreviewed <package>`
+  scenario (or the broken rule, quoted with its file and line), the smallest fix, `confirmed` or `plausible`, the severity move if any, `rests on unreviewed <package>`
   if so, and the questions attached to it;
 - **Nice** findings, one line each;
 - the remaining questions for the author;

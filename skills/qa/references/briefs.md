@@ -16,19 +16,21 @@ Checkpoints: {IDs with the outcome to capture, e.g. J1-2 — the cart lists the 
 URL: {base URL} · Role: {role} · Login: {environment variable names, or "none"}
 Data: {how the data is prepared, from docs/qa/index.md}
 Viewports: {desktop 1440x900, mobile 390x844 | from the scenario}
-Screenshots: {.qa/<run>/} — name each <checkpoint>[-<viewport>].png, with '/' in the ID replaced by '-'
+Screenshots: {.qa/<run>/} — name each <checkpoint>[-<viewport>].png and each step's <scenario>-s<n>.png, with '/' in
+an ID replaced by '-'
 Browser tool: {tool names from the host mapping}
 
 Use only the browser: do not read the application's source or its docs — you test what a user sees. Start from a
 clean state: a new page, logged out unless the scenario says otherwise. Find controls in the page
 snapshot (accessibility tree), not by guessing selectors. Perform the steps as a user would — type, click, wait for
-the page to settle. At each checkpoint, for each viewport, take a full-page screenshot. Read the console messages
+the page to settle. After every step take a screenshot of the visible page (first viewport only) — it proves the
+step to a person, also when nothing is checked there. At each checkpoint, for each viewport, take a full-page screenshot. Read the console messages
 and the network requests after every step. If a step cannot be done (control missing, page changed, data missing),
 take a screenshot, describe what you see and stop the scenario there — do not improvise a different path. Never
 use a URL outside {base URL}; never pay, send e-mails or delete data outside the test data.
 
 Return exactly these sections:
-1. Steps — each step: what you did, what happened, in one line.
+1. Steps — each step: what you did, what happened, in one line, and its screenshot path.
 2. Checkpoints — for each checkpoint and viewport: screenshot path, the visible text and state that matter (headings,
    counts, messages, values), console errors since the previous checkpoint, failed requests (method, path, status).
 3. Not executed — steps or checkpoints you could not reach, with the reason and the screenshot path.

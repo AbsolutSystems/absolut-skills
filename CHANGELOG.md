@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.18.0
+
+- Choices are explained before they are asked: the host mappings (`references/claude-tools.md`,
+  `references/codex-tools.md`) gain "Asking the user to choose" — how it works today, a concrete scenario where it
+  breaks, how often and how badly, each option's pros, cons and cost, and a recommendation with the reason, in plain
+  language — and only then the short question. `tech-lead` points to it before every choice.
+
 ## 1.17.0
 
 - `qa` writes an HTML evidence page next to its working screenshots (`.qa/<run>/report.html`): a summary with the

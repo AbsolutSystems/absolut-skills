@@ -9,6 +9,11 @@
 - Without subagents, `as:tech-lead` options: one recommended architecture with its main alternative in a line;
   the 2–3 option comparison only when the user asks for it.
 - Asking the user: ask in plain text, numbered, with suggested options, and wait for the answer.
+- Asking the user to choose: first explain each decision in plain language, so the user can decide without reading
+  the code: how it works today; when exactly it breaks (a concrete scenario — who does what, what they see); how often
+  and how badly; then each option — what changes, pros, cons, cost — and your recommendation with the reason. Explain
+  jargon (class names, framework or protocol terms) or leave it out. Only then list the numbered options, kept short
+  because the explanation is already above.
 - Simplify (`as:finish`): follow `skills/finish/references/review.md`.
 - Review (`as:review`, also inside `as:finish` and `as:deliver`): reviewers and verifiers as subagents if available;
   otherwise the lenses run one after another, and verification is a separate pass that re-reads the code.

@@ -21,6 +21,8 @@ Change proposal format: [references/change-format.md](references/change-format.m
 - Challenge the request when warranted: an existing feature that covers it, a smaller version that delivers most of the
   value, a hidden cost (migration, security, coupling). Say it once, plainly, then respect the decision.
 - Always give a recommendation with a reason; do not hand the user an unranked menu.
+- Before any choice, explain it as in the host mapping's "Asking the user to choose" — a terse option list is not
+  enough to decide.
 - Prefer the least new code that fully solves the problem (see the working principles in the root `AGENTS.md` if present).
 - Converse in the user's language. Artifacts follow the spec language (`lang` in the marker on the first line of `docs/spec/index.md`), else English.
 

@@ -19,6 +19,11 @@
   get `model: "fable"` (the other stages, and the review inside the Finish stage, stay on the session model). An
   Agent call refused because of the model → repeat it without `model` and say so in one line.
 - Asking the user: use AskUserQuestion (up to 4 questions per call; ask further batches if needed), with concrete options.
+- Asking the user to choose: first explain each decision in the message text, in plain language, so the user can
+  decide without reading the code: how it works today; when exactly it breaks (a concrete scenario — who does what,
+  what they see); how often and how badly; then each option — what changes, pros, cons, cost — and your
+  recommendation with the reason. Explain jargon (class names, framework or protocol terms) or leave it out. Only then
+  call AskUserQuestion; its labels and descriptions stay short because the explanation is already above.
 - Simplify (`as:finish`): the built-in `simplify` skill via the Skill tool, or the `code-simplifier` agent if that plugin
   is installed; otherwise follow `skills/finish/references/review.md`.
 - Review (`as:review`, also inside `as:finish` and `as:deliver`): reviewers and verifiers are Agent tool subagents

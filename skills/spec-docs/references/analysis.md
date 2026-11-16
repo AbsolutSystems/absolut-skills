@@ -49,7 +49,9 @@ Return exactly these sections:
 6. Glossary — domain terms with a one-line meaning.
 7. Drift — for each claim in the existing page that is false or outdated: the claim / ID, why it is wrong, evidence.
    List existing scenario IDs that no longer apply (to be marked removed).
-8. Open questions — what the code cannot tell; propose likely answers as options.
+8. Open questions — what the code cannot tell; propose likely answers as options, mark the one you recommend and
+   give the evidence for it (a rule the rest of the code enforces, a test that pins it, a caller that relies on it,
+   data it can lose or leak).
 ```
 
 ## Coverage brief (`as:spec-tests`, one module)

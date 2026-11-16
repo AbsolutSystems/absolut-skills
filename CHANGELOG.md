@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.18.1
+
+- Every question to the user carries a recommendation and its reason. A batch of many similar decisions (bug or
+  intended, keep or remove) is shown as one table — item, what it does today, recommendation, why — and the user only
+  accepts it or names the items to change; the recommended option comes first. `spec-docs` analysis subagents mark
+  the answer they recommend for each open question, with evidence, and step 3 builds the table from them.
+
 ## 1.18.0
 
 - Choices are explained before they are asked: the host mappings (`references/claude-tools.md`,

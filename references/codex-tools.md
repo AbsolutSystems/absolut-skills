@@ -14,6 +14,11 @@
   and how badly; then each option — what changes, pros, cons, cost — and your recommendation with the reason. Explain
   jargon (class names, framework or protocol terms) or leave it out. Only then list the numbered options, kept short
   because the explanation is already above.
+  A batch of many similar decisions (bug or intended, keep or remove, one per finding) gets one table per batch
+  instead — item, what it does today in a sentence, your recommendation, why — and the question asks only whether to
+  accept the table or which items to change. Every question carries a recommendation: list the recommended option
+  first, marked "(recommended)"; when you have none, say what is missing to form one. Never ask a bare "which of
+  these are bugs?".
 - Simplify (`as:finish`): follow `skills/finish/references/review.md`.
 - Review (`as:review`, also inside `as:finish` and `as:deliver`): reviewers and verifiers as subagents if available;
   otherwise the lenses run one after another, and verification is a separate pass that re-reads the code.

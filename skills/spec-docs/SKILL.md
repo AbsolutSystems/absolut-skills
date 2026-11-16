@@ -76,7 +76,9 @@ If the host has no subagents, do the same analysis sequentially in the main thre
 ### 3. Clarify with the user
 
 Collect open questions from all reports, deduplicate, and ask in small batches, most impactful first, with options
-derived from the code. Typical questions:
+derived from the code. Each item comes with a recommendation and its reason, judged from the reports: does it break a
+rule the rest of the code enforces, can it lose or leak data, does a test or another module rely on it. Present a
+batch as the table in the host mapping's "Asking the user to choose" and ask whether to accept it. Typical questions:
 
 - Is this behaviour an intended business rule or a bug? Only intended rules go into the spec. A bug becomes an issue
   candidate (kind `bug`, with the evidence from the report and the intended behaviour from the answer) per

@@ -11,7 +11,8 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
 - `agent-docs` — `AGENTS.md`/`CLAUDE.md` hierarchy and `.guidelines/`.
 - `spec-docs` — Markdown module contracts in `docs/spec/` (migrates legacy HTML); owns `references/markdown-format.md`
   and `scripts/spec_lint.py`.
-- `tech-lead` — design and bug investigation; writes change proposals to `docs/spec/changes/`.
+- `tech-lead` — design, bug and performance investigation; writes change proposals to `docs/spec/changes/`; owns
+  `references/safety-fact.md` (also used by `fix`) and `references/perf.md`.
 - `estimate` — client feature request analysis and hour estimate; writes `docs/estimates/<slug>/`; owns
   `scripts/estimate_totals.py`.
 - `feature` — living feature docs in `docs/features/<slug>/` (page + `sources/`); owns
@@ -53,18 +54,18 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
 - Renaming or restructuring a step or reference in one skill means updating every skill that links to it — the
   validator checks link targets and `#anchors`, but not step numbers or section names quoted in prose.
 - `finish` (step 4) and `deliver` follow `review` in branch mode (`finish` passes its step 3 new clones as the
-  review's `[context]`); `finish` names its steps 2–7 by number; `explain`
+  review's `[context]`, and names `review` steps 2–8 by number); `explain`
   takes a change's target and context from `review` steps 1–2, and runs `feature`'s `xlsx_text.py` (step 1).
 - `deliver` follows `tech-lead` (From feature, Feature), `implement`, `finish`, `fix` (steps 2–3 by number) and
-  `review`; `references/autopilot.md` names their questions and gates (review, spec
-  drift, contract tests, implement deviations) — a new question or gate in those skills needs a policy line there, or the unattended run stalls on it.
+  `review`; `references/autopilot.md` names their questions and gates (review and its Prove step,
+  spec drift, contract tests and the mutation check, implement deviations, an `unproven` safety fact) — a new question or gate in those skills needs a policy line there, or the unattended run stalls on it.
 - `references/recommended-plugins.md` (repo root) is shared by `init` (installs) and `doctor` (reports).
 - `qa` and `qa-docs` follow `qa-docs/references/qa-format.md` and read feature pages by
   `feature/references/feature-format.md` (`AC<n>` anchors, `**Realised by:**`, `**Modules:**`); `qa` selects `branch`
   scenarios like `finish` step 1. `deliver` runs `qa` as its QA stage in the main thread (a stage subagent cannot start
   the executor and judge) — `autopilot.md` holds its policy, so a new question in `qa` needs a line there. The browser
   tool names live only in the host mappings.
-- `fix` follows `tech-lead`'s `#bug` and `#feature` paths and `tech-lead` routes known-issue requests to `fix/SKILL.md`;
+- `fix` follows `tech-lead`'s `#bug`, `#feature` and `#performance` paths and `tech-lead` routes known-issue requests to `fix/SKILL.md`;
   `docs-check` follows `agent-docs` and `spec-docs` steps 1–4 by number — renumbering them means updating it.
   `doctor` reads the marker of `init/references/working-principles.md` and the first line of `health.css` and
   `explain.css`, and runs `spec_lint.py` — change the marker or the version line format together with `doctor.py`. `health` closes issues by their `**Key:**`, so the snapshot `key` format and `issue-format.md` change together.

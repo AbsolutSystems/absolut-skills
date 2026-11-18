@@ -21,7 +21,8 @@
   these are bugs?".
 - Simplify (`as:finish`): follow `skills/finish/references/review.md`.
 - Review (`as:review`, also inside `as:finish` and `as:deliver`): reviewers and verifiers as subagents if available;
-  otherwise the lenses run one after another, and verification is a separate pass that re-reads the code.
+  otherwise the lenses run one after another, and verification is a separate pass that re-reads the code. Provers
+  (step 6) run one after another as subagents, or in the main thread without subagents.
 - Plan mode (`as:tech-lead` handoff) is a Claude Code feature: on Codex, present the plan, wait for
   approval, then implement step by step.
 - Unattended run (`as:deliver`): start Codex with an approval policy that never asks, e.g.

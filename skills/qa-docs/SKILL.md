@@ -1,6 +1,6 @@
 ---
 name: qa-docs
-description: "Create and maintain docs/qa/, what as:qa checks in a browser for a web application: environments and how to start them, test accounts (environment variable names, never secrets) and data, roles, app-wide UI rules (viewports, empty, error and loading states), and journeys — cross-feature user paths J1…Jn written as intent with observable checkpoints. Drafts it from the routes, roles and UI conventions in the code, the feature pages' acceptance criteria and AGENTS.md; on later runs reports drift (criteria and screens no journey covers, journeys naming removed screens or roles), the last result of every criterion and journey from the run reports, outdated journeys and criteria too vague to check, and writes only the suggestions the user accepts. Web applications only. Use only when the user explicitly invokes as:qa-docs."
+description: "Create and maintain docs/qa/, what as:qa checks in a browser for a web application: environments and how to start them, test accounts (environment variable names, never secrets) and data, roles, app-wide UI rules (viewports, empty, error and loading states), and journeys — cross-feature user paths with readable slug IDs (checkout-guest) written as intent with observable checkpoints. Drafts it from the routes, roles and UI conventions in the code, the feature pages' acceptance criteria and AGENTS.md; on later runs reports drift (criteria and screens no journey covers, journeys naming removed screens or roles), the last result of every criterion and journey from the run reports, outdated journeys and criteria too vague to check, and writes only the suggestions the user accepts. Web applications only. Use only when the user explicitly invokes as:qa-docs."
 disable-model-invocation: true
 argument-hint: "[area | path]"
 ---
@@ -61,6 +61,11 @@ critical for the business, and whether a staging URL may be used.
   correctly"): propose a sharper checkpoint, or a journey for the criterion. A criterion itself is changed only with
   `as:feature` — say so; never edit the feature page.
 - **Removed** — journeys whose path no longer exists: mark them removed per the format, never delete or renumber.
+- **Legacy IDs** — journeys still identified by `J<n>`: propose a slug for each by the format's ID rules (one
+  suggestion per journey, so the user can take some). An applied one is migrated per the format: the slug becomes
+  the anchor and the ID, the old `J<n>` stays as a second anchor and in a `**Was:**` line, checkpoints become
+  `<slug>-<m>`; run reports and issues are not edited. Offered while any `J<n>` journey is active; a declined
+  suggestion is not a problem — `J<n>` stays valid.
 
 ### 4. Coverage
 
@@ -71,7 +76,8 @@ or whose last run is older than the latest change to the code they cross, are li
 ### 5. Approval and write
 
 Show the draft (new) or the suggestions grouped as in step 3 (existing), and ask which to apply (multi-select, all
-preselected). Write only those. New journeys and rules take the next free `J<n>` / `R<n>`; existing IDs never change.
+preselected). Write only those. A new journey takes a slug by the format's ID rules (a natural slug that breaks them → pick
+another); a new rule the next free `R<n>`; existing IDs never change.
 Update `**Updated:**` in `index.md`. Problems in the app found on the way (a route that crashes, a role check missing)
 → offer to save them as issues per [../issue/references/issue-format.md](../issue/references/issue-format.md),
 `**Source:**` `as:qa-docs`.
@@ -79,6 +85,7 @@ Update `**Updated:**` in `index.md`. Problems in the app found on the way (a rou
 ### 6. Verify and summary
 
 Check that every relative link in `index.md` and `journeys.md` resolves (including `#AC<n>` anchors on feature pages)
-and that no `J<n>`, `J<n>-<m>` or `R<n>` is used twice. Summary: files written, journeys and rules added, changed and
+and that no journey ID (`**Was:**` and removed journeys included), checkpoint ID or `R<n>` is used twice, and that
+every new journey ID follows the format's ID rules. Summary: files written, journeys and rules added, changed and
 removed, the coverage gaps that remain, issues saved. Next: `as:qa journeys` (or `as:qa docs/features/<slug>`), with
 the app running.

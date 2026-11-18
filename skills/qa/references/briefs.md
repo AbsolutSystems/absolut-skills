@@ -10,9 +10,9 @@ explorer tries to break an area. Fill the placeholders and pass verbatim. Result
 You are a QA tester executing one scenario in a real browser. You collect evidence; you do not decide whether the
 app is right — someone else judges your evidence. Do not modify files other than screenshots, do not change code.
 
-Scenario: {J<n> — name | <slug>/AC<n> — criterion text}
+Scenario: {journey ID — title | <slug>/AC<n> — criterion text}
 Details: {journey steps and checkpoints | the criterion and its Realised-by scenarios (Given/When/Then)}
-Checkpoints: {IDs with the outcome to capture, e.g. J1-2 — the cart lists the product}
+Checkpoints: {IDs with the outcome to capture, e.g. first-order-2 — the cart lists the product}
 URL: {base URL} · Role: {role} · Login: {environment variable names, or "none"}
 Data: {how the data is prepared, from docs/qa/index.md}
 Viewports: {desktop 1440x900, mobile 390x844 | from the scenario}

@@ -8,7 +8,7 @@
 - Subagent model: read-only briefs that find and classify (Explore, Investigate, `spec-docs`/`agent-docs` analysis,
   coverage, test quality, `finish` analysis, `estimate` Impact, `feature` legacy mapping) pass a smaller model in the Agent tool's `model` parameter (e.g. `sonnet`, or `haiku` for
   plain searches); `tech-lead` Architecture briefs pass `model: "opus"` whatever the session model, and are not part
-  of the opt-in below; `estimate` Consistency, `review` reviewers and verifiers and the `explain` fact check keep the
+  of the opt-in below; `estimate` Consistency, `review` reviewers, verifiers and provers and the `explain` fact check keep the
   session model; the `explain` inventory may use `haiku`, its tracing `sonnet`.
 - Stronger model (opt-in): the subagents that keep the session model above are the judgement subagents. Before a
   skill starts the first of them, unless the session already runs on Fable, ask with AskUserQuestion whether to run
@@ -33,7 +33,9 @@
   is installed; otherwise follow `skills/finish/references/review.md`.
 - Review (`as:review`, also inside `as:finish` and `as:deliver`): reviewers and verifiers are Agent tool subagents
   with `subagent_type: "general-purpose"` on the session model (Explore reads excerpts, too little to judge a defect),
-  told in the brief to stay read-only; one message with several Agent calls runs them in parallel.
+  told in the brief to stay read-only; one message with several Agent calls runs them in parallel. Provers (step 6)
+  are `general-purpose` subagents on the same model, allowed to create new test files and run the test command; one
+  Agent call at a time, never in parallel.
 - Explain (`as:explain`): inventory and tracing subagents are `Explore`; the fact check is `general-purpose` on the
   session model, told to stay read-only.
 - Built-in skills depend on the Claude Code version: use one only if it appears in the available skills list, else take
@@ -49,7 +51,7 @@
   ([recommended plugins](recommended-plugins.md)) provides the browser tools `mcp__plugin_playwright_playwright__*`:
   `browser_navigate`, `browser_snapshot` (accessibility tree — find controls here, not by guessing selectors),
   `browser_click`, `browser_type`, `browser_fill_form`, `browser_resize`, `browser_take_screenshot` (`filename`
-  relative to the project root, e.g. `.qa/<run>/J1-2-mobile.png` — it writes only inside the session's workspace),
+  relative to the project root, e.g. `.qa/<run>/checkout-guest-2-mobile.png` — it writes only inside the session's workspace),
   `browser_console_messages`, `browser_network_requests`, `browser_evaluate` (only to reset test data), `browser_close`.
   They are deferred tools: a subagent loads them first with ToolSearch (`select:<names>`) — say so in the brief. The
   tool also leaves logs and page snapshots in `.playwright-mcp/` in the project root: gitignore it with `.qa/`.

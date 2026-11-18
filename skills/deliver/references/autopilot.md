@@ -63,6 +63,22 @@ the assumption; one that changes the scope → blocked. Do not ask between miles
 - Contract tests: cover every `MISSING` and `PARTIAL` scenario of the merged proposals and the new behaviour. A new
   test that fails because the code breaks its scenario → fix the code; a scenario that looks wrong → keep the test out
   of the diff and save a `spec-gap` issue. Never weaken an assertion.
+- Mutation check — for every new test of an `error` or `edge` scenario written in this stage, prove that it fails
+  when the behaviour breaks:
+  1. copy the production file to `${TMPDIR:-/tmp}/as-mutation/<tree>/<path in the repo>`, where `<tree>` is
+     `git rev-parse --show-toplevel` with `/` replaced by `-` (one directory per worktree), and record
+     `git hash-object <file>` in `<copy>.orig` next to it;
+  2. make the smallest edit that breaks the scenario's behaviour (invert the guard, skip the effect), and record the
+     mutated file's `git hash-object` in `<copy>.mutated`;
+  3. run only that test (the module's test command filtered to it; no filter → the module's command, reading that
+     test's result); it must fail;
+  4. copy the file back, check that `git hash-object` matches `.orig`, then delete the copy and its two hash files.
+     A mismatch fails the stage.
+
+  The test still passes → it is weak: derive the expected value from the scenario, strengthen the assertion and
+  repeat once. Still passes → save an `add-tests` issue (`p3`) with the mutation as evidence; that scenario never
+  counts as covered until a later check of it reports `killed`. Report every result (`killed`, `strengthened`,
+  `survived`) with the scenario ID, the file and the edit under Checks. Interactive `finish` does not run this check.
 - Agent docs: apply only facts the branch made false or necessary (commands, rules, pitfalls); skip the rest.
 - A module named by the proposal without a spec page → create it with the `spec-docs` procedure for that module, so
   the proposal can merge; other touched modules without a page → note them for the report.
@@ -70,16 +86,22 @@ the assumption; one that changes the scope → blocked. Do not ask between miles
 
 **fix** (Fix stage): the issues the loop selected; no list, no choice; the evidence re-check as in fix step 3 (a
 misfitting priority → `git mv` without asking). `S` without a contract change → fixed here,
-test-first, issue deleted. `M`/`L` or a contract change → a proposal through the tech-lead path as above (the loop
+test-first, issue deleted; a `**Safe because:**` line that says `unproven` → run the cheapest check it names when
+it is local and read-only (never a production system or a credential); otherwise, or still unproven → record it as an
+assumption. An `add-tests` issue saved by a mutation check: strengthen the test, then run the same mutation check as
+in **finish** and report its result under Checks (`survived` again → the issue stays). `M`/`L` or a contract change → a proposal through the tech-lead path as above (the loop
 implements and finishes it); its `**Issue:**` meta line closes the issue. Evidence gone → delete the issue. A fix
 that needs a human-only decision → blocked (an issues run skips the issue and goes on).
 
 **review** (inside the Finish stage, and the Final review stage): [review](../../review/SKILL.md) in branch mode from
 the run's base; inside a stage subagent its reviewers and verifiers run in sequence. More than 5
-packages → review all of them. Fix every `confirmed` Must and
-Should finding. A `plausible` one → write a test that shows it first: it fails → fix it; it passes, or no test can show it (a race,
-a security path) → drop the test and save the finding as a `p4` issue with "unconfirmed by as:review" in its Problem,
-for a human; it no longer counts as a Must or Should finding. Save the ones still failing after one fix attempt as issues (Must → `p2`,
+packages → review all of them. Run the Prove step without asking (provers in sequence inside the stage); a prover
+that changed an existing file → stop proving and return failed with the diff (the loop repairs or sets it aside).
+Act on each finding's status after the step, not on the prover's result: `refuted` → dropped; still `plausible` →
+save it as a `p4` issue with "unconfirmed by as:review" in its Problem, for a human; it no longer counts as a Must or
+Should finding; `proven` and `confirmed` Must and Should findings → fix them (a `proven` one starting from its test).
+A finding that matches a problem the brief lists as fixed earlier in this run → do not fix it again: save it as an
+issue and report it under Issues as returning (the loop runs the premise rule). Save the ones still failing after one fix attempt as issues (Must → `p2`,
 `p1` for data or security; Should → `p3`). Drop Nice findings and refuted ones; questions for the author and a failed
 merge check go to the report. The Final review stage reviews the whole diff from the base and returns `clean` only
 when it fixed nothing.
@@ -107,6 +129,10 @@ Report: {report path}
 Start-up decisions and earlier assumptions: {from the report}
 Checks: {test, lint, type-check, build commands}
 Repair only: failing output of the previous attempt: {output}
+Fixed earlier in this run: {review findings, QA failures and issues the stages table marks fixed, with their commits}
+Premise only: this problem came back after {earlier fix: commit and one line}. Before fixing, state in one sentence
+the assumption that fix rested on, name an observation that would come out differently if it were false, make it,
+and fix from what it shows. Report the assumption, the observation and its result under Assumptions.
 
 Read {skill path}/SKILL.md and follow it for this stage only, with the policy in
 {deliver skill path}/references/autopilot.md replacing every question and approval. If you cannot start subagents,
@@ -166,6 +192,9 @@ checks this for the feature report).
 
 - `**Rollout:**` deploy Billing first. Set aside: none.
 ```
+
+A Fix stage run under the premise rule notes `premise: <assumption> — <observation and its result>` in its row;
+the loop reads it to tell a first return from a second.
 
 The QA row reads `skipped — <reason>` when start-up skipped QA, and is left out when the project has no `docs/qa/`.
 

@@ -37,6 +37,8 @@ Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex):
    `**Effort:**` (the user may override):
    - `bug`, `security`, `spec-gap` → the tech-lead [Bug](../tech-lead/SKILL.md#bug) path: reproduce, root cause, plan
      with a failing test first, approval, fix.
+   - `perf` → the tech-lead [Performance](../tech-lead/SKILL.md#performance) path, starting from the issue's claim and
+     baseline; the baseline is measured again before any plan.
    - `refactor`, `review`, `delete`, `deps` → observable behaviour stays: no scenario changes ("No contract change"),
      and the plan starts by running or adding tests that pin the current behaviour.
    - `add-tests` → tests only, tagged with the scenario IDs they verify; a missing scenario is a specification gap —
@@ -46,8 +48,9 @@ Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex):
    - `docs` → hand over to `as:agent-docs` or `as:spec-docs` for the affected path, or `as:finish` / drop for a stale
      change proposal; delete the issue when that is done.
 
-   An `S` issue without a contract change is fixed here after the user approves the short plan: failing test first,
-   then the fix, then the module's tests. `M`/`L` issues, or any contract change → the tech-lead
+   An `S` issue without a contract change is fixed here after the user approves the short plan — with its
+   `**Safe because:**` line ([../tech-lead/references/safety-fact.md](../tech-lead/references/safety-fact.md)):
+   failing test first, then the fix, then the module's tests. `M`/`L` issues, or any contract change → the tech-lead
    [Feature](../tech-lead/SKILL.md#feature) path from step 2, with `` · **Issue:** `<slug>` `` in the
    proposal's meta line; then `as:implement` and `as:finish`. In a series, an `M`/`L` issue ends the series:
    ask whether to continue with the next issue after its proposal is written.

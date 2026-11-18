@@ -36,7 +36,8 @@ The user is still here: settle everything now, then never ask again.
 - **Issues run** — load the open issues and order them as [fix](../fix/SKILL.md) step 2 does (priority, effort, date),
   filtered by the request. Unlike fix step 1, keep the issues named by the `**Issue:**` line of an open proposal: mark
   them with the proposal, which becomes part of the run (the loop continues it).
-  `remove-tests` and `docs` issues need a human or another skill → not selected; list them. Show the table (file,
+  `remove-tests` and `docs` issues need a human or another skill, and `perf` issues need a quiet machine and
+  production-like settings an unattended run cannot promise → not selected; list them. Show the table (file,
   kind, priority, effort, module, title) and ask which to take (multi-select, all preselected). None → stop.
 - **Spec lint** — when `docs/spec/` or `docs/features/` exists, run `spec_lint.py` (as in `feature` step 6); any error →
   stop and say which skill fixes it (`as:feature`, `as:spec-docs`) — the done criteria need it `OK`.
@@ -50,7 +51,7 @@ The user is still here: settle everything now, then never ask again.
   by stage and must not mix in foreign changes (on a resume they are an interrupted stage: leave them to the loop).
   Record the base (`git merge-base HEAD origin/HEAD`, else the default branch).
 - **Checks** — the test, lint, type-check and build commands from the relevant `AGENTS.md` files; none documented →
-  ask for them. Run them: anything red → stop. A run that starts on red cannot tell its own breakage from the old.
+  ask for them. Run the mutation restore of step 2.1 first (a crashed run may have left one), then the checks: anything red → stop. A run that starts on red cannot tell its own breakage from the old.
 - **Host** — the run must not stall on permission prompts: check the setup described in the host mapping and tell the
   user what is missing. Where the host mapping offers a stronger model for judgement subagents, ask now whether the
   Plan and Final review stages use it; the answer is a start-up decision (a resume reads it from the report).
@@ -72,8 +73,12 @@ stage reads it. From here on, ask nothing: questions are answered by the policy.
 
 Each stage starts from the files, not from memory — re-read them every time (the conversation may have been compacted):
 
-1. **Tree** — uncommitted changes at the start of a stage mean an interrupted stage: run the checks; green → commit
-   them as that stage, red → a repair stage (below).
+1. **Tree** — first the **mutation restore**: a copy left in this worktree's `${TMPDIR:-/tmp}/as-mutation/<tree>/`
+   ([policy](references/autopilot.md#per-skill), finish) means a stage died in the middle of a mutation check. For
+   each copy: the file's current `git hash-object` equals its `.orig` or `.mutated` (no `.mutated` yet → `.orig`
+   only) → copy it back, check `.orig`, delete the copy and its hash files; it equals neither → newer work is in the
+   file: stop and report it, never overwrite. Then uncommitted changes at the start of a stage mean an interrupted
+   stage: run the checks; green → commit them as that stage, red → a repair stage (below).
 2. **Pick the next stage**, first match wins:
 
    | State | Stage | Follows |
@@ -92,7 +97,7 @@ Each stage starts from the files, not from memory — re-read them every time (t
 
    A **run issue** is an open issue that is selected in the report (issues run), or added on this branch
    (`git diff --name-only --diff-filter=A <base> -- docs/issues`) with `p1`–`p3` — not skipped in the report and not
-   of kind `remove-tests` or `docs` (those wait for a human; the report lists them).
+   of kind `remove-tests`, `docs` or `perf` (those wait for a human; the report lists them).
    A **run proposal** is an open proposal in `docs/spec/changes/` with this feature's `**Feature:**` meta line, one
    whose `**Issue:**` names a run issue, or one added on this branch (`git diff --name-only --diff-filter=A <base> --
    docs/spec/changes`, e.g. by a Fix stage) — unless its issue is skipped.
@@ -102,12 +107,13 @@ Each stage starts from the files, not from memory — re-read them every time (t
    runs in the main thread instead — a stage subagent cannot start the executor and judge subagents `qa` needs —
    following [qa](../qa/SKILL.md) with the policy; the app is restarted with its `Start` command first when it does
    not reload changed code by itself. The loop keeps only the result counts, the report path and the issues.
-4. **Verify** — rerun the checks yourself; do not trust the stage report alone. Red → one **repair** stage (brief with
+4. **Verify** — run the mutation restore of step 2.1 first (a stage that died mid-check leaves its copy), then rerun
+   the checks yourself; do not trust the stage report alone. Red → one **repair** stage (brief with
    the failing output, goal: green without weakening a test). Still red → set the stage's changes aside with
    `git stash push -u -m "as:deliver <stage>"` (nothing is lost); a feature run stops, an issues run skips the issue
    (step 3) and goes on.
 5. **Log** — append the stage to the report ([format](references/autopilot.md#report)): stage, result,
-   assumptions, issues saved, closed and skipped.
+   assumptions, issues saved, closed and skipped, mutation results with their scenario IDs.
 6. **Commit** — stage the files of the report's Changes and `docs/` (`git add -A -- <paths>`, deletions included) and
    commit `as:deliver(<slug>): <stage> — <one line>` (`as:deliver(issues)` for an issues run), with the stage's
    assumptions and issues in the body. Other files the stage left (coverage output, traces, a generated `.env`) stay
@@ -123,8 +129,15 @@ Stop the loop (then [step 5](#5-report)) when:
   An issues run skips the issue instead: stash the stage's changes as in step 2.4, add the issue with the question to
   the report's skipped list (the loop no longer picks it or its proposal), commit the log and go on;
 - the checks stay red after the repair stage (an issues run skips the issue, as above);
-- **no progress** — a stage other than a clean final review or a QA stage changed nothing but its log line, or a review finding, QA failure or
-  issue already fixed in this run comes back (record it as an issue and stop instead of looping);
+- **no progress** — a stage other than a clean final review or a QA stage changed nothing but its log line;
+- **a fixed problem comes back twice** — a review finding, QA failure or issue already fixed in this run (the stages
+  table says so) comes back; review stages get the fixed ones in their brief and report a returning finding instead
+  of fixing it again. The first time, do not stop: save it as a run issue and make the next stage a Fix stage
+  for it under the premise rule ([tech-lead Bug](../tech-lead/SKILL.md#bug) step 2) — the stage brief's `Premise only:`
+  line names the earlier fix; the stage states the assumption the fixes shared and the observation that tests it, and the
+  log line records both with `premise`. A problem whose log already has a `premise` line comes back again → save it as
+  an issue with both fixes and the tested assumption as evidence; a feature run stops, an issues run skips the issue
+  as for **blocked** and goes on. The extra Fix stage counts towards `--max-stages`;
 - `--max-stages` is reached.
 
 Never: push, merge, rebase, amend or reset commits, delete branches, edit `sources/`, change or remove acceptance
@@ -139,8 +152,9 @@ All must hold; check each with its command, not from the stage reports:
 - the checks from step 1 are green;
 - `spec_lint.py` prints `OK` (when it ran at start-up);
 - every scenario added or changed by this run's proposals (archived since base) has a test with its ID
-  (`git grep -n '<ID>'` over the test directories), `error` and `edge` ones included;
-- the final review found no `confirmed` Must finding left unfixed;
+  (`git grep -n '<ID>'` over the test directories), `error` and `edge` ones included, and none of them has
+  `survived` as its latest mutation result in the log;
+- the final review found no `proven` or `confirmed` Must finding left unfixed;
 - no `p1`–`p3` issue added on this branch is left open, except skipped ones;
 - when QA was not skipped: the report written by the run's last QA stage (named in its log line) has no `FAIL`.
 

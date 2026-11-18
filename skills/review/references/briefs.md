@@ -1,7 +1,8 @@
 # Review briefs
 
-Used by [review](../SKILL.md) steps 4 and 5. Both subagents are read-only: they never edit files, commit or post
-anything.
+Used by [review](../SKILL.md) steps 4, 5 and 6. Reviewers and verifiers are read-only: they never edit files,
+commit or post anything. A prover only adds new test files and runs the test command; it never edits an existing file,
+commits or posts anything.
 
 ## Reviewer
 
@@ -82,4 +83,41 @@ correction: a statement of the finding is false although the verdict holds — g
 
 confirmed: you traced a path on which the failure happens. plausible: you could neither refute it nor trace it
 without running the code. refuted: you found what prevents it, or it is pre-existing.
+```
+
+## Prover
+
+One per finding, one after another; receives a finding step 6 selected.
+
+```text
+You prove or disprove one review finding by running code. You may only create new files and run the test command:
+never edit, move or delete an existing file, never commit or post.
+
+Repository: {path of the reviewed tree}
+Diff: {diff command}
+Goal of the change: {goal}
+Finding: {severity, file:line, claim, failure scenario, status (confirmed | plausible) and the verifier's evidence}
+Test location and style: {test directory, reference test file, naming of test files}
+Test command: {command, and how to run a single test file or test}
+Coverage tool: {command the project already has, or "none"}
+
+Write the smallest test (or a repro script, when no test fits) that drives the failure scenario through the code in
+question and asserts the outcome the goal requires — the expected value from the goal or the spec, not from the code.
+Put it in a new file in the test location, following the reference test. Run it. When it fails because of the test
+itself (import, setup, a typo), repair your own file, at most twice. Then decide:
+- proven: the test fails, and the failure is the one the scenario predicts — not a setup error;
+- disproved: the test passes, and you can show the scenario reached the code in question — an assertion that can hold
+  only on that path, or line coverage of that code from the coverage tool. A passing test without that proof is not
+  disproved: report unprovable with "passed without proof of reach";
+- unprovable: a race, an external system, no cheap way to reach the code from a test — with the reason.
+
+Return exactly these sections:
+- Result: proven | disproved | unprovable
+- Command: the exact command you ran last
+- Output: the lines it printed that show the result (failure message, assertion, coverage of the lines in question)
+- Required output: what the command would print if the code met the goal
+- Reach: the assertion or coverage that shows the scenario reached the code (disproved only)
+- Files created: paths
+- Test code: the full content of the test or script you created last
+- Reason: one line (unprovable only)
 ```

@@ -1,6 +1,6 @@
 ---
 name: tech-lead
-description: "Act as a tech lead when the user wants to discuss, design or plan a new feature, investigate a bug or unexpected behaviour, weigh technical options (\"how should we…\", \"I want to add…\", \"why does X break\", \"A or B?\"), work through the known problems saved in docs/issues/ (\"fix the most important bugs\"), plan a client-accepted estimate or the next phase of a documented feature (as:tech-lead docs/estimates/<slug> | docs/features/<slug>). Grounds the discussion in the code, AGENTS.md and the docs/spec contracts first, asks targeted questions, challenges the request, compares alternative architectures, records the decision and the proposed spec scenarios in a change proposal (docs/spec/changes/), and saves an implementation plan in it, then offers to continue in plan mode for larger changes — without writing code until the plan is approved. Not for small, clearly specified edits (rename, typo, one-line fix), questions about how existing code works, or executing an already approved plan (as:implement)."
+description: "Act as a tech lead when the user wants to discuss, design or plan a new feature, investigate a bug, unexpected behaviour or slow code, weigh technical options (\"how should we…\", \"I want to add…\", \"why does X break\", \"X is slow\", \"A or B?\"), work through the problems saved in docs/issues/ (\"fix the most important bugs\"), plan a client-accepted estimate or the next phase of a documented feature (as:tech-lead docs/estimates/<slug> | docs/features/<slug>). Grounds the discussion in the code, AGENTS.md and docs/spec contracts first, asks targeted questions, challenges the request, compares alternative architectures, records the decision and the proposed spec scenarios in a change proposal (docs/spec/changes/), and saves an implementation plan in it, then offers plan mode for larger changes — without writing code until the plan is approved. Not for small, clearly specified edits (rename, typo, one-line fix), questions about how existing code works, or executing an already approved plan (as:implement)."
 argument-hint: "[feature, bug or question | docs/estimates/<slug> | docs/features/<slug>]"
 ---
 
@@ -31,7 +31,8 @@ Change proposal format: [references/change-format.md](references/change-format.m
 Before any exploration, size the task from the request and one or two searches:
 
 - **S** — one module, a few files, no contract change: read only that module's `AGENTS.md` and code, no subagents,
-  no options step, no change proposal; one recommendation and a short plan. Offer the full process if the user wants it.
+  no options step, no change proposal; one recommendation and a short plan with its `**Safe because:**` line
+  ([references/safety-fact.md](references/safety-fact.md)). Offer the full process if the user wants it.
 - **M** / **L** — several files or modules, a contract change, or unknowns: the full path below.
 
 Say the size in one line; the user may override it.
@@ -40,6 +41,7 @@ Say the size in one line; the user may override it.
 
 - **Feature or change** — new or changed behaviour → [Feature](#feature).
 - **Bug** — behaviour differs from what someone expects → [Bug](#bug).
+- **Performance** — "X is slow", "make Y faster", a measured regression → [Performance](#performance).
 - **Question** — "A or B?", "is this a good idea?" → ground, compare, recommend; produce no artifacts unless asked.
 - **Known issues** — "what should we fix next", "fix the 10 most important bugs", an issue slug: read
   [../fix/SKILL.md](../fix/SKILL.md) and follow it — it picks from `docs/issues/` and comes back to the paths below.
@@ -164,6 +166,13 @@ a roadmap of phases, decisions and sources. One phase becomes one change proposa
 4. Continue the [Feature](#feature) path from step 3. The proposal's `## Why` links the feature instead of repeating
    it; its meta line has `**Feature:**` with the criteria it realises; writing it sets the phase to `🔄 in progress`.
 
+## Performance
+
+Follow [references/perf.md](references/perf.md): claim, baseline, limiter, plan (approved before any code), after,
+report. The verdict rests on a number with its run count and range; without a named limiter, a tuned run on both sides
+and checked errors it is `inconclusive`. A change at the limiter that alters a contract continues on the
+[Feature](#feature) path from step 2; a measured problem the user defers is saved as a `perf` issue.
+
 ## Bug
 
 1. **Reproduce** — establish symptom, expected vs actual behaviour, inputs and environment. An issue in
@@ -175,7 +184,12 @@ a roadmap of phases, decisions and sources. One phase becomes one change proposa
    - code matches the scenario → the expectation differs from the contract: this is a feature request → [Feature](#feature).
 2. **Hypotheses** — list likely causes, ranked; verify each against code, logs, tests or a minimal reproduction
    (read-only; parallel subagents with brief "Investigate" when there are several). Discard the disproved ones explicitly.
-3. **Root cause** — state it with evidence (file, line, input) and the blast radius: other callers and data affected.
+   **Premise rule:** two hypotheses or two fixes built on the same assumption have failed → state that assumption in one
+   sentence, name an observation that would come out differently if it were false, and make that observation. No
+   third fix before that.
+3. **Root cause** — state it with evidence (file, line, input). Check the other callers and the data the root cause
+   reached, and state the safety fact of the planned fix — the `**Safe because:**` line of
+   [references/safety-fact.md](references/safety-fact.md), with its evidence level.
 4. **Plan** — a failing test first (tagged with the scenario ID), the fix at the root cause, checks of the other
    callers, data repair if needed. A specification gap gets a small change proposal adding the missing `error`/`edge`
    scenario; a pure bug needs none.

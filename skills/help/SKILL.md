@@ -27,7 +27,7 @@ Show this table as it is, in the user's language:
 | I want to… | Command |
 |------------|---------|
 | start with a repository (agent docs, spec, plugins) | `as:init` |
-| design a feature, investigate a bug, choose between options | `as:tech-lead` (also starts on its own) |
+| design a feature, investigate a bug or slow code, choose between options | `as:tech-lead` (also starts on its own) |
 | analyse and price a client's feature request | `as:estimate` |
 | keep a feature's why, acceptance criteria, roadmap and sources (PDF, e-mails) in one place | `as:feature` |
 | continue an approved plan, also in a new session | `as:implement` (also starts on its own) |
@@ -68,6 +68,9 @@ Show these as short chains, then point to the sections below for details:
   assumptions and commits → `/commit-commands:commit-push-pr`.
 - **Bug**: `as:tech-lead <symptom>` (root cause, failing test, fix after approval; or saved to `docs/issues/` if you
   defer it) → `as:finish` → commit.
+- **Performance**: `as:tech-lead <what is slow>` (claim, baseline of 5+ runs, the limiter from a profile, plan after
+  approval, the same measurement after; verdict with median, range and run count, or `inconclusive` and why; deferred →
+  a `perf` issue) → `as:finish` → commit.
 - **Known issues**: problems found by any skill, or by `/code-review` and `/claude-security` saved with `as:issue`,
   wait in `docs/issues/p1…p4-<slug>.md` → `as:fix` (list by priority, fixes the one you choose and deletes its file;
   larger ones get a proposal → `as:implement`) → `as:finish` → commit. Unattended: `as:deliver docs/issues [request]`
@@ -76,8 +79,8 @@ Show these as short chains, then point to the sections below for details:
 - **Health**: `as:health` (report and snapshot in `docs/health/`, fixes small items you pick, saves larger ones as
   issues) → the Known issues flow; the next `as:health` closes issues it no longer finds.
 - **QA**: `as:qa-docs` (once, then after features change: environments, accounts, UI rules and journeys in
-  `docs/qa/`) → with the app running, `as:qa branch` before the PR, `as:qa docs/features/<slug>` or `as:qa journeys`
-  (screenshots judged by a separate agent, report in `docs/qa/runs/`, failures saved as issues) → the Known issues
+  `docs/qa/`) → with the app running, `as:qa branch` before the PR, `as:qa docs/features/<slug>`, `as:qa journeys` or
+  named journeys (`as:qa checkout-guest`) (screenshots judged by a separate agent, report in `docs/qa/runs/`, failures saved as issues) → the Known issues
   flow; `as:qa explore <area>` tries to break one area. Needs the `playwright` plugin (Claude Code) or the Playwright
   MCP server (Codex).
 - **Parallel work**: `as:worktree-create <name>`, run any flow there in a new session, `as:worktree-close`.
@@ -135,6 +138,7 @@ start in a new session.
 - Security-sensitive changes or a release: run `/claude-security` (or ask for a security scan).
 - Your branch on its own: `/as:review` (`/as:finish` runs it for you). A teammate's PR: `/as:review <number or URL>` —
   reviews it in a separate worktree against the PR's base and posts the findings you approve as GitHub review comments.
+  When reading cannot settle a finding, it offers to prove it: a test per finding, run, reported with its output.
 
 ### finish — after delivering a feature
 

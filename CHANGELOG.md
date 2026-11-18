@@ -1,5 +1,46 @@
 # Changelog
 
+## 1.19.0
+
+Evidence by running: four places produce a command, its output or a number a person can check. Ideas from
+[pstack](https://github.com/cursor/plugins/tree/main/pstack) (MIT).
+
+- Working principles v3 (`as:doctor` reports `v2, current is v3`): two fixes of one failure did not hold → test the
+  assumption they shared before a third; a test fails when the behaviour breaks and survives a refactor (assert what
+  callers observe, the expected value from the requirement). `tech-lead` Bug step 2 gains the premise rule.
+- `deliver`: a finding, QA failure or issue fixed in the run that comes back gets one more Fix stage under the premise
+  rule (the assumption and its observation in the run log); back again → issue, a feature run stops, an issues run
+  skips it. In the Finish stage every new `error`/`edge` test is mutation-checked: the production file is copied to
+  `${TMPDIR:-/tmp}/as-mutation/`, broken by the smallest edit, the test must fail, the file is restored and its hash
+  checked (the Tree step restores leftovers after a crash); a test that survives is strengthened once, then saved as
+  an `add-tests` `p3` issue and its scenario does not count as covered.
+- Safety fact (`skills/tech-lead/references/safety-fact.md`): the plan of a size S change, of a bug fix (`tech-lead`
+  Bug step 3) and of an `S` issue fixed by `fix` states the one fact the change is safe because of —
+  `**Safe because:** <fact> — level <n> — <evidence>` — with evidence levels 1–5; level 4 (a script that runs the real
+  code) for facts outside the type system; `unproven` plus the cheapest check otherwise. A list of callers is not that
+  fact. Unattended, `deliver` runs the named check and records what stays unproven as an assumption.
+- `review` step 6 **Prove** (Report, Act and Summary become 7–9; `finish` step 4 follows steps 2–8): asked once when
+  there is a `plausible` Must or Should or a `confirmed` Must — one prover subagent per finding writes the smallest
+  test of its failure scenario (new files only, one after another) and runs it. `proven` (the command, its output, the
+  required output), `disproved` → `refuted` only with proof the scenario reached the code, `unprovable` with the
+  reason. Statuses `proven`, `confirmed`, `plausible`, `refuted`; `fix first` on a `proven` or `confirmed` Must. Branch
+  mode: a `proven` finding's fix starts from its test; an unfixed one's test moves into the issue. PR mode: in the
+  review tree (dependency install asked as in `worktree-create`), the comment states the test and its output, and every
+  file the provers wrote is deleted before posting. New Prover brief in `skills/review/references/briefs.md`; provers
+  are judgement subagents in the host mappings. `deliver` runs the step without asking (`unprovable` → `p4` issue).
+- `tech-lead` **Performance** path (`skills/tech-lead/references/perf.md`) for "X is slow", "make Y faster" or a measured
+  regression: claim, baseline (5+ runs, median and range, errors and "did it run" checked), the limiter from a profile
+  of an unreported run, the plan after approval, the same measurement after (production-like, A/B alternated; within
+  the range → reverted), and a report with the verdict first — or `inconclusive` and why. New issue kind `perf`:
+  `fix` routes it to the Performance path, `deliver` leaves it for a human.
+- Readable journey IDs: a QA journey is identified by a kebab-case slug given once when it is written
+  (`### <a id="checkout-guest"></a>Guest checkout`, checkpoints `checkout-guest-2`, `as:qa checkout-guest
+  refund-partial`) instead of `J1`, `J2`, …; renaming changes only the title. Rules in `qa-format.md`: two to four
+  words, not `journeys`/`branch`/`explore`, not `j<n>`, no trailing digits, never reused. Existing `J<n>` journeys stay
+  valid; `qa-docs` suggests a slug for each ("Legacy IDs"), and a migrated journey keeps `J<n>` as a second anchor and
+  a `**Was:** J<n>` line, so old reports, issues and `as:qa J2` still resolve. `qa` lists the journey IDs with titles
+  and runs nothing when a named one does not exist.
+
 ## 1.18.1
 
 - Every question to the user carries a recommendation and its reason. A batch of many similar decisions (bug or

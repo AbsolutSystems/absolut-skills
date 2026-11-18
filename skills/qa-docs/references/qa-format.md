@@ -11,14 +11,14 @@ module behaviour stays in `docs/spec/`.
 ```text
 docs/qa/
   index.md                          # environments, accounts, roles, app-wide UI rules, links
-  journeys.md                       # cross-feature paths J1…Jn
+  journeys.md                       # cross-feature paths, each with a slug ID (checkout-guest)
   runs/
     2026-10-29-journeys.md          # report of one run (target after the date)
     2026-10-29-journeys/            # screenshots of FAIL and OUTDATED checkpoints only
-      J2-3-mobile.png               # <checkpoint>[-<viewport>].png, '/' in an ID becomes '-'
+      first-order-3-mobile.png      # <checkpoint>[-<viewport>].png, '/' in an ID becomes '-'
 .qa/                                # working files of every run — gitignored, never committed
   2026-10-29-journeys/
-    J1-2.png, J1-s2.png             # screenshots of every checkpoint and every step (<scenario>-s<n>.png)
+    first-order-2.png, first-order-s2.png  # every checkpoint and every step (<scenario>-s<n>.png)
     run.json, report.html           # the run's data and its evidence page
 ```
 
@@ -74,7 +74,7 @@ Checked on every screen of every run, in addition to the scenario's own checkpoi
 - **Accounts:** never write secrets. Login and password columns hold environment variable names (or "ask"); the
   agent reads them from the environment at run time. `Data` says how the test data is created or reset.
 - **App-wide rules** `R<n>`: short, observable, checkable from a screenshot, the console or the network. Numbered
-  like journeys (below).
+  once, never renumbered or reused.
 
 ## `journeys.md`
 
@@ -87,7 +87,7 @@ A journey is a path a user takes across features or screens that no single accep
 
 # Journeys
 
-### <a id="J1"></a>J1 — First order
+### <a id="first-order"></a>First order
 
 **Role:** customer · **Viewports:** desktop, mobile · **Crosses:** [Cart AC1](../features/cart/index.md#AC1), [Checkout AC2](../features/checkout/index.md#AC2)
 
@@ -99,13 +99,32 @@ A journey is a path a user takes across features or screens that no single accep
 
 **Checkpoints:**
 
-- **J1-1** (after step 1) — the header shows the customer's name.
-- **J1-2** (after step 2) — the cart badge shows 1 and the cart lists the product with its price.
-- **J1-3** (after step 3) — a confirmation page with an order number; the order appears in "My orders".
+- **first-order-1** (after step 1) — the header shows the customer's name.
+- **first-order-2** (after step 2) — the cart badge shows 1 and the cart lists the product with its price.
+- **first-order-3** (after step 3) — a confirmation page with an order number; the order appears in "My orders".
 ```
 
-- `J<n>` and checkpoint IDs `J<n>-<m>` are never renumbered or reused. A removed journey keeps its text with
-  `**Status:** 🗑️ removed` after the meta line and a struck-through heading (`### <a id="J4"></a>~~J4 — …~~`).
+- **Journey ID** — a kebab-case slug, the anchor of the heading, given once when the journey is written: two to four
+  words naming the path from the user's side (`checkout-guest`, `admin-blocks-customer`). Not a target word of
+  `as:qa` (`journeys`, `branch`, `explore`), not of the form `j<n>`, not ending in `-<digits>`; unique across the
+  file, removed journeys and `**Was:**` IDs included. Renaming a journey changes only its title; a journey whose
+  meaning changes is a new journey and the old one is removed.
+- Checkpoint IDs are `<journey ID>-<m>`, numbered from 1 within the journey. No journey or checkpoint ID is ever
+  changed, renumbered or reused. A removed journey keeps its text with `**Status:** 🗑️ removed` after the meta line
+  and a struck-through title (`### <a id="wishlist-share"></a>~~Share a wishlist~~`).
+- **Legacy IDs** — files written before 1.19.0 use `J<n>` (heading `### <a id="J2"></a>J2 — …`, checkpoints
+  `J2-<m>`); they stay valid and `as:qa` selects them. A journey migrated by `as:qa-docs` takes a slug, keeps the old
+  ID as a second anchor and names it on a line after the meta line, so old run reports and issues still resolve:
+
+  ```markdown
+  ### <a id="checkout-guest"></a><a id="J2"></a>Guest checkout
+
+  **Role:** customer · **Viewports:** desktop
+
+  **Was:** J2
+  ```
+
+  Its checkpoints become `<slug>-<m>` with the same `<m>`.
 - A checkpoint names an outcome a person can see (text, state, count, page), so a judge can decide it from a
   screenshot. "Works correctly" is not a checkpoint.
 - `**Crosses:**` links the acceptance criteria the journey touches (none → leave the field out).
@@ -119,7 +138,7 @@ reported `BLOCKED` with the reason; `as:qa-docs` suggests a journey or a sharper
 
 ## Run report
 
-`docs/qa/runs/<YYYY-MM-DD>-<target>.md`, target in kebab-case (`journeys`, `j3`, `branch-qa-skills`,
+`docs/qa/runs/<YYYY-MM-DD>-<target>.md`, target in kebab-case (`journeys`, a journey ID such as `checkout-guest`, `branch-qa-skills`,
 `feature-cart`, `explore-checkout`); another run of the same target on the same day takes the next free suffix (`-2`, `-3`, …). Every run writes
 a report, also one that selected nothing (it says so) — `as:deliver` reads the report its QA stage wrote.
 
@@ -135,13 +154,13 @@ a report, also one that selected nothing (it says so) — `as:deliver` reads the
 
 | Checkpoint | Result | Evidence |
 |------------|--------|----------|
-| J1-1 | PASS | header shows "Anna" |
-| J1-2 | FAIL | badge shows 0 after adding — [screenshot](2026-10-29-journeys/J1-2.png); `POST /api/cart` 500 |
-| J2-1 | OUTDATED | "Wishlist" moved to the account menu (intended, commit `b2c3d4e`) — [screenshot](2026-10-29-journeys/J2-1.png) |
+| first-order-1 | PASS | header shows "Anna" |
+| first-order-2 | FAIL | badge shows 0 after adding — [screenshot](2026-10-29-journeys/first-order-2.png); `POST /api/cart` 500 |
+| wishlist-save-1 | OUTDATED | "Wishlist" moved to the account menu (intended, commit `b2c3d4e`) — [screenshot](2026-10-29-journeys/wishlist-save-1.png) |
 
 ## App-wide rules
 
-- R1 — FAIL on mobile: checkout button cut off — [screenshot](2026-10-29-journeys/J1-3-mobile.png).
+- R1 — FAIL on mobile: checkout button cut off — [screenshot](2026-10-29-journeys/first-order-3-mobile.png).
 
 ## Findings
 
@@ -149,7 +168,7 @@ Exploratory runs only: each with steps to reproduce, expected and actual, and ev
 
 ## Issues
 
-Saved: `p2-cart-add-returns-500` (J1-2). Suggested for `as:qa-docs`: J2-1.
+Saved: `p2-cart-add-returns-500` (first-order-2). Suggested for `as:qa-docs`: wishlist-save-1.
 ```
 
 - Results: `PASS`, `FAIL` (the app breaks an expected outcome or an app-wide rule), `OUTDATED` (the journey no longer
@@ -176,23 +195,23 @@ and embeds the images, so the file can be moved or sent; it is not committed (th
   "title": "journeys", "date": "2026-10-29", "url": "http://localhost:5173", "commit": "a1b2c3d",
   "host": "Claude Code", "judge": "independent", "report": "docs/qa/runs/2026-10-29-journeys.md", "lang": "en",
   "scenarios": [{
-    "id": "J1", "name": "First order", "role": "customer", "given": "a logged-out customer, the QA seed loaded",
+    "id": "first-order", "name": "First order", "role": "customer", "given": "a logged-out customer, the QA seed loaded",
     "steps": [
-      {"action": "Add the cheapest product to the cart", "observed": "badge stayed 0", "screenshot": "J1-s2.png"},
+      {"action": "Add the cheapest product to the cart", "observed": "badge stayed 0", "screenshot": "first-order-s2.png"},
       {"action": "Check out with the test card", "observed": "the cart is empty", "not_done": true}
     ],
     "checkpoints": [{
-      "id": "J1-2", "after_step": 1, "expected": "the cart badge shows 1 and the cart lists the product",
+      "id": "first-order-2", "after_step": 1, "expected": "the cart badge shows 1 and the cart lists the product",
       "results": [{"viewport": "desktop", "result": "FAIL", "reason": "badge shows 0 after adding",
-                   "screenshot": "J1-2.png", "console": ["TypeError: cart is undefined"],
+                   "screenshot": "first-order-2.png", "console": ["TypeError: cart is undefined"],
                    "requests": ["POST /api/cart 500"]}]
     }],
     "not_executed": ["step 2 — nothing to check out"]
   }],
-  "rules": [{"id": "R4", "checkpoint": "J1-2", "viewport": "desktop", "what": "POST /api/cart returned 500"}],
+  "rules": [{"id": "R4", "checkpoint": "first-order-2", "viewport": "desktop", "what": "POST /api/cart returned 500"}],
   "skipped": ["cart/AC4 — planned, phase 2"],
-  "notes": ["J2-1 desktop: price label truncated"],
-  "issues": ["p2-cart-add-returns-500 (J1-2)"],
+  "notes": ["wishlist-save-1 desktop: price label truncated"],
+  "issues": ["p2-cart-add-returns-500 (first-order-2)"],
   "findings": [{"id": "F1", "title": "…", "priority": "p2", "steps": ["…"], "expected": "…", "actual": "…",
                 "screenshots": ["F1.png"], "console": [], "requests": []}],
   "tried": ["double submit of the address form — one order"]

@@ -2,7 +2,7 @@
 name: qa
 description: "Check a running web application in a real browser the way a user does: executes the acceptance criteria of a feature page and the journeys in docs/qa/ (or the ones the branch's changes touch), one executor subagent per scenario in sequence collecting screenshots, console errors and failed requests at every checkpoint, then a separate judge subagent with fresh context decides PASS, FAIL, OUTDATED or BLOCKED from the evidence and the app-wide UI rules alone. An exploratory mode tries to break one area. Writes a run report to docs/qa/runs/ with the screenshots of failures, a self-contained HTML evidence page (every scenario, step and screenshot, failures marked FAILED) to .qa/, and offers failures as issues. Opens only local or listed test environments, never production. Requires docs/qa/ from as:qa-docs. Web applications only. Use only when the user explicitly invokes as:qa."
 disable-model-invocation: true
-argument-hint: "docs/features/<slug> | journeys | J<n> | branch [base] | explore <area>"
+argument-hint: "docs/features/<slug> | journeys | <journey ID>… | branch [base] | explore <area>"
 ---
 
 # QA
@@ -18,7 +18,8 @@ Converse in the user's language. Format of `docs/qa/` and the report:
 Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex):
 
 - `docs/features/<slug>` — the feature's active acceptance criteria.
-- `journeys` — every active journey; `J<n>` (several allowed) — those journeys.
+- `journeys` — every active journey; `<journey ID>` (several allowed, e.g. `checkout-guest refund-partial`) — those
+  journeys. A legacy `J<n>` selects its journey too, also one migrated to a slug (its `**Was:**` line).
 - `branch [base]` — the criteria and journeys the branch's changes touch (base as in
   [finish](../finish/SKILL.md) step 1).
 - `explore <area>` — an exploratory session of one area (screens or a flow, in the user's words).
@@ -55,7 +56,9 @@ Stop at the first failure, with what to do:
 
 - **Feature** — read the page; every active `AC<n>` is a scenario, with the scenarios of its `**Realised by:**`
   links as details. Planned criteria (`planned — phase <n>`) are skipped and listed.
-- **Journeys** — the active journeys of `journeys.md` (or the named `J<n>`).
+- **Journeys** — the active journeys of `journeys.md`, or the named ones: each name matches a journey's ID or its
+  `**Was:**` ID. A name that matches none → run nothing, list the active journey IDs with their titles, and ask which
+  were meant.
 - **Branch** — the changed files since base (as in [finish](../finish/SKILL.md) step 1); map them to modules (spec
   `Source` entries, `AGENTS.md`) and screens; select the criteria of features whose `**Modules:**` include a touched
   module or whose proposals are on the branch (`**Feature:**` meta line), and the journeys that cross those criteria

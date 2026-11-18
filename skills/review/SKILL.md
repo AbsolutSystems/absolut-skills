@@ -1,6 +1,6 @@
 ---
 name: review
-description: "Review a change for real defects with few false positives: your own branch before the PR (diff from base), or someone else's pull request (number or URL, checked out in a separate worktree against the PR's real base branch). Three read-only reviewers with disjoint scopes — correctness and security, goal and contract, UI only when the diff touches it — report only findings with a concrete failure scenario; a separate verifier checks every statement of each Must and Should finding against the code, then corrects, re-rates or drops it. Large diffs are split into packages; you decide before any is left out. Also checks the PR description against the diff and whether the branch merges cleanly into its base. Own branch: you pick fixes, the rest can be saved to docs/issues/. Pull request: findings become inline GitHub review comments, posted only after you approve them. Use when the user invokes as:review, or asks to review this branch before a PR or to review a pull request; not for a quick look at one file."
+description: "Review a change for real defects with few false positives: your own branch before the PR (diff from base), or someone else's pull request (number or URL, in a separate worktree against the PR's real base). Three read-only reviewers with disjoint scopes — correctness and security, goal and contract, UI only when the diff touches it — report only findings with a concrete failure scenario; a separate verifier checks each Must and Should finding's statements against the code, corrects, re-rates or drops it; on request, a prover per unsettled finding runs a test for it. Large diffs are split into packages; you decide what is left out. Also checks the PR description against the diff and whether the branch merges cleanly. Own branch: you pick fixes, the rest can be saved to docs/issues/. Pull request: inline GitHub review comments, posted only after you approve them. Use when the user invokes as:review, or asks to review this branch before a PR or to review a pull request; not for a quick look at one file."
 argument-hint: "[<PR number or URL> | <base>] [context]"
 ---
 
@@ -105,7 +105,7 @@ For each package, in parallel, one read-only subagent per lens with the
 | Goal and contract | the goal is reached, callers and consumers still work, spec scenarios and public API kept or intentionally changed, risky logic without a test, written project rules (`AGENTS.md`, `.guidelines/`) kept | always |
 | UI | loading, error and empty states, dead controls, rendering of missing data, double submit and stale state, accessibility that blocks use | the package has UI files |
 
-Reviewers and verifiers are judgement subagents: where the host mapping offers a stronger model for them, ask the
+Reviewers, verifiers and provers (step 6) are judgement subagents: where the host mapping offers a stronger model for them, ask the
 user first, once — not when the skill that follows this one (`finish`, `deliver`) already has the answer.
 
 Without subagents, run the lenses one after another in the main thread, each on its own pass over the diff.
@@ -134,41 +134,83 @@ Without subagents, verify in a separate pass that re-reads the code from scratch
 
 The other **Nice** candidates are not verified.
 
-### 6. Report
+### 6. Prove
+
+Reading cannot settle every finding; running the code can. Candidates: every `plausible` Must and Should, and every
+`confirmed` Must. None → skip this step without a word.
+
+Ask once, recommending yes: prove `N` findings by writing and running a test for each — `N` prover subagents, new
+files only, one after another. Declined → the findings keep their status and "not proven" goes under not checked.
+
+- **Branch mode** — in the working tree, provers one after another (parallel test runs collide).
+- **PR mode** — in the review tree. First run the project's test command there; it does not run (dependencies
+  missing) → ask once whether to install them as in [worktree-create](../worktree-create/SKILL.md) step 6; declined →
+  skip this step and list it under not checked.
+
+Before the first prover, record the tree: `git status --porcelain -uall` and a hash of tracked and untracked content,
+`{ git diff; git ls-files -o --exclude-standard -z | xargs -0 git hash-object; } | git hash-object --stdin`. Then one
+prover per finding with the [prover brief](references/briefs.md#prover): the smallest test or repro script that shows
+the failure scenario, in the project's test location and style, run, with at most two attempts to repair the test's
+own errors. It writes only new files. After each prover, the files it created are the new lines of
+`git status --porcelain -uall` (not only the ones it reports); the hash taken without them must equal the record — it
+does not → an existing file changed: stop the step, show the diff and ask how to restore it, never discard changes on
+your own. Findings not yet proven keep their status.
+
+| Prover result | Evidence | Finding becomes |
+|---------------|----------|-----------------|
+| `proven` — the test fails as the scenario predicts | the command, the output it printed, the output the goal requires | `proven` |
+| `disproved` — the test passes | proof the scenario reached the code in question: an assertion that can hold only on that path, or line coverage from a tool the project already has | `refuted` (counted with the others); without that proof it stays `plausible` |
+| `unprovable` — a race, an external system, no cheap test path | the reason | unchanged |
+
+Statuses from here on: `proven`, `confirmed`, `plausible`, `refuted`. Keep, with each finding, the files its prover
+created and its test code (the brief's Test code section); step 8 decides which files stay. **PR mode:** delete every
+file the provers created now and check that `git status --porcelain -uall` matches the record (a file the test run
+left, such as coverage output, is deleted too) — the test code lives on only in the comments.
+
+Without subagents, prove in the main thread, one finding at a time, under the same rules.
+
+### 7. Report
 
 In the conversation:
 
 - base ← head (PR: number, title, link), goal, scale, CI, merge check result;
 - **coverage** — packages reviewed `N of M`; each package left out with its files and `+/-` lines;
-- **verdict** — `ship` (no Must or Should, every package reviewed), `fix first` (confirmed Must), `fix or answer`
+- **verdict** — `ship` (no Must or Should, every package reviewed), `fix first` (a `proven` or `confirmed` Must), `fix or answer`
   (other Must or Should), or `partial` (no Must or Should, packages left out). With packages left out the verdict
   line repeats the coverage (`fix or answer — 5 of 9 packages`);
 - **Must** and **Should** findings: file and line, the lens or lenses that raised it, what the code does, the failure
-  scenario (or the broken rule, quoted with its file and line), the smallest fix, `confirmed` or `plausible`, the severity move if any, `rests on unreviewed <package>`
+  scenario (or the broken rule, quoted with its file and line), the smallest fix, `proven` (with the command, its
+  output and the required output), `confirmed` or `plausible` (with the prover's reason when `unprovable`), the severity move if any, `rests on unreviewed <package>`
   if so, and the questions attached to it;
 - **Nice** findings, one line each;
 - the remaining questions for the author;
-- not checked: lenses skipped (no UI files), `N` findings refuted.
+- not checked: lenses skipped (no UI files), the Prove step if skipped or declined, `N` findings refuted (of them
+  `M` disproved by a test).
 
-### 7. Act
+### 8. Act
 
-**Branch mode** — ask which findings to fix (multi-select; confirmed Must preselected). Before the first fix, run the
-test, lint, type-check and build commands from the relevant `AGENTS.md` files and record the failures already there
-(inside `finish`, its step 2 did this). Fix only the chosen findings, then rerun the checks; a fix that adds a failure
-is reverted and reported. Then offer to save the unfixed Must and Should findings as issues (multi-select, all preselected; Nice only
+**Branch mode** — ask which findings to fix (multi-select; `proven` and `confirmed` Must preselected), and whether to
+keep each `disproved` test. Then, before any fix, remove the step 6 files that will not stay: the test of a `proven`
+finding not chosen (its code goes into the issue's evidence), a `disproved` test not kept, the files of `unprovable`
+attempts. Before the first fix, run the test, lint, type-check and build commands from the relevant `AGENTS.md` files
+and record the failures already there (inside `finish`, its step 2 did this; the failing tests of the chosen `proven`
+findings are expected to turn green, not counted as added). Fix only the chosen findings, then rerun the checks; a fix
+that adds a failure is reverted and reported. The fix of a `proven` finding starts from its test: it is the failing
+test first, and it stays. Then offer to save the unfixed Must and Should findings as issues (multi-select, all preselected; Nice only
 on request) per [../issue/references/issue-format.md](../issue/references/issue-format.md), `**Source:**`
 `as:review`.
 
 **PR mode** — never edit the PR's code. Draft one review:
 
 - an inline comment per Must and Should finding, on the line of the new side of the diff: severity, the problem, the
-  failure scenario, the suggested fix, with its attached questions; a `plausible` finding is phrased as a question.
+  failure scenario, the suggested fix, with its attached questions; a `proven` finding is a statement with the test
+  and its output, a `plausible` finding is phrased as a question.
   Written in the language of the PR description;
 - the review body: goal as understood, verdict with coverage, the remaining questions for the author, merge check
   result, and the findings whose line is outside the diff.
 
 Show the drafts and ask which comments to post (multi-select, all preselected) and the review event: `COMMENT`
-(default), `REQUEST_CHANGES` (offered only with a confirmed Must), or `APPROVE` (offered only with verdict `ship`).
+(default), `REQUEST_CHANGES` (offered only with a `proven` or `confirmed` Must), or `APPROVE` (offered only with verdict `ship`).
 Posting is public — nothing is sent without this approval. Write the payload to a temporary file outside the
 repository and post it in one call:
 
@@ -184,8 +226,8 @@ post once more; a `422` about the event (you cannot approve or request changes o
 Show the review URL. Finally, offer to remove
 the worktree (`git worktree remove <path>`) — only after the user confirms.
 
-### 8. Summary
+### 9. Summary
 
-Findings per severity (fixed, saved as issues, or posted), refuted count, merge check, coverage, and what was not checked. Branch
+Findings per severity (fixed, saved as issues, or posted), proven and refuted counts, merge check, coverage, and what was not checked. Branch
 mode, next steps: `/commit-commands:commit-push-pr` (Claude Code, if installed); if the diff touches authentication,
 authorisation, input handling, secrets or data access, suggest `/claude-security` on the branch's changes.

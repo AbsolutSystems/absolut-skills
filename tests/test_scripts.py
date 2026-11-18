@@ -279,7 +279,7 @@ def test_estimate_totals_reports_bad_rows_and_client_mismatch():
 
 
 def test_doctor_reports_outdated_and_broken_setup(tmp_path, monkeypatch):
-    (tmp_path / "AGENTS.md").write_text("# Repo\n\n<!-- as:working-principles v1 -->\n## Working principles\n"
+    (tmp_path / "AGENTS.md").write_text("# Repo\n\n<!-- as:working-principles v2 -->\n## Working principles\n"
                                         "<!-- /as:working-principles -->\n")
     (tmp_path / "CLAUDE.md").write_text("@AGENTS.md\n")
     (tmp_path / "app/.guidelines").mkdir(parents=True)
@@ -303,7 +303,7 @@ def test_doctor_reports_outdated_and_broken_setup(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     checks = doctor(tmp_path, date(2026, 6, 1))["checks"]
     found = {(c["area"], c["status"], c["detail"]) for c in checks}
-    assert ("working principles", "WARN", "v1, current is v2") in found
+    assert ("working principles", "WARN", "v2, current is v3") in found
     assert ("agent docs", "WARN", "app: CLAUDE.md is not exactly @AGENTS.md") in found
     assert ("guidelines", "WARN", "app: .guidelines/testing-guideline.md not listed in AGENTS.md") in found
     assert ("guidelines", "WARN", "app: AGENTS.md lists missing .guidelines/api-guideline.md") in found
@@ -337,7 +337,7 @@ def test_doctor_edge_cases_from_review(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     checks = doctor(tmp_path, date(2026, 6, 1))["checks"]
     found = {(c["area"], c["status"], c["detail"]) for c in checks}
-    assert ("working principles", "WARN", "v9, newer than this plugin's v2") in found
+    assert ("working principles", "WARN", "v9, newer than this plugin's v3") in found
     assert not [c for c in checks if c["area"] == "guidelines" and c["status"] == "WARN"]
     assert ("guidelines", "INFO", "frontend: app without guidelines") in found
     assert not [c for c in checks if c["area"] == "change proposals"]
@@ -345,12 +345,12 @@ def test_doctor_edge_cases_from_review(tmp_path, monkeypatch):
     assert ("health", "INFO", "never run") in found
 
 
-def qa_run(*results: str) -> dict:
+def qa_run(*results: str, journey: str = "checkout-guest") -> dict:
     checkpoints = [
-        {"id": f"J1-{n}", "after_step": 1, "expected": "<b>seen</b>", "results": [{"viewport": "desktop", "result": r, "screenshot": f"J1-{n}.png"}]}
+        {"id": f"{journey}-{n}", "after_step": 1, "expected": "<b>seen</b>", "results": [{"viewport": "desktop", "result": r, "screenshot": f"{journey}-{n}.png"}]}
         for n, r in enumerate(results, 1)
     ]
-    return {"scenarios": [{"id": "J1", "steps": [{"action": "Open", "screenshot": "J1-s1.png"}], "checkpoints": checkpoints}]}
+    return {"scenarios": [{"id": journey, "steps": [{"action": "Open", "screenshot": f"{journey}-s1.png"}], "checkpoints": checkpoints}]}
 
 
 def test_qa_report_marks_failures_and_counts_results():
@@ -358,10 +358,11 @@ def test_qa_report_marks_failures_and_counts_results():
     assert validate(run) == []
     assert counts(run) == {"FAIL": 1, "BLOCKED": 0, "OUTDATED": 1, "PASS": 1}
     assert status(run["scenarios"][0]) == "FAIL"
-    page, missing = render(run, lambda path: None if path == "J1-2.png" else "data:image/png;base64,AAAA")
-    assert missing == ["J1-2.png"]
+    page, missing = render(run, lambda path: None if path == "checkout-guest-2.png" else "data:image/png;base64,AAAA")
+    assert missing == ["checkout-guest-2.png"]
     assert page.count('<span class="banner">FAILED</span>') == 1
-    assert '<a href="#J1-2-desktop">J1-2</a>' in page  # linked from the summary
+    assert '<a href="#checkout-guest-2-desktop">checkout-guest-2</a>' in page  # linked from the summary
+    assert 'id="checkout-guest"' in page and 'id="checkout-guest-2"' in page
     assert "&lt;b&gt;seen&lt;/b&gt;" in page and "<b>seen</b>" not in page
     assert "Everything checked passed" not in page
     assert "Everything checked passed" in render(qa_run("PASS"), lambda path: "data:,")[0]
@@ -369,12 +370,18 @@ def test_qa_report_marks_failures_and_counts_results():
 
 def test_qa_report_rejects_unknown_result_and_unjudged_checkpoint():
     run = qa_run("PASSED")
-    run["scenarios"][0]["checkpoints"].append({"id": "J1-9", "results": []})
+    run["scenarios"][0]["checkpoints"].append({"id": "checkout-guest-9", "results": []})
     errors = validate(run)
     assert any("'PASSED' is not one of" in e for e in errors)
-    assert any(e.startswith("J1-9: no results") for e in errors)
+    assert any(e.startswith("checkout-guest-9: no results") for e in errors)
     assert validate({}) == ["run has no scenarios and no findings"]
     assert status({"id": "J2"}) == "BLOCKED"
+
+
+def test_qa_report_links_legacy_journey_ids():
+    page = render(qa_run("FAIL", journey="J2"), lambda path: "data:,")[0]
+    assert '<a href="#J2-1-desktop">J2-1</a>' in page
+    assert 'id="J2"' in page and 'id="J2-1"' in page
 
 
 def test_qa_report_embeds_only_images_inside_the_run_directory(tmp_path):

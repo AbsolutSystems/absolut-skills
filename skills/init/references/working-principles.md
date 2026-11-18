@@ -9,7 +9,7 @@ If the user declines, write only `<!-- as:working-principles off -->` in the roo
 again. To ask again, the user deletes that line.
 
 ```markdown
-<!-- as:working-principles v2 -->
+<!-- as:working-principles v3 -->
 ## Working principles
 
 Solve the whole task with the least new code.
@@ -20,7 +20,10 @@ Solve the whole task with the least new code.
 - No abstractions, options, wrappers or "for later" code nobody asked for; keep the existing structure and conventions.
   Deleting beats adding.
 - Fixing a bug: fix the root cause once, in the shared code, after checking every caller.
+- Two fixes of one failure did not hold: stop, write down the assumption they shared, and test it before a third.
 - New non-trivial logic (branching, parsing, money, security) ships with a small test.
+- A test fails when the behaviour breaks and survives a refactor: assert what callers observe, with the expected
+  value taken from the requirement, not from the code under test.
 - A deliberate shortcut gets a comment: `shortcut: <limit>, <when to upgrade>`.
 - Never cut validation at trust boundaries, error handling that prevents data loss, security, accessibility, or anything
   the user asked for.

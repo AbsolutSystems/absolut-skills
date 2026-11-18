@@ -59,7 +59,8 @@ Root cause if known, and the fix in one or two sentences.
 
 Meta line:
 
-- `**Kind:**` — `bug`, `security`, `spec-gap` (behaviour the spec does not define), or the `as:health` categories
+- `**Kind:**` — `bug`, `security`, `spec-gap` (behaviour the spec does not define), `perf` (measured slowness; its
+  evidence is the measurement command, the baseline numbers and the limiter), or the `as:health` categories
   `review`, `refactor`, `delete`, `add-tests`, `remove-tests`, `deps`, `docs`.
 - `**Priority:**` — as in the file name. `**Effort:**` — `S` (one module, a few files, no contract change), `M`, `L`.
 - `**Module:**` — link to the module's spec page, else the module directory in backticks.

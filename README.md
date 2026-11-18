@@ -256,7 +256,7 @@ and PRs, `claude-security` for security-sensitive changes, `frontend-design` for
 | `/as:spec-docs` | `[path] [--lang en\|pl]` | Spec refresh |
 | `/as:spec-tests` | `[path]` | Scenario test coverage |
 | `/as:qa-docs` | `[area \| path]` | Once, then after features change: what browser QA checks |
-| `/as:qa` | `docs/features/<slug>` \| `journeys` \| `J<n>` \| `branch [base]` \| `explore <area>` `[--env <name>]` | App running: check it in a browser |
+| `/as:qa` | `docs/features/<slug>` \| `journeys` \| `<journey ID>…` \| `branch [base]` \| `explore <area>` `[--env <name>]` | App running: check it in a browser |
 
 ## Skills in detail
 
@@ -303,14 +303,25 @@ between technical options. It behaves like a tech lead:
    or switch to plan mode (medium; large gets milestones).
 
 It sizes the task first: a small change in one module gets one recommendation and a short plan, without subagents or
-a change proposal.
+a change proposal. That plan names the one fact the change is safe because of — not a list of callers — with its
+evidence: a `file:line`, a walked failure path, or, for facts no type checker sees (a JSON response, a database column,
+an event, a library's behaviour), a script that runs the real code; a fact it cannot prove is marked `unproven` with
+the cheapest check ([levels](skills/tech-lead/references/safety-fact.md)).
 
-Bugs follow their own path: reproduce, find the violated or missing scenario, verify hypotheses, root cause, then a
+Bugs follow their own path: reproduce, find the violated or missing scenario, verify hypotheses (two that failed on
+one assumption → that assumption is tested before a third), root cause and the safety fact of the fix, then a
 failing test first; after you approve the plan it implements the fix and suggests `/as:finish`. A bug you defer is
 saved to `docs/issues/` with its root cause. No production code is written before you approve the plan.
 
 With `docs/estimates/<slug>` it plans a client-accepted `as:estimate` from its analysis: re-checks the listed code,
 asks only the open client questions, and starts from the estimate's steps, warning when the plan exceeds its `max`.
+
+Asked to make something faster ("export is slow"), it follows the Performance path
+([steps](skills/tech-lead/references/perf.md)): the sentence it expects to report, a baseline of at least 5 runs
+(median and range, errors counted, the work confirmed to run), the limiter taken from a profile — not guessed — then
+the smallest change there after your approval, the same measurement after, and a verdict first: faster, slower, no
+measurable difference (the change is reverted) or inconclusive, with the reason. A deferred problem becomes a `perf`
+issue.
 
 Asked to fix known problems ("fix the most important bugs"), it follows `as:fix` over `docs/issues/`.
 
@@ -336,7 +347,7 @@ save it there; `issue` saves the ones found elsewhere.
 ```
 
 `fix` re-checks each issue's evidence against the current code (gone → offers to delete the file), fixes small ones
-test-first after you approve the plan and deletes the issue file in the same diff, and turns larger ones into a change
+test-first after you approve the plan (with its safety fact) and deletes the issue file in the same diff, and turns larger ones into a change
 proposal (`**Issue:** <slug>` in its meta line) for `/as:implement`; `/as:finish` deletes the issue when it archives
 that proposal. Refactors keep behaviour (tests pin it first); removing tests needs per-test consent.
 
@@ -405,14 +416,18 @@ assumption (`Assumed by as:deliver` in the proposal). Every green stage is a loc
 It stops when all phases are done, checks are green, `spec_lint.py` is OK, the new scenarios have tests, the review has
 no Must finding, no p1–p3 issue from the run is open and the last QA run has no failure — or earlier, at a decision only a human may take (acceptance
 criteria, data deletion, a new external service, a breaking public contract), at checks it cannot repair (the stage's
-changes go to a stash), when it stops making progress, or at `--max-stages`. `docs/features/<slug>/delivery.md` is the
+changes go to a stash), when it stops making progress, or at `--max-stages`. A problem fixed in the run that comes
+back gets one more Fix stage, which first names the assumption the earlier fix rested on and checks it; back a second
+time, it is saved as an issue (a feature run stops, an issues run skips it). Every new test of an error or edge
+scenario is checked against a deliberately broken copy of the code it covers (restored and hash-checked afterwards,
+also after a crash): a test that still passes is strengthened once, then saved as an `add-tests` issue. `docs/features/<slug>/delivery.md` is the
 morning report: criteria, assumptions to review first, stages and commits. Rerunning the command resumes.
 
 Point it at `docs/issues` instead (optionally with a request as in `fix`: `all p1`, `bugs in orders`) and it works
 through the saved problems the same way: you confirm the selection at the start, then each issue gets a Fix stage
 (small ones fixed test-first, larger ones planned, implemented and finished), most important first. Issues are
 independent, so one that needs a human decision or cannot be made green is skipped (its changes go to a stash) and the
-run goes on. `remove-tests` and `docs` issues are left for a human. Done when every selected issue is closed or skipped; the
+run goes on. `remove-tests`, `docs` and `perf` issues are left for a human. Done when every selected issue is closed or skipped; the
 report is `docs/deliveries/<branch>.md`, skipped issues with their questions first.
 
 ```text
@@ -426,10 +441,10 @@ report is `docs/deliveries/<branch>.md`, skipped issues with their questions fir
 
 Tests check modules; nobody looks at the assembled app. `qa-docs` writes `docs/qa/`: where the app runs and how to
 start it, test accounts (environment variable names, never secrets) and data, roles, app-wide UI rules (viewports,
-empty, error and loading states) and journeys — cross-feature paths `J1…Jn` written as intent ("add the cheapest
-product to the cart") with checkpoints a screenshot can decide. Acceptance criteria stay on the feature pages. On
-later runs it reports drift, journeys a run marked outdated, criteria too vague to check, and the last result of every
-criterion and journey.
+empty, error and loading states) and journeys — cross-feature paths with readable IDs (`checkout-guest`) written
+as intent ("add the cheapest product to the cart") with checkpoints a screenshot can decide. Acceptance criteria stay
+on the feature pages. On later runs it reports drift, journeys a run marked outdated, criteria too vague to check,
+journeys still on legacy `J<n>` IDs, and the last result of every criterion and journey.
 
 `qa` runs them against a local or listed test environment (never production): one executor subagent per scenario,
 in sequence, clicking through the steps and saving screenshots, console errors and failed requests at every
@@ -446,7 +461,7 @@ screens). Web applications only.
 /as:qa-docs
 /as:qa branch
 /as:qa docs/features/cart --env staging
-/as:qa J2 J5
+/as:qa checkout-guest refund-partial
 /as:qa explore checkout
 ```
 
@@ -464,13 +479,17 @@ modules and extend it later with `spec-docs`.
 
 With your consent it adds a fixed **Working principles** block to the repo root `AGENTS.md` — rules that keep agents
 from over-engineering (reuse before writing, no speculative abstractions, root-cause fixes, tests for non-trivial
-logic, never cutting validation or security) and from the structural mistakes behind data bugs (validate once at the
+logic, never cutting validation or security), from fix loops (after two failed fixes, test the assumption they
+shared), from tests that pass whatever the code does (assert what callers observe, the expected value from the
+requirement) and from the structural mistakes behind data bugs (validate once at the
 boundary, new business decisions free of I/O, no illegal states in new models, idempotent re-runs, one owner per
 piece of state). The text lives in
 [`skills/init/references/working-principles.md`](skills/init/references/working-principles.md) and is updated when its
 version changes; declining leaves an `off` marker so you are not asked again; `agent-docs` keeps the block untouched.
 Inspired by [ponytail](https://github.com/DietrichGebert/ponytail); the architecture rules and the clone check in
-`finish` by [ub-mode](https://github.com/unclebob/ub-mode).
+`finish` by [ub-mode](https://github.com/unclebob/ub-mode); the premise and test rules, the safety fact, the Prove
+step of `review`, the mutation check of `deliver` and the Performance path of `tech-lead` by
+[pstack](https://github.com/cursor/plugins/tree/main/pstack) (MIT).
 
 At the end it checks the recommended Anthropic plugins (see `help` below) and installs missing ones after you
 agree.
@@ -525,11 +544,19 @@ style, naming or "could be cleaner"; zero findings is a valid answer. The one ex
 5. **Verify** — a separate subagent checks every statement of each Must and Should finding against the code (and of a
 Nice finding two lenses raised or disagreed on): `confirmed`, `plausible` (kept, marked unverified) or `refuted`
 (dropped, only counted), with a correction when a detail was false and the final severity.
-6. **Report** — coverage (packages reviewed of all), verdict (`ship` only with every package reviewed), findings with
-their lens, severity moves and attached questions, Nice findings, questions, merge readiness.
-7. **Act** — branch: you pick fixes, then tests; unfixed ones can be saved to `docs/issues/`. PR: drafts of inline
-review comments and a summary, posted to GitHub only after you approve them (`COMMENT` by default); then it offers to
-remove the worktree.
+6. **Prove** — asked once, when there is something to prove: for every `plausible` Must and Should and every
+`confirmed` Must, a prover subagent writes the smallest test that shows the failure scenario and runs it (new files
+only, one after another). A failing test makes the finding `proven`, reported with the command, its output and the
+output the goal requires; a passing test refutes it only with proof that the scenario reached the code (otherwise it
+stays `plausible`); a race or an external system is `unprovable`, with the reason.
+7. **Report** — coverage (packages reviewed of all), verdict (`ship` only with every package reviewed; `fix first` on
+a `proven` or `confirmed` Must), findings with their lens, status, severity moves and attached questions, Nice
+findings, questions, merge readiness.
+8. **Act** — branch: you pick fixes, then tests (a `proven` finding's fix starts from its test; the test of one you
+do not fix moves into the issue's evidence); unfixed ones can be saved to `docs/issues/`. PR: drafts of inline
+review comments and a summary, posted to GitHub only after you approve them (`COMMENT` by default; a `proven` finding is
+stated with its test and output, and no file the provers wrote stays in the PR's tree); then it offers to remove the
+worktree.
 
 ### `explain` — code explained to a person
 

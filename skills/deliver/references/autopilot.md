@@ -7,7 +7,8 @@ replaces their questions and approval gates.
 
 Wherever a followed skill says **ask**, **approve**, **confirm** or **offer**, do not ask: take the option the skill
 would recommend — the recommended option, the preselected items, the smaller and more reversible change, the one that
-keeps the existing contract — and record it as an assumption:
+keeps the existing contract; between equals, what serves the product's users better, as its product owner would — and
+record it as an assumption:
 
 - in the proposal, as a note under `## Open questions`:
   `> [!NOTE]` / `> Assumed by as:deliver: <question> — <choice>, because <reason>.`
@@ -102,9 +103,17 @@ save it as a `p4` issue with "unconfirmed by as:review" in its Problem, for a hu
 Should finding; `proven` and `confirmed` Must and Should findings → fix them (a `proven` one starting from its test).
 A finding that matches a problem the brief lists as fixed earlier in this run → do not fix it again: save it as an
 issue and report it under Issues as returning (the loop runs the premise rule). Save the ones still failing after one fix attempt as issues (Must → `p2`,
-`p1` for data or security; Should → `p3`). Drop Nice findings and refuted ones; questions for the author and a failed
-merge check go to the report. The Final review stage reviews the whole diff from the base and returns `clean` only
-when it fixed nothing.
+`p1` for data or security; Should → `p3`). Drop Nice findings and refuted ones. Answer each question for the author
+as the product owner: from the feature page, the proposal, the spec and the code, decide what serves the product's
+users better —
+
+- the answer is a gap or a defect (missing behaviour, unhandled case, inconsistent rule) → a finding: fix it when it
+  stays within the stage's scenarios and modules, else save it as an issue (priority by the rubric);
+- the answer is a choice (wording, default, naming, ordering) → make it by the rule and record the assumption;
+- only a human-only decision goes to the report's open items, with the options and your recommendation.
+
+A failed merge check goes to the report. The Final review stage reviews the whole diff from the base and returns
+`clean` only when it fixed nothing.
 
 **qa** (QA stage, run by the loop in the main thread): no target question — the loop names it, always with
 `--env local`; the start question is skipped; an app that does not answer is started with the `local` row's `Start`

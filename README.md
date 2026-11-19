@@ -411,7 +411,9 @@ fresh subagent and follows an existing skill: `tech-lead` plans the next phase, 
 `finish` reviews, merges the proposal and adds contract tests, `fix` closes the issues the run saved, and a final review
 covers the whole branch; when the project has `docs/qa/`, a QA stage then checks the app in a browser with `qa` and
 the failures it finds go back into the loop as issues. Where those skills would ask, it takes the recommended option and records it as an
-assumption (`Assumed by as:deliver` in the proposal). Every green stage is a local commit; nothing is pushed.
+assumption (`Assumed by as:deliver` in the proposal), judging as the product's owner would. A reviewer's question
+for the author is answered the same way: a gap it reveals is fixed or saved as an issue, a choice is made and
+recorded; only a human-only decision reaches the report's open items. Every green stage is a local commit; nothing is pushed.
 
 It stops when all phases are done, checks are green, `spec_lint.py` is OK, the new scenarios have tests, the review has
 no Must finding, no p1–p3 issue from the run is open and the last QA run has no failure — or earlier, at a decision only a human may take (acceptance

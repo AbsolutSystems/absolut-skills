@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.19.1
+
+- `deliver`: decides as the product owner. A review question for the author is no longer copied to the report's open
+  items: a gap or defect it reveals (missing behaviour, unhandled case) is fixed within the stage's scope or saved as
+  an issue, a choice (wording, default, naming) is made and recorded as an assumption; only a human-only decision
+  reaches the open items.
+
 ## 1.19.0
 
 Evidence by running: four places produce a command, its output or a number a person can check. Ideas from

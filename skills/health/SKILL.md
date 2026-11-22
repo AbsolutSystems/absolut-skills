@@ -58,6 +58,11 @@ Run independent parts in parallel; see [references/signals.md](references/signal
 - **Docs**: the `as:docs-check` analyses (`agent-docs` and `spec-docs` steps 2–4) in report-only form (no questions,
   no writes), the `as:spec-tests` coverage report when `docs/spec/` exists, and open change proposals in `docs/spec/changes/` older
   than 30 days (a `docs` finding: implement, merge with `as:finish`, or drop).
+- **Product** (not with `--quick`, when `docs/spec/` exists): the
+  [product check](../spec-docs/references/product-check.md) of `spec-docs` step 3 runs here over the whole spec —
+  the one place that asks whether what is already written still makes sense for the product. Its Suspect items and
+  written rules to reconsider become `product` findings: evidence is the scenario ID and the harm, severity from the
+  suggested priority (`p1`/`p2` → `high`, `p3` → `medium`, `p4` → `low`), key `product:<scenario or rule ID>`.
 - **Test quality** (not with `--quick`): one read-only subagent per module with the brief from
   [references/signals.md](references/signals.md), focused on hotspots — gaps (risky code without tests, untested error
   paths) and excess (tests without assertions, tests of internals, over-mocking, duplicates, slow or flaky tests).
@@ -67,7 +72,7 @@ If a tool fails, record it in the report and continue with the remaining signals
 ### 4. Synthesize
 
 - Per module: a scorecard of metrics, each with a trend against the baseline snapshot.
-- Findings: `H-NNN` (numbered per run), category (`review | refactor | delete | add-tests | remove-tests | deps | docs`),
+- Findings: `H-NNN` (numbered per run), category (`review | refactor | delete | add-tests | remove-tests | deps | docs | product`),
   severity (`high | medium | low`), effort (`S | M | L`), evidence, suggested action. Order as described in
   [references/signals.md](references/signals.md) ("Prioritising").
 - Compare with the baseline findings: mark which earlier findings are resolved and which persist.
@@ -101,6 +106,9 @@ Ask which findings to fix now (multi-select; `S` effort preselected; none is a v
   (multi-select; untracked `high` and `medium` preselected) and write them per
   [../issue/references/issue-format.md](../issue/references/issue-format.md): priority from severity as the format
   maps it, `**Kind:**` = category, `**Source:**` `as:health`, `**Key:**` = the finding's key. `as:fix` picks them up.
+- **`product` findings** — never fixed here, whatever their effort, and never by editing the spec: saved the same
+  way, with `**Kind:**` `bug` (the code should change) or `spec-gap` (the written rule itself is open) and what the
+  product should do instead in the Problem.
 - **Resolved issues** — the issues found resolved in step 4: offer to delete them (`git rm`, multi-select).
 
 Finish with a summary: findings fixed, issues saved and deleted, files changed. Do not commit; suggest `as:finish` on the

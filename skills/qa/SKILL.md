@@ -66,7 +66,8 @@ Stop at the first failure, with what to do:
   check) and stop.
 - **Explore** — the area; no selection.
 
-Show the list (scenario, checkpoints, role, viewports) with the URL, and ask once to start. Then run without asking.
+Show the list (scenario, checkpoints, role, viewports) with the URL, and ask once to start — with the stronger-model
+question of the product check (step 4) in the same batch, where the host mapping offers one. Then run without asking.
 
 ### 3. Execute
 
@@ -97,11 +98,20 @@ the report's judge `same agent`.
 Before the report, open the screenshots of every `FAIL` yourself and confirm the judge's reason is visible; a reason
 you cannot confirm becomes `BLOCKED` with a note.
 
+**Product check** — a judge decides only by what is written, so behaviour no criterion or rule names passes
+unnoticed (a ticket saved without its author). After the judges, run the
+[product check](../spec-docs/references/product-check.md) once over the run: the items are what the executors saw —
+their Steps and Checkpoints sections with the screenshots, status `new` — and Written holds the criteria, expected
+outcomes and app-wide rules of the selected scenarios. Leave out what a `FAIL` already reports. It changes no result:
+its Suspect items and written rules to reconsider become the report's Product notes, after you opened their
+screenshots and dropped the ones the evidence does not show. Explore runs skip it — the explorer already reports
+expected against actual.
+
 ### 5. Report
 
 Write `docs/qa/runs/<YYYY-MM-DD>-<target>.md` per the format: header (target, URL, commit, host, judge), result
-counts, one row per checkpoint and viewport, broken app-wide rules, visual notes from the judges (as a short list),
-explorer findings. Copy the screenshots of `FAIL` and `OUTDATED` checkpoints and of findings from `.qa/<run>/` to
+counts, one row per checkpoint and viewport, broken app-wide rules, product notes, visual notes from the judges (as
+a short list), explorer findings. Copy the screenshots of `FAIL` and `OUTDATED` checkpoints, of product notes and of findings from `.qa/<run>/` to
 `docs/qa/runs/<run>/` and link them; leave the rest in `.qa/`.
 
 **Evidence page** — the proof a person reads: every scenario with its steps, what the executor saw, and the
@@ -119,9 +129,12 @@ the images embedded and prints the result counts: the Markdown report's counts m
   [../issue/references/issue-format.md](../issue/references/issue-format.md) (multi-select, all `p1`–`p3`
   preselected): steps, expected, actual, the run report and the screenshot as evidence, `**Source:**` `as:qa`. One issue
   per cause — several checkpoints failing on the same request are one issue. Add the saved issue names to the report.
+- **Product notes** — offer each in the same question, with the harm and what the product should do instead: a
+  Suspect item as a `bug` issue (priority as the check suggested), a written rule to reconsider as a `spec-gap`
+  issue naming the criterion or journey. Never "fix" one by editing a criterion, a journey or the spec to match the app.
 - **OUTDATED** — list them; suggest `as:qa-docs` to correct the journeys.
 - **BLOCKED** — list them with the reason (missing data, account, unreachable step).
 
-Summary: the result counts, failures with their issues, outdated and blocked checkpoints, the report path and the
+Summary: the result counts, failures and product notes with their issues, outdated and blocked checkpoints, the report path and the
 evidence page path (to open in a browser). Do not commit. Next: `as:fix` for the saved issues, `as:qa-docs` for outdated journeys, and the same `as:qa` command after a
 fix to confirm it.

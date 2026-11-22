@@ -119,5 +119,5 @@ cycles, with `trend` spans against the previous run. Newest first. Footer link t
 }
 ```
 
-Use `null` for metrics that were not measured, never `0`. `key` (category + primary file or module pair) identifies the
+Use `null` for metrics that were not measured, never `0`. `key` (category + primary file or module pair; for a `product` finding the scenario or rule ID) identifies the
 same finding across runs: matching keys mean "persists", a baseline key missing now means "resolved".

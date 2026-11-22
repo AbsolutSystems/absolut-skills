@@ -162,6 +162,11 @@ a report, also one that selected nothing (it says so) — `as:deliver` reads the
 
 - R1 — FAIL on mobile: checkout button cut off — [screenshot](2026-10-29-journeys/first-order-3-mobile.png).
 
+## Product notes
+
+- first-order-4 — the order confirmation does not say who placed the order; support cannot tell a guest order from
+  an account order — [screenshot](2026-10-29-journeys/first-order-4.png).
+
 ## Findings
 
 Exploratory runs only: each with steps to reproduce, expected and actual, and evidence.
@@ -170,6 +175,11 @@ Exploratory runs only: each with steps to reproduce, expected and actual, and ev
 
 Saved: `p2-cart-add-returns-500` (first-order-2). Suggested for `as:qa-docs`: wishlist-save-1.
 ```
+
+- Product notes come from the [product check](../../spec-docs/references/product-check.md): behaviour that passed
+  because nothing written names it, but harms the product's users — what was seen, what the product should do
+  instead and who loses what. They change no result; their screenshots are kept like those of a `FAIL`. The section
+  is left out when there are none.
 
 - Results: `PASS`, `FAIL` (the app breaks an expected outcome or an app-wide rule), `OUTDATED` (the journey no longer
   matches an intended change — see below), `BLOCKED` (could not be checked: missing data, an unreachable step, an
@@ -210,6 +220,7 @@ and embeds the images, so the file can be moved or sent; it is not committed (th
   }],
   "rules": [{"id": "R4", "checkpoint": "first-order-2", "viewport": "desktop", "what": "POST /api/cart returned 500"}],
   "skipped": ["cart/AC4 — planned, phase 2"],
+  "product": ["first-order-4: the confirmation does not say who placed the order — support cannot tell a guest order"],
   "notes": ["wishlist-save-1 desktop: price label truncated"],
   "issues": ["p2-cart-add-returns-500 (first-order-2)"],
   "findings": [{"id": "F1", "title": "…", "priority": "p2", "steps": ["…"], "expected": "…", "actual": "…",
@@ -220,7 +231,8 @@ and embeds the images, so the file can be moved or sent; it is not committed (th
 
 - Screenshot paths are relative to `run.json`. `after_step` is the 1-based step a checkpoint follows (a criterion
   without steps leaves it out). Every checkpoint has one result per viewport, with `result` one of the four values;
-  a scenario shows its worst one. `rules` lists only broken rules; `findings` and `tried` are for exploratory runs.
+  a scenario shows its worst one. `rules` lists only broken rules; `product` holds the product notes (the page then
+  reads "Needs attention" even when every checkpoint passed); `findings` and `tried` are for exploratory runs.
 - Required: `scenarios` or `findings`, each scenario's and checkpoint's `id`, and `results`. The rest may be left out.
 
 ## Ownership

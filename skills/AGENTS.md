@@ -9,8 +9,9 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
 - `help` — installation check, workflow guide.
 - `init` — orchestrates `agent-docs` → `spec-docs` → links → working principles → recommended plugins.
 - `agent-docs` — `AGENTS.md`/`CLAUDE.md` hierarchy and `.guidelines/`.
-- `spec-docs` — Markdown module contracts in `docs/spec/` (migrates legacy HTML); owns `references/markdown-format.md`
-  and `scripts/spec_lint.py`.
+- `spec-docs` — Markdown module contracts in `docs/spec/` (migrates legacy HTML); owns `references/markdown-format.md`,
+  `scripts/spec_lint.py` and `references/product-check.md` (the product-owner brief, also run by `tech-lead`, `finish`, `qa`
+  and `health`).
 - `tech-lead` — design, bug and performance investigation; writes change proposals to `docs/spec/changes/`; owns
   `references/safety-fact.md` (also used by `fix`) and `references/perf.md`.
 - `estimate` — client feature request analysis and hour estimate; writes `docs/estimates/<slug>/`; owns
@@ -59,6 +60,10 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
 - `deliver` follows `tech-lead` (From feature, Feature), `implement`, `finish`, `fix` (steps 2–3 by number) and
   `review`; `references/autopilot.md` names their questions and gates (review and its Prove step,
   spec drift, contract tests and the mutation check, implement deviations, an `unproven` safety fact) — a new question or gate in those skills needs a policy line there, or the unattended run stalls on it.
+- The product check (`spec-docs/references/product-check.md`) runs in `spec-docs` step 3 (so also in `docs-check`
+  and, over the whole spec, in `health`), `tech-lead` Feature step 5, `finish` step 6 and `qa` step 4; its sections (Suspect, Written rules to
+  reconsider) are quoted by those skills and by `autopilot.md` — rename them together. `qa` writes its notes to the
+  report's Product notes and `run.json`'s `product` (`qa-format.md`, `qa_report.py`).
 - `references/recommended-plugins.md` (repo root) is shared by `init` (installs) and `doctor` (reports).
 - `qa` and `qa-docs` follow `qa-docs/references/qa-format.md` and read feature pages by
   `feature/references/feature-format.md` (`AC<n>` anchors, `**Realised by:**`, `**Modules:**`); `qa` selects `branch`

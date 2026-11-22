@@ -8,7 +8,8 @@
 - Subagent model: read-only briefs that find and classify (Explore, Investigate, `spec-docs`/`agent-docs` analysis,
   coverage, test quality, `finish` analysis, `estimate` Impact, `feature` legacy mapping) pass a smaller model in the Agent tool's `model` parameter (e.g. `sonnet`, or `haiku` for
   plain searches); `tech-lead` Architecture briefs pass `model: "opus"` whatever the session model, and are not part
-  of the opt-in below; `estimate` Consistency, `review` reviewers, verifiers and provers and the `explain` fact check keep the
+  of the opt-in below; `estimate` Consistency, `review` reviewers, verifiers and provers, the `explain` fact check and the product
+  check (`spec-docs`, `tech-lead`, `finish`, `qa`, `health`; `subagent_type: "general-purpose"`, told to stay read-only) keep the
   session model; the `explain` inventory may use `haiku`, its tracing `sonnet`.
 - Stronger model (opt-in): the subagents that keep the session model above are the judgement subagents. Before a
   skill starts the first of them, unless the session already runs on Fable, ask with AskUserQuestion whether to run

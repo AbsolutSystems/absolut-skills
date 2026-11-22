@@ -43,6 +43,9 @@ Do not assume these; return **blocked** with the question, the options and your 
 - Clarify: answer from the page, its sources, the code and the start-up decisions; the rest by the rule.
 - Options: run the architecture subagents when the size calls for them, then pick your recommendation; the table and
   the reason go to `## Decision` as usual.
+- Product check of the draft: run it yourself, in a separate pass. A Suspect scenario → correct it in the proposal
+  and record the assumption; a written rule to reconsider → the rule stays, save a `spec-gap` issue and name it in
+  the report's open items (a criterion or decision that makes the phase undeliverable → blocked, as human-only).
 - Write the proposal and its `## Plan` without the approval step; large changes get milestones. Set the phase
   `🔄 in progress`. No plan mode, no handoff — the loop implements it next.
 - A change outside the roadmap → not this run: save it as an issue (`spec-gap`) instead of adding a phase.
@@ -60,6 +63,10 @@ the assumption; one that changes the scope → blocked. Do not ask between miles
   implemented → keep the proposal open and add an unticked `## Plan` step for each (the loop implements them). Drift explained by the proposal or the
   feature's acceptance criteria → intended; any other drift → unintended: fix the code. Unsure → keep the spec, save a
   `spec-gap` issue.
+- Product check (also where `spec-docs` runs it for a new module page): run it yourself, in a separate pass. A
+  Suspect item is never written as a scenario: fix the code when the fix stays within the stage's scenarios and
+  modules, else save a `bug` issue (priority as suggested). A written rule to reconsider → a `spec-gap` issue and an
+  open item for the report; the rule stays (changing a criterion or a decision is human-only).
 - `**Verify:**` — run it if it runs locally, else leave it as an open item for the report.
 - Contract tests: cover every `MISSING` and `PARTIAL` scenario of the merged proposals and the new behaviour. A new
   test that fails because the code breaks its scenario → fix the code; a scenario that looks wrong → keep the test out
@@ -121,7 +128,9 @@ command without asking (still no answer → QA `BLOCKED`, recorded, the run goes
 those scenarios `BLOCKED`; `.qa/` is added to `.gitignore` without asking. A `FAIL` or a finding → issue without asking:
 `p2` when it breaks a feature criterion or a main flow, `p1` for data loss or security, else `p3`; one per cause. A
 `FAIL` the judge doubted (FAIL or OUTDATED) is still saved — the fix stage re-checks its evidence. `OUTDATED` and
-`BLOCKED` → report only (for `as:qa-docs`), never fixed by editing `docs/qa/`. The stage's log line names its report.
+`BLOCKED` → report only (for `as:qa-docs`), never fixed by editing `docs/qa/`. The product check runs on the session
+model without its stronger-model question; a product note → issue without asking, as a `FAIL` (`bug`, priority as
+suggested; a written rule to reconsider → `spec-gap` and an open item), so the next Fix stage takes it. The stage's log line names its report.
 
 **Issues** (any stage): saved per [../../issue/references/issue-format.md](../../issue/references/issue-format.md)
 without asking, with `**Source:**` `as:deliver`, duplicates merged into the existing file. Out-of-plan problems in

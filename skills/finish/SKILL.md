@@ -106,8 +106,12 @@ name or commit messages, or affected modules among the touched ones), as confirm
   merged scenarios, the Now line, `**Updated:**`, the feature status (`shipped` when no phase is left) and the
   catalogue row follow. `spec_lint.py` (it also checks `docs/features/`) must then print `OK`.
 
-Drift explained by a merged proposal is intended by definition. For the remaining items of the Spec drift and New
-behaviour sections from step 5, ask the user to classify each:
+Drift explained by a merged proposal is intended by definition. The remaining items of the Spec drift and New
+behaviour sections from step 5 first go through the
+[product check](../spec-docs/references/product-check.md) (status `new`; Written holds the feature's criteria and
+decisions and the proposals' scenarios): that the diff does something is no proof it was wanted. Then ask the user to
+classify each, recommending Unintended for its Suspect items with the harm as the reason; a written rule to
+reconsider is asked about separately and, when confirmed, saved as an issue:
 
 - **Intended** — part of this feature: update the page per `spec-docs` rules (a new behaviour candidate becomes a
   scenario with a new ID, changed scenarios keep their ID, removed ones get the removed status).

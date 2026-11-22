@@ -229,7 +229,8 @@ def render(run: dict, image: Callable[[str], str | None]) -> tuple[str, list[str
     ]
     not_checked = list(run.get("skipped", []))
     not_checked += [f"{s['id']}: {line}" for s in scenarios for line in s.get("not_executed", [])]
-    clean = not problems and not rules
+    product = run.get("product", [])
+    clean = not problems and not rules and not product
     meta = " · ".join(
         f"{label}: {value}"
         for label, value in (
@@ -270,6 +271,7 @@ def render(run: dict, image: Callable[[str], str | None]) -> tuple[str, list[str
         + "</div>",
         box("Needs attention", f"<ul>{''.join(problems)}</ul>" if problems else "", "attention"),
         box("Broken app-wide rules", items(rules), "attention"),
+        box("Product notes", items(product), "attention"),
         box("Not checked", items(not_checked)),
         box("Visual notes", items(run.get("notes", []))),
         box("Issues", items(run.get("issues", []))),

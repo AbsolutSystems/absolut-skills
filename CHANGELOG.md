@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.20.0
+
+Product check: that the code does something is no proof it was wanted. Until now behaviour the written record was
+silent about was judged only for consistency with the code, so a ticket saved without its author could be specified
+as a scenario or pass QA.
+
+- New brief `skills/spec-docs/references/product-check.md`: one read-only product-owner subagent (a judgement
+  subagent in the host mappings) gets the behaviours about to be accepted and reports only those with a nameable harm
+  to the product's users — lost author, owner or history, input dropped silently, dead ends, a neighbouring flow that
+  works differently, a role with too much or too little — plus written rules to reconsider. It changes nothing: a
+  Suspect item is recommended as `bug` and becomes an issue, never a scenario; a doubted written rule is a question.
+- `spec-docs` step 3 (also in `docs-check`): runs it over the new and the existing scenarios and rules before the
+  "intended or bug?" questions.
+- `tech-lead` Feature step 5 (also From estimate and From feature): the draft proposal's added and changed scenarios
+  pass it before the user approves — once merged they are intended by definition, so this is the last and cheapest
+  place to question them. A Suspect scenario is corrected in the draft.
+- `finish` step 6: Spec drift and New behaviour items pass it before the user classifies them.
+- `qa` step 4: after the judges, over what the executors saw; the report gains `## Product notes`, `run.json` a
+  `product` list, and the evidence page a Product notes box (it reads "Needs attention" even when every checkpoint
+  passed). Product notes are offered as issues with the failures.
+- `health`: new `product` findings — the product check over the whole spec (not with `--quick`); saved as `bug` or
+  `spec-gap` issues, never fixed in the run.
+- `deliver`: policy lines for the product check in the Plan, Finish and QA stages — a Suspect item is fixed within the
+  stage's scope or saved as an issue, a written rule to reconsider becomes a `spec-gap` issue and an open item.
+
 ## 1.19.1
 
 - `deliver`: decides as the product owner. A review question for the author is no longer copied to the report's open

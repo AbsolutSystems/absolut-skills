@@ -88,6 +88,8 @@ Severity:
   5% in a module, major-version-outdated dependencies.
 - **low** — dead code, unused dependencies, excess tests elsewhere, ownership concentration, minor drift.
 
+A `product` finding takes its severity from the product check's suggested priority, not from the list above.
+
 Effort: **S** — one file or a few lines, no design decision (delete dead code, drop an unused dependency, add a test
 for an untested branch, delete a test without assertions). **M** — several files in one module. **L** — crosses
 modules or needs a design decision (break a cycle, split a hotspot).

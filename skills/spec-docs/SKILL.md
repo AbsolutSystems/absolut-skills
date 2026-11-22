@@ -39,7 +39,8 @@ docs/spec/
 - Scenario IDs are stable (`<PREFIX>-NNN`) and are never renumbered or reused; tests refer to them.
 - The spec describes observable behaviour from the point of view of a caller of the module (another module, a user, an
   external system), not the implementation. No internal class names, no algorithms.
-- State only facts backed by the code or by the user's answers. Behaviour that looks like a bug is asked about, not specified.
+- State only facts backed by the code or by the user's answers. Behaviour that looks like a bug — in the code, or
+  for the product's users — is asked about, not specified.
 
 Page format: [references/markdown-format.md](references/markdown-format.md).
 Subagent briefs and report formats: [references/analysis.md](references/analysis.md).
@@ -75,15 +76,22 @@ If the host has no subagents, do the same analysis sequentially in the main thre
 
 ### 3. Clarify with the user
 
+**Product check first.** The reports say what the code does; that it does it is no proof it was wanted. Run the
+[product check](references/product-check.md) over every requirement, scenario and business rule of the reports —
+new ones, and the ones already on the pages (status `written`). Its Suspect items and written rules to reconsider
+join the questions below as "intended or bug?", recommended `bug` with the harm as the reason.
+
 Collect open questions from all reports, deduplicate, and ask in small batches, most impactful first, with options
-derived from the code. Each item comes with a recommendation and its reason, judged from the reports: does it break a
-rule the rest of the code enforces, can it lose or leak data, does a test or another module rely on it. Present a
+derived from the code. Each item comes with a recommendation and its reason, judged from the reports and the product
+check: does it harm the people who use the product, does it break a rule the rest of the code enforces, can it lose
+or leak data, does a test or another module rely on it. Present a
 batch as the table in the host mapping's "Asking the user to choose" and ask whether to accept it. Typical questions:
 
 - Is this behaviour an intended business rule or a bug? Only intended rules go into the spec. A bug becomes an issue
   candidate (kind `bug`, with the evidence from the report and the intended behaviour from the answer) per
   [../issue/references/issue-format.md](../issue/references/issue-format.md), saved in step 5 — not a note on the
-  page.
+  page. A scenario already on the page that turns out to describe a bug stays until the fix changes it; the issue
+  names its ID.
 - Who the actors are and what a term means in the business domain (glossary).
 - Whether an operation is public contract or internal (used by other modules only by accident).
 - What should happen in an unhandled error case — record the answer as an open question on the page if it is not

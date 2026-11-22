@@ -368,6 +368,14 @@ def test_qa_report_marks_failures_and_counts_results():
     assert "Everything checked passed" in render(qa_run("PASS"), lambda path: "data:,")[0]
 
 
+def test_qa_report_product_notes_need_attention_though_all_passed():
+    run = qa_run("PASS") | {"product": ["ticket-create-2: the ticket has no <author>"]}
+    assert counts(run) == {"FAIL": 0, "BLOCKED": 0, "OUTDATED": 0, "PASS": 1}
+    page = render(run, lambda path: "data:,")[0]
+    assert "Everything checked passed" not in page and "Needs attention" in page
+    assert "<b>Product notes</b>" in page and "the ticket has no &lt;author&gt;" in page
+
+
 def test_qa_report_rejects_unknown_result_and_unjudged_checkpoint():
     run = qa_run("PASSED")
     run["scenarios"][0]["checkpoints"].append({"id": "checkout-guest-9", "results": []})

@@ -80,7 +80,7 @@ Show these as short chains, then point to the sections below for details:
   issues) → the Known issues flow; the next `as:health` closes issues it no longer finds.
 - **QA**: `as:qa-docs` (once, then after features change: environments, accounts, UI rules and journeys in
   `docs/qa/`) → with the app running, `as:qa branch` before the PR, `as:qa docs/features/<slug>`, `as:qa journeys` or
-  named journeys (`as:qa checkout-guest`) (screenshots judged by a separate agent, report in `docs/qa/runs/`, failures saved as issues) → the Known issues
+  named journeys (`as:qa checkout-guest`) (screenshots judged by a separate agent, then a product check of what no criterion names; report in `docs/qa/runs/`, failures and product notes saved as issues) → the Known issues
   flow; `as:qa explore <area>` tries to break one area. Needs the `playwright` plugin (Claude Code) or the Playwright
   MCP server (Codex).
 - **Parallel work**: `as:worktree-create <name>`, run any flow there in a new session, `as:worktree-close`.
@@ -143,7 +143,7 @@ start in a new session.
 ### finish — after delivering a feature
 
 - `/as:finish` — on the branch's changes only: baseline tests, lint and build → simplify → review (you pick fixes) →
-  one analysis per touched module → merge of the change proposal and spec check (intended change vs regression) → writes missing contract tests tagged with scenario
+  one analysis per touched module → merge of the change proposal and spec check (intended change vs regression, after a product check of the new behaviour) → writes missing contract tests tagged with scenario
   IDs → refreshes `AGENTS.md`. Checks rerun after every code change; nothing is committed. Suggests `/claude-security`
   when the diff touches auth, input handling or data access.
 - `/as:finish <base>` to compare against another ref; `--no-simplify`, `--no-review`, `--no-tests`, `--no-docs` skip steps.

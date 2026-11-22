@@ -81,9 +81,10 @@ Three ideas run through every command:
 
 - **State lives in files, not in the conversation.** A plan is a checklist in `docs/spec/changes/<slug>.md`, a known
   problem is a file in `docs/issues/`, a health check is a snapshot in `docs/health/<date>.json`. Any step can continue in a new session or with a cheaper model.
-  In Claude Code, when the session is not on Fable, `review` (also inside `finish`), `estimate`, `explain` and
-  `deliver` ask once whether their judgement subagents — reviewers and verifiers, the consistency review, the fact
-  check, the Plan and Final review stages — should run on Fable; the rest stays on the session model. The
+  In Claude Code, when the session is not on Fable, `review` (also inside `finish`), `estimate`, `explain`,
+  `deliver` and the skills that run the product check (`spec-docs`, `tech-lead`, `qa`, `health`) ask once whether their judgement
+  subagents — reviewers and verifiers, the consistency review, the fact check, the product check, the Plan and Final
+  review stages — should run on Fable; the rest stays on the session model. The
   architecture options of `tech-lead` always run on Opus, without a question.
 - **Nothing is written to code before you approve a plan**, and nothing is committed by `as` — you commit at the end.
   The one exception is `as:deliver`: you hand it a whole feature or the saved issues, it decides as you would by the recommended options,
@@ -161,6 +162,12 @@ Or let `/as:deliver docs/features/cancel-items` run the whole roadmap unattended
 Every skill that finds a problem it does not fix now (`review`, `health`, `spec-docs` "rule or bug?",
 `tech-lead` bug, `implement`) offers to save it as `docs/issues/p<1-4>-<slug>.md` — priority in the file name, so
 `ls docs/issues` is the list. Fixed means deleted, in the same diff as the fix.
+
+**Product check.** That the code does something is no proof it was wanted. Before behaviour is written into the
+spec (`spec-docs`, a `tech-lead` proposal, `finish`), after a QA run (`qa`) and over the whole spec (`health`), a separate product-owner
+subagent asks one thing: does this harm the people who use the product — a ticket saved without its author, input
+dropped silently, a dead end. What it flags is offered as a `bug` issue, never specified; a written rule it
+doubts is a question to you, never a silent edit.
 
 ### 7. Health check (once a sprint or month)
 

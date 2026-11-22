@@ -61,7 +61,8 @@ Meta line:
 
 - `**Kind:**` — `bug`, `security`, `spec-gap` (behaviour the spec does not define), `perf` (measured slowness; its
   evidence is the measurement command, the baseline numbers and the limiter), or the `as:health` categories
-  `review`, `refactor`, `delete`, `add-tests`, `remove-tests`, `deps`, `docs`.
+  `review`, `refactor`, `delete`, `add-tests`, `remove-tests`, `deps`, `docs` (its `product` findings are saved as
+  `bug` or `spec-gap`).
 - `**Priority:**` — as in the file name. `**Effort:**` — `S` (one module, a few files, no contract change), `M`, `L`.
 - `**Module:**` — link to the module's spec page, else the module directory in backticks.
 - `**Found:**` — date. `**Source:**` — who found it: `as:review`, `as:explain`, `as:health`, `as:spec-docs`, `as:tech-lead`, `as:deliver`, `as:qa`, `as:qa-docs`,

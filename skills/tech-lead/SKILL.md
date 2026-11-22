@@ -84,8 +84,17 @@ The user picks or adjusts an option. Record open points that remain undecided; d
 ### 5. Change proposal
 
 Draft the change proposal per [references/change-format.md](references/change-format.md): why, scope, decision (options
-considered, choice, rationale), affected modules, scenarios added / changed / removed with IDs, open questions. Show a
-short summary of the scenarios and ask before writing `docs/spec/changes/<slug>.md`. A proposal for a feature phase
+considered, choice, rationale), affected modules, scenarios added / changed / removed with IDs, open questions.
+
+Before showing it, run the [product check](../spec-docs/references/product-check.md) on the draft: the items are its
+added and changed scenarios (status `new`), Written holds the feature's criteria and decisions and the existing
+scenarios the change builds on. Once merged, these scenarios are intended by definition — `as:finish` does not
+question them again — and a wrong one is cheapest to fix now, before any code. A Suspect scenario → correct it in the
+draft (or add the missing one) and say what changed and why; a written rule to reconsider → ask the user (a
+criterion or a decision of a feature page changes only with `as:feature`).
+
+Show a short summary of the scenarios, with what the product check changed, and ask before writing
+`docs/spec/changes/<slug>.md`. A proposal for a feature phase
 carries the `**Feature:**` meta line, and after writing it set that phase to `🔄 in progress` with a link to the
 proposal on the feature page (format: [../feature/references/feature-format.md](../feature/references/feature-format.md)).
 A change that serves a documented feature outside its roadmap: ask whether to add it as a phase (`as:feature`).

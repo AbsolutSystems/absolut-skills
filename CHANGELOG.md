@@ -1,5 +1,57 @@
 # Changelog
 
+## 1.21.0
+
+Three additions around what gets built and how it is to use: a roadmap above features, the user flow inside a
+feature, and a UX review of the running app.
+
+New skill `roadmap`: the level above a feature. `feature` documents one capability and splits it into phases; there
+was nowhere to talk about a whole application or a large module before its features are known.
+
+- `as:roadmap <direction>`: reads what exists, then discusses the direction at product level — users, capabilities,
+  rules and limits, scope, order — with no technical design (a technical question becomes an open question for
+  `tech-lead`). It sizes the topic first: one change → `as:tech-lead`, one feature → `as:feature` (with the summary
+  to pass on), and writes nothing; several capabilities worth shipping alone → a roadmap.
+- `docs/roadmap/<slug>/index.md` (format in `skills/roadmap/references/roadmap-format.md`): direction, users and
+  goals, out of scope, stages with plain-language capabilities `C<n>` (the preliminary specification), product
+  decisions, open questions, sources; catalogue in `docs/roadmap/index.md`. One stage = one feature.
+- `as:roadmap docs/roadmap/<slug>`: refreshes stage statuses from the linked feature pages and records changes of
+  direction.
+- `feature`: new argument `docs/roadmap/<slug> [stage]` — documents a stage as a feature (capabilities become the
+  acceptance-criteria candidates), adds `**Roadmap:**` to the feature's meta line and the stage's `**Feature:**` link.
+- `tech-lead` (Size first): a topic beyond one feature is not designed there; it suggests `as:roadmap` (never for a
+  feature phase or an estimate, so `deliver` is not stopped by it). From feature reads the decisions and out of scope
+  of the roadmap the feature belongs to.
+- `doctor`, `docs-check` and `feature` (after editing a roadmap page) lint `docs/roadmap/` with `spec_lint.py`.
+- `agent-docs`: the root `AGENTS.md` links `docs/roadmap/index.md` when it exists. `help`, README and the catalogue
+  list the new skill and flow.
+- `deliver` is unchanged: it still delivers one feature, not a roadmap.
+
+User flow in `feature`: acceptance criteria said what the user gets, but not how they move through the screens, so
+that was decided during implementation.
+
+- Feature pages gain `## User flow`: flows `UF<n>` with the criteria they cover, where the flow starts, numbered
+  steps (screen — action → what the user sees next) and the empty, error and no-access states. Behaviour only, no
+  visual design. A feature without a user interface says so in one line.
+- `feature` asks about the flow in its Clarify step (proposing it from the criteria and the existing screens) and
+  checks in Verify that every criterion reached through the interface is covered. Existing pages get the section on
+  their next update.
+- `tech-lead` (From feature) treats a flow's steps and states as requirements the proposal's scenarios cover; `qa`
+  passes the flows to the executor as details; `qa-docs` reads them.
+
+New skill `ux`: how an area of the running web application is to use, also where nothing is written.
+
+- `as:ux <area | URL>`: proposes 2–4 walks (persona, goal in their words, start, viewport); a walker subagent per
+  walk pursues the goal in a browser knowing only what the persona knows and records what it looked for, where it
+  hesitated or got lost, with a screenshot per step; a separate reviewer subagent (a judgement subagent in the host
+  mappings) reports only findings with a nameable cost to the persona — orientation, consistency, feedback, dead
+  ends, error recovery, wording, effort. Flow and behaviour, not visual design.
+- Report in `docs/ux/<date>-<area>.md` (format in `skills/ux/references/report-format.md`): walks, mismatches with
+  written criteria, flows or rules, findings, themes, what works well. Findings are offered as issues of the new kind
+  `ux`, mismatches as `bug`; themes spanning several screens are named as material for `as:roadmap`.
+- Same browser setup and safety rules as `qa` (local or listed test environments only); works without `docs/qa/`
+  by asking for the URL and role. Changes no code and no docs.
+
 ## 1.20.0
 
 Product check: that the code does something is no proof it was wanted. Until now behaviour the written record was

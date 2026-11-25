@@ -29,7 +29,7 @@
   `codex --ask-for-approval never --sandbox workspace-write` (tests that need the network fail in that sandbox; use
   `--sandbox danger-full-access` only in a worktree or container you can throw away). Without subagents the stages run
   in the main thread, one after another.
-- Browser (`as:qa`, `as:qa-docs`): the Playwright MCP server, added once with
+- Browser (`as:qa`, `as:qa-docs`, `as:ux`): the Playwright MCP server, added once with
   `codex mcp add playwright -- npx @playwright/mcp@latest` (Node.js required), then restart Codex. Its tools are
   named as in [Claude Code](claude-tools.md) without the `mcp__plugin_playwright_playwright__` prefix. The judge views
   screenshots with the host's image viewer. Without subagents, `as:qa` executes every scenario in the main thread

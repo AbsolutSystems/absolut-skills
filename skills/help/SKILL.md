@@ -29,7 +29,8 @@ Show this table as it is, in the user's language:
 | start with a repository (agent docs, spec, plugins) | `as:init` |
 | design a feature, investigate a bug or slow code, choose between options | `as:tech-lead` (also starts on its own) |
 | analyse and price a client's feature request | `as:estimate` |
-| keep a feature's why, acceptance criteria, roadmap and sources (PDF, e-mails) in one place | `as:feature` |
+| talk through the direction of a whole application or a large module and split it into stages (one feature each) | `as:roadmap` |
+| keep a feature's why, acceptance criteria, user flow, roadmap and sources (PDF, e-mails) in one place | `as:feature` |
 | continue an approved plan, also in a new session | `as:implement` (also starts on its own) |
 | deliver a whole documented feature, or fix all saved problems, unattended (e.g. overnight) | `as:deliver` |
 | wrap up a feature before the PR (simplify, review, spec, tests, docs) | `as:finish` (also starts on its own) |
@@ -44,6 +45,7 @@ Show this table as it is, in the user's language:
 | see which spec scenarios have no tests | `as:spec-tests` |
 | check the running web app in a browser (criteria, journeys, screenshots judged) | `as:qa` (after `as:qa-docs`) |
 | say what QA checks: environments, accounts, UI rules, cross-feature journeys | `as:qa-docs` |
+| see how an area of the running web app is to use (walked as its users, findings with screenshots) | `as:ux` |
 | review the health of the whole project | `as:health` |
 | work on several branches at once | `as:worktree-create` / `as:worktree-close` |
 | learn how it all fits together | `as:help flows` |
@@ -57,6 +59,10 @@ Show these as short chains, then point to the sections below for details:
 - **Client request**: `as:estimate <request>` (analysis, PRD and hour estimate in `docs/estimates/<slug>/`;
   send `client.md`) → `as:estimate docs/estimates/<slug>` with the client's answers → after acceptance
   `as:tech-lead docs/estimates/<slug>` → the Feature flow.
+- **Product roadmap** (a whole application or a large module, before the features are known): `as:roadmap
+  <direction>` (product-level discussion, no technical design; one feature → it sends you to `as:feature`) → direction,
+  agreed capabilities and stages in `docs/roadmap/<slug>/` → `as:feature docs/roadmap/<slug>` per stage → the Feature
+  roadmap flow; direction changed or a stage shipped → `as:roadmap docs/roadmap/<slug>`.
 - **Feature roadmap** (a feature that ships in several changes, or comes with client material): `as:feature
   <description, files, pasted e-mail>` (or `docs/estimates/<slug>`, or a legacy docs folder) → page and sources in
   `docs/features/<slug>/` → `as:tech-lead docs/features/<slug>` per phase → the Feature flow (`as:finish` marks the
@@ -83,6 +89,9 @@ Show these as short chains, then point to the sections below for details:
   named journeys (`as:qa checkout-guest`) (screenshots judged by a separate agent, then a product check of what no criterion names; report in `docs/qa/runs/`, failures and product notes saved as issues) → the Known issues
   flow; `as:qa explore <area>` tries to break one area. Needs the `playwright` plugin (Claude Code) or the Playwright
   MCP server (Codex).
+- **UX review**: with the app running, `as:ux <area>` (walks the area in a browser as 2–4 personas with a goal each,
+  a separate reviewer turns the walks into findings on flow and behaviour — not visual design; report in `docs/ux/`)
+  → findings saved as `ux` issues → the Known issues flow; larger themes → `as:roadmap`. Same browser setup as QA.
 - **Parallel work**: `as:worktree-create <name>`, run any flow there in a new session, `as:worktree-close`.
 - **Upkeep**: `as:doctor` (setup and versions, seconds), `as:docs-check` (docs and spec against the code, no writes),
   `as:spec-tests` (scenarios without tests), `as:guidelines <app> <topic>` (rules and reference files per topic).
@@ -100,6 +109,9 @@ start in a new session.
 
 ### plan — before non-trivial changes
 
+- **`/as:roadmap <direction>`** — one level above a feature: a whole application or a large module discussed at
+  product level and split into stages, one feature each (`docs/roadmap/<slug>/`). It tells you when the topic is
+  just one feature.
 - **`as:tech-lead`** starts on its own when you describe a feature, a bug or a design question (or call
   `/as:tech-lead <topic>`): it reads the code and spec first, asks targeted questions, compares 2–3 architectures,
   records the decision and proposed scenarios in `docs/spec/changes/<slug>.md`, saves the approved plan there as a checklist, and offers the

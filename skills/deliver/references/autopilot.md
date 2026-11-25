@@ -39,7 +39,7 @@ Do not assume these; return **blocked** with the question, the options and your 
 **tech-lead** (Plan stage, [From feature](../../tech-lead/SKILL.md#from-feature)):
 
 - Size: a feature phase always gets a change proposal with a `## Plan`, whatever its size (`as:finish` closes the
-  phase through it).
+  phase through it). The "Beyond one feature" redirect to `as:roadmap` never applies to a phase.
 - Clarify: answer from the page, its sources, the code and the start-up decisions; the rest by the rule.
 - Options: run the architecture subagents when the size calls for them, then pick your recommendation; the table and
   the reason go to `## Decision` as usual.

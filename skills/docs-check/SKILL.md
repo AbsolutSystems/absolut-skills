@@ -29,7 +29,9 @@ Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex):
 4. **Features** — when `docs/features/` exists: run
    [spec_lint.py](../spec-docs/scripts/spec_lint.py) and report its `ERROR` lines for feature pages (broken links to
    scenarios, phases whose status does not match their proposal, sources not listed). Fix with
-   `as:feature docs/features/<slug>`.
+   `as:feature docs/features/<slug>`. When `docs/roadmap/` exists, run it again with `--features docs/roadmap` and
+   report the `ERROR` lines of roadmap pages (broken links to features, sources not listed); fix with
+   `as:roadmap docs/roadmap/<slug>`.
 5. **Issues** — list the issue candidates from step 3, and offer one `docs` issue per file whose drift the user does
    not want to fix now. Ask which to save (multi-select), then write them per
    [../issue/references/issue-format.md](../issue/references/issue-format.md) and remove the notes of moved bugs.

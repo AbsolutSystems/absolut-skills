@@ -24,7 +24,8 @@ the code is `as:docs-check`, the state of the code itself is `as:health`.
 2. **Spec lint** — when `docs/spec/` or `docs/features/` exists, run `python3 <spec-docs skill
    directory>/scripts/spec_lint.py` ([../spec-docs/scripts/spec_lint.py](../spec-docs/scripts/spec_lint.py)) and count
    its `ERROR` lines per file; fix: `as:spec-docs <path>` for spec pages, `as:feature docs/features/<slug>` for feature
-   pages.
+   pages. When `docs/roadmap/` exists, run it again with `--features docs/roadmap` and count only the `ERROR` lines
+   of files under `docs/roadmap/`; fix: `as:roadmap docs/roadmap/<slug>`.
 3. **Plugins** — on Claude Code, check the plugins in
    [../../references/recommended-plugins.md](../../references/recommended-plugins.md) as described there:
    `INSTALLED` / `DISABLED` / `MISSING`, with the `claude plugin install` or `enable` command from that file as the

@@ -16,6 +16,8 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
   `references/safety-fact.md` (also used by `fix`) and `references/perf.md`.
 - `estimate` — client feature request analysis and hour estimate; writes `docs/estimates/<slug>/`; owns
   `scripts/estimate_totals.py`.
+- `roadmap` — product-level direction of an application or a large module in `docs/roadmap/<slug>/`, in stages (one
+  feature each); owns `references/roadmap-format.md`.
 - `feature` — living feature docs in `docs/features/<slug>/` (page + `sources/`); owns
   `references/feature-format.md` and `scripts/xlsx_text.py`.
 - `implement` — executes a proposal's approved `## Plan` step by step in any session.
@@ -41,6 +43,8 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
 - `qa-docs` — what browser QA checks, in `docs/qa/`; owns `references/qa-format.md` (also the run report format).
 - `qa` — runs criteria and journeys in a browser with executor and judge subagents; owns `references/briefs.md` and
   `scripts/qa_report.py` (the HTML evidence page; its input format is in `qa-format.md` — change them together).
+- `ux` — walks an area of the running web app as personas and reports what costs the user, in `docs/ux/`; owns
+  `references/briefs.md` (walker, reviewer) and `references/report-format.md`.
 - `worktree-create`, `worktree-close` — branch + git worktree in `../<repo>-worktrees/`; close keeps the branch.
 
 ## Dependencies between skills
@@ -52,6 +56,17 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
   renaming its sections means updating the From estimate path; `feature` seeds from it too. `tech-lead` (From feature),
   `finish` (step 6) and `docs-check` follow `feature/references/feature-format.md`; `spec_lint.py` checks feature pages
   (phase status words, `AC<n>` anchors, `sources/`) — change the format and the script together.
+- `roadmap` follows `feature` step 5 for sources and `feature-format.md#sources`, uses `tech-lead`'s Explore brief and
+  runs `spec_lint.py --features docs/roadmap` (stage statuses sit under the heading, not in it, so the phase check
+  does not fire); `feature` seeds from a stage by `roadmap/references/roadmap-format.md` and writes the stage's
+  `**Feature:**` link, status, Now line and catalogue row; `tech-lead` (Size first) suggests `roadmap` — never for a
+  phase or an estimate, and `autopilot.md` says so — and From feature reads the roadmap's decisions; `doctor`,
+  `docs-check` and `feature` step 6 run the same lint on `docs/roadmap/`.
+- `ux` follows `qa` step 1 (Preflight) by number, shares its `.qa/` working directory and the browser tools of the
+  host mappings, and reads `## Users and goals` and `## User flow` of feature pages; its reviewers are judgement
+  subagents (`claude-tools.md`). The `ux` issue kind is defined in `issue-format.md`.
+- User flows (`UF<n>`, `feature-format.md`) are read by `tech-lead` (From feature steps 2–3), `qa` (step 2), `qa-docs`
+  and `ux` — rename the section or the ID together.
 - Renaming or restructuring a step or reference in one skill means updating every skill that links to it — the
   validator checks link targets and `#anchors`, but not step numbers or section names quoted in prose.
 - `finish` (step 4) and `deliver` follow `review` in branch mode (`finish` passes its step 3 new clones as the
@@ -98,10 +113,13 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
   `.guidelines/` — `guidelines` writes, `agent-docs` fixes drift and keeps the app `AGENTS.md` index; `docs/features/` —
   `feature` writes, `tech-lead` sets a phase `in progress`, `finish` sets it `done` and updates the page, `deliver`
   writes `<slug>/delivery.md` (and `docs/deliveries/` for issues runs); `sources/` are never edited after saving;
-  `docs/qa/` — `qa-docs` writes `index.md` and `journeys.md`, `qa` writes `runs/` (also inside `deliver`).
+  `docs/roadmap/` — `roadmap` writes (and adds `**Roadmap:**` to a feature page it links), `feature` sets a stage's
+  `**Feature:**` link and `in progress` with the Now line and catalogue row;
+  `docs/qa/` — `qa-docs` writes `index.md` and `journeys.md`, `qa` writes `runs/` (also inside `deliver`);
+  `docs/ux/` — `ux` writes, nothing else reads it.
 - `docs/issues/` — any skill that finds a problem writes, only with the user's consent (`deliver` without asking, by
   its policy); deleted (with the fix, in the same diff) by `fix` (also inside `deliver`), `tech-lead` (Bug), `finish` (archiving a proposal with `**Issue:**`) and `health` (finding
   gone). Never numbered: the priority prefix and slug avoid cross-branch collisions.
 - Files generated in user projects are in English, except spec pages (`spec-docs --lang`) and pages that follow
   their language (`lang` in the marker on the first line of `docs/spec/index.md`): change proposals, health reports,
-  issues, estimate analyses, feature pages, `docs/explain/` pages and `docs/qa/` (sources keep their own); an estimate's `client.md` follows the client's request (`estimate --lang`).
+  issues, estimate analyses, feature and roadmap pages, `docs/explain/` pages, `docs/ux/` reports and `docs/qa/` (sources keep their own); an estimate's `client.md` follows the client's request (`estimate --lang`).

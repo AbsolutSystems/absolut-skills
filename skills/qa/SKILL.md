@@ -55,7 +55,7 @@ Stop at the first failure, with what to do:
 ### 2. Select
 
 - **Feature** — read the page; every active `AC<n>` is a scenario, with the scenarios of its `**Realised by:**`
-  links as details. Planned criteria (`planned — phase <n>`) are skipped and listed.
+  links and the user flows (`UF<n>`) that cover it as details. Planned criteria (`planned — phase <n>`) are skipped and listed.
 - **Journeys** — the active journeys of `journeys.md`, or the named ones: each name matches a journey's ID or its
   `**Was:**` ID. A name that matches none → run nothing, list the active journey IDs with their titles, and ask which
   were meant.

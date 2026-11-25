@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills Roadmap"
+  short_description: "Product-level direction of an app or large module: agreed scope and stages, one feature each"
+  default_prompt: "Use $as:roadmap to discuss this direction and split it into stages in docs/roadmap/."
+policy:
+  allow_implicit_invocation: false

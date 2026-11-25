@@ -1,7 +1,7 @@
 # Feature format
 
 A feature page is the living, whole-feature view of a capability that usually spans several modules: why it exists,
-what the user gets (acceptance criteria), the roadmap of phases, the decisions taken and the sources they came from.
+what the user gets (acceptance criteria), how they move through it (user flow), the roadmap of phases, the decisions taken and the sources they came from.
 It is the page a person or an agent reads first ("read the feature, then we continue"). It never repeats what lives
 elsewhere: behaviour is in the module pages of `docs/spec/`, the plan of a phase is in its change proposal, a decision's
 details are in the archived proposal or the source — the feature page links them.
@@ -75,7 +75,7 @@ Customers cancel single items of a placed order until it ships.
 
 **Now:** phase 2 in progress — [proposal](../../spec/changes/partial-cancel-refunds.md). **Next:** phase 3, notifications.
 
-**On this page:** [Acceptance criteria](#acceptance-criteria) · [Roadmap](#roadmap) · [Decisions](#decisions) · [Sources](#sources) · [Open questions](#open-questions)
+**On this page:** [Acceptance criteria](#acceptance-criteria) · [User flow](#user-flow) · [Roadmap](#roadmap) · [Decisions](#decisions) · [Sources](#sources) · [Open questions](#open-questions)
 
 ## Why
 
@@ -103,6 +103,19 @@ Support handles ~40 requests a week to remove one item; today the whole order mu
 > The cancelled item's amount is refunded to the original payment method.
 
 **Realised by:** planned — phase 2 · **Source:** [e-mail](sources/2026-10-20-email-refunds.md)
+
+## User flow
+
+### UF1 — Cancel items of an order
+
+**Covers:** AC1, AC2 · **Starts:** order details → "Cancel items", shown only while the order has not shipped
+
+1. Order details — the customer ticks the items to cancel → the refund amount for the ticked items appears.
+2. Confirm — "Cancel 2 items" → order details again: the items are marked cancelled, the total is lower, and a message says when the refund arrives.
+
+- **Empty:** every item already cancelled → no "Cancel items" action.
+- **Errors:** the order shipped in the meantime → a message says so, nothing is cancelled, the action disappears.
+- **No access:** another customer's order → the same "not found" page as for a missing order.
 
 ---
 
@@ -146,10 +159,17 @@ E-mail to the customer after a cancellation · AC3
 
 - `**Status:**` of the feature: `draft` (not started), `active`, `shipped` (every phase `done` or `dropped`),
   `paused`, `dropped`. `**Updated:**` is the date and commit of the last write.
+- A feature that is a stage of a roadmap has `· **Roadmap:** [<name>, stage <n>](../../roadmap/<slug>/index.md)` at
+  the end of the meta line ([roadmap format](../../roadmap/references/roadmap-format.md)).
 - `**Now:**` says what is happening and what comes next, in one line; agents read it first.
 - Acceptance criteria are user-level outcomes, not Given/When/Then: the scenarios that make them true live in the
   module pages and are linked in `**Realised by:**` (or `planned — phase <n>`). IDs `AC<n>` are local to the page,
   never renumbered or reused; a removed criterion keeps its text with `**Status:** 🗑️ removed` and a struck-through heading.
+- User flows `UF<n>` say how a user moves through the screens: where the flow starts, numbered steps (screen —
+  action → what the user sees next), and the empty, error and no-access states ("none" when there is none). Behaviour
+  only: no layout, colours or component names. `**Covers:**` lists the criteria the flow serves; every criterion a
+  user reaches through the interface is covered by a flow. Numbered like AC, never renumbered. A feature without a
+  user interface has one line under the heading instead ("No user interface — a nightly job.").
 - Roadmap phases: `### Phase <n> — <name>` (translated with the page) ending in the status `⏳ planned`,
   `🔄 in progress`, `✅ done` or `🗑️ dropped` — emoji and English words fixed, last on the heading line; `spec_lint.py`
   finds phases by them. One phase = one change proposal and ends with working, tested value. An `in progress`
@@ -187,7 +207,8 @@ Moves use `git mv` (history is kept) and rename to the source naming rule; nothi
 
 ## Ownership
 
-`as:feature` writes the page and the catalogue. `as:tech-lead` sets a phase to `in progress` and links its proposal;
+`as:feature` writes the page and the catalogue (and, for a roadmap stage, that stage's `**Feature:**` link and
+status on the roadmap page); `as:roadmap` adds `**Roadmap:**` to the meta line of a feature it links. `as:tech-lead` sets a phase to `in progress` and links its proposal;
 `as:finish` sets it to `done` or `dropped`, relinks it to the archive, fills `**Realised by:**`, the Now line, the
 feature status and the catalogue row. `as:deliver` writes its run report to `<slug>/delivery.md`. Other skills only
 read.

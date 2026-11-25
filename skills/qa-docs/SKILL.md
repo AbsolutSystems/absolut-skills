@@ -28,7 +28,7 @@ stop. Several front ends (a shop and an admin panel) → one `docs/qa/` covering
 
 ### 2. Analysis
 
-Read `docs/qa/` if it exists, `docs/features/index.md` and the feature pages (acceptance criteria, `**Realised by:**`),
+Read `docs/qa/` if it exists, `docs/features/index.md` and the feature pages (acceptance criteria, `**Realised by:**`, user flows),
 the latest run reports in `docs/qa/runs/` (the newest per target), and the root and app `AGENTS.md` (start, seed,
 test commands). Then fan out one read-only subagent per front end with the brief in
 [references/analysis.md](references/analysis.md); without subagents, run it in the main thread.

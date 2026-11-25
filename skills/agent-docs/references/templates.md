@@ -21,6 +21,7 @@ API, dependencies, framework conventions. Write the rule behind them only when t
 - `docs/spec/` — human-readable specification of module contracts; start at `docs/spec/index.md`.
 - `docs/features/` — features: why, acceptance criteria, roadmap and sources; read a feature's `index.md` before
   working on it.
+- `docs/roadmap/` — product direction of the application or a large module, in stages (one feature each).
 
 ## Commands
 

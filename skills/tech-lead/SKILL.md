@@ -34,6 +34,10 @@ Before any exploration, size the task from the request and one or two searches:
   no options step, no change proposal; one recommendation and a short plan with its `**Safe because:**` line
   ([references/safety-fact.md](references/safety-fact.md)). Offer the full process if the user wants it.
 - **M** / **L** — several files or modules, a contract change, or unknowns: the full path below.
+- **Beyond one feature** — a whole application or a large module, several capabilities that are each worth shipping
+  alone, or a direction rather than a behaviour: do not design it here. Say so and suggest `as:roadmap <topic>`
+  (product-level discussion and stages, one feature each); continue only if the user picks one capability to plan
+  now. Never for a `docs/features/<slug>` or `docs/estimates/<slug>` argument — that scope is already agreed.
 
 Say the size in one line; the user may override it.
 
@@ -169,9 +173,13 @@ a roadmap of phases, decisions and sources. One phase becomes one change proposa
 1. **Load** the page and say its status and Now line. Pick the first `⏳ planned` phase, or the one the user names; a
    phase already `🔄 in progress` → offer `as:implement` on its proposal instead.
 2. **Ground** as in [Feature](#feature) step 1, starting from the page's modules, the `**Realised by:**` links of
-   done criteria, and the decisions; read a source only when the page does not answer a question.
-3. **Clarify** only what the phase's criteria and the page's open questions leave unknown; an answer that changes a
-   criterion or adds a decision is recorded on the feature page with `as:feature` after this run — say so.
+   done criteria, the user flows (`UF<n>`) of the phase's criteria, and the decisions; a page with `**Roadmap:**` on
+   its meta line → read that roadmap's Decisions and Out of scope too, they bind the phase; read a source only when
+   the page does not answer a question.
+3. **Clarify** only what the phase's criteria, its user flows and the page's open questions leave unknown — a
+   flow's steps and its empty, error and no-access states are requirements: the proposal's scenarios cover them. An
+   answer that changes a criterion or a flow, or adds a decision, is recorded on the feature page with `as:feature`
+   after this run — say so.
 4. Continue the [Feature](#feature) path from step 3. The proposal's `## Why` links the feature instead of repeating
    it; its meta line has `**Feature:**` with the criteria it realises; writing it sets the phase to `🔄 in progress`.
 

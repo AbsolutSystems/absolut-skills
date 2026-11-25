@@ -10,7 +10,7 @@ Codex, skip any step that checks or installs them and say so in one sentence.
 | `code-simplifier` | Agent that simplifies recently changed code without changing behaviour | Ask Claude to run the `code-simplifier` agent | After implementing, before committing |
 | `code-review` | Multi-agent pull request review with confidence scoring | `/code-review:code-review` | A second, independent opinion on an open PR (`as:review <PR>` is the default) |
 | `commit-commands` | Git workflow commands | `/commit-commands:commit`, `/commit-commands:commit-push-pr`, `/commit-commands:clean_gone` | Committing, opening a PR, pruning gone branches |
-| `playwright` | Browser automation tools (navigate, click, type, screenshot, console, network) | Used by `as:qa` and `as:qa-docs` | Checking a web app in a browser |
+| `playwright` | Browser automation tools (navigate, click, type, screenshot, console, network) | Used by `as:qa`, `as:qa-docs` and `as:ux` | Checking a web app in a browser |
 | `claude-security` | Deep vulnerability scan with verified findings and opt-in patches | `/claude-security` (or ask for a security scan) | Before a release, or after changing auth, input handling or data access |
 
 ## Checking

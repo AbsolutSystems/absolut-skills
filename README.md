@@ -56,7 +56,8 @@ Point either host at a local clone instead of `AbsolutSystems/absolut-skills`, e
 | start with a repository (agent docs, spec, plugins) | `/as:init` |
 | design a feature, investigate a bug, choose between options | `/as:tech-lead` (also starts on its own) |
 | analyse and price a client's feature request | `/as:estimate` |
-| keep a feature's why, acceptance criteria, roadmap and sources (PDF, e-mails) in one place | `/as:feature` |
+| talk through the direction of a whole application or a large module and split it into stages (one feature each) | `/as:roadmap` |
+| keep a feature's why, acceptance criteria, user flow, roadmap and sources (PDF, e-mails) in one place | `/as:feature` |
 | continue an approved plan, also in a new session | `/as:implement` (also starts on its own) |
 | deliver a whole documented feature, or fix all saved problems, unattended (e.g. overnight) | `/as:deliver` |
 | wrap up a feature before the PR (simplify, review, spec, tests, docs) | `/as:finish` (also starts on its own) |
@@ -71,6 +72,7 @@ Point either host at a local clone instead of `AbsolutSystems/absolut-skills`, e
 | see which spec scenarios have no tests | `/as:spec-tests` |
 | check the running web app in a browser (criteria, journeys, screenshots judged) | `/as:qa` |
 | say what QA checks: environments, accounts, UI rules, cross-feature journeys | `/as:qa-docs` |
+| see how an area of the running web app is to use (walked as its users, findings with screenshots) | `/as:ux` |
 | review the health of the whole project | `/as:health` |
 | work on several branches at once | `/as:worktree-create` / `/as:worktree-close` |
 | learn how it all fits together | `/as:help flows` |
@@ -91,7 +93,8 @@ Three ideas run through every command:
   commits each green stage locally and leaves the review (and the push) to you.
 - **Docs follow the code.** `AGENTS.md` tells agents what the code cannot; `docs/spec/` describes module contracts as
   scenarios with stable IDs (`ORD-003`) that tests refer to; `docs/features/` keeps each feature's why, acceptance
-  criteria and roadmap across many changes. `as:finish` keeps them current.
+  criteria and roadmap across many changes; `docs/roadmap/` keeps the direction of the whole application or a large
+  module as stages, one feature each. `as:finish` keeps the spec and the feature pages current.
 
 ### 1. Onboard a repository (once)
 
@@ -132,7 +135,8 @@ module gets a short plan without a proposal.
 ```text
 /as:feature cancel single items — order in the attached PDF, e-mail below   # or docs/estimates/<slug>, or a legacy folder
     → saves the sources verbatim in docs/features/cancel-items/sources/ (PDF, .xlsx + its text, pasted e-mails)
-    → docs/features/cancel-items/index.md: why, acceptance criteria linked to module scenarios, phases, decisions
+    → docs/features/cancel-items/index.md: why, acceptance criteria linked to module scenarios, the user flow
+      (screens, steps, empty and error states), phases, decisions
 /as:tech-lead docs/features/cancel-items       # plans the next phase as a change proposal → the feature flow
 /as:feature docs/features/cancel-items         # a new e-mail or document: records it and what it changes
 ```
@@ -141,6 +145,17 @@ module gets a short plan without a proposal.
 later session.
 
 Or let `/as:deliver docs/features/cancel-items` run the whole roadmap unattended (see [`deliver`](#deliver--a-whole-feature-or-all-issues-unattended)).
+
+Bigger than one feature — a whole application, a large module, a direction? Start one level up:
+
+```text
+/as:roadmap customers should manage their own orders without writing to support
+    → what exists today, then a product-level discussion: users, capabilities, rules, order — no technical design
+    → sizes it: one feature → sends you to /as:feature; several → a roadmap
+    → docs/roadmap/customer-self-service/index.md: direction, agreed capabilities, decisions, stages (one feature each)
+/as:feature docs/roadmap/customer-self-service   # documents the next planned stage as a feature, linked both ways
+/as:roadmap docs/roadmap/customer-self-service   # later: refresh stage statuses, record what changed in the direction
+```
 
 ### 5. Bug
 
@@ -212,12 +227,23 @@ An executor subagent clicks each scenario and keeps screenshots, console errors 
 decides from that evidence alone. Failures are offered as issues (the Known issues flow). Needs the `playwright`
 plugin (Claude Code) or the Playwright MCP server (Codex); only local or listed test environments, never production.
 
+`as:qa` asks whether what is written works. To see what an area is like to use — also where nothing is written:
+
+```text
+/as:ux checkout                     # app running: walks the area as 2–4 personas, each with a goal in their own words
+    → a walker per persona records what it looked for, where it hesitated or got lost, a screenshot per step
+    → a separate reviewer reports what costs the user: orientation, consistency, feedback, dead ends, wording, effort
+    → docs/ux/<date>-checkout.md; findings offered as ux issues, larger themes as material for /as:roadmap
+```
+
+It reviews flow and behaviour, not visual design, and changes no code.
+
 ### Plan mode and other plugins
 
 In Claude Code, `as:tech-lead` hands medium and large changes to **plan mode** (Shift+Tab): Claude plans without
 editing and implements after you approve. In Codex, ask for a plan and say not to edit until you approve it.
 `as` works with the recommended Anthropic plugins (`/as:help` shows which are installed): `commit-commands` for commits
-and PRs, `claude-security` for security-sensitive changes, `frontend-design` for UI, `playwright` for `as:qa`.
+and PRs, `claude-security` for security-sensitive changes, `frontend-design` for UI, `playwright` for `as:qa` and `as:ux`.
 
 ### What gets written where
 
@@ -229,12 +255,14 @@ and PRs, `claude-security` for security-sensitive changes, `frontend-design` for
 | `docs/spec/changes/<slug>.md` | `tech-lead`, `implement` (ticks) | Open change proposal: decision, scenarios, `## Plan` |
 | `docs/spec/changes/archive/` | `finish` | Merged proposals — the decision log |
 | `docs/features/<slug>/` | `feature`; phase status by `tech-lead`, `finish`; `delivery.md` by `deliver` | Feature page (why, acceptance criteria, roadmap, decisions) and `sources/` kept verbatim |
+| `docs/roadmap/<slug>/` | `roadmap`; a stage's feature link by `feature` | Product direction of an application or a large module: agreed capabilities, decisions, stages (one feature each) and `sources/` |
 | `docs/estimates/<slug>/` | `estimate` | Client request analysis and hour estimate: `analysis.md` (internal), `client.md` (to send) |
 | `docs/deliveries/<branch>.md` | `deliver` | Report of an unattended issues run |
-| `docs/issues/p<1-4>-<slug>.md` | `issue`, `review`, `explain`, `finish`, `health`, `spec-docs`, `tech-lead`, `implement`, `docs-check`, `spec-tests`, `qa`, `qa-docs`, `guidelines`; deleted by `fix`, `finish`, `health`, `deliver` | Known problems not fixed yet, one file each, priority in the name |
+| `docs/issues/p<1-4>-<slug>.md` | `issue`, `review`, `explain`, `finish`, `health`, `spec-docs`, `tech-lead`, `implement`, `docs-check`, `spec-tests`, `qa`, `qa-docs`, `guidelines`, `ux`; deleted by `fix`, `finish`, `health`, `deliver` | Known problems not fixed yet, one file each, priority in the name |
 | `docs/explain/` | `explain` | HTML pages explaining a change, a module or a feature's logic, with `explain.css` |
 | `docs/health/` | `health` | Dated HTML reports, JSON snapshots, index with trends |
 | `docs/qa/index.md`, `docs/qa/journeys.md` | `qa-docs` | Environments, test accounts (variable names), roles, app-wide UI rules, journeys |
+| `docs/ux/` | `ux` | Dated UX review reports with the screenshots of findings; other screenshots in gitignored `.qa/` |
 | `docs/qa/runs/` | `qa` (also inside `deliver`) | Browser run reports with the screenshots of failures; other screenshots and the HTML evidence page in gitignored `.qa/` |
 
 ## Commands
@@ -245,7 +273,8 @@ and PRs, `claude-security` for security-sensitive changes, `frontend-design` for
 | `/as:init` | `[path] [--spec <path>… \| all] [--no-spec] [--lang en\|pl]` | Once per repository |
 | `/as:tech-lead` | `<feature, bug or question>` \| `docs/estimates/<slug>` \| `docs/features/<slug>` | Before any non-trivial change |
 | `/as:estimate` | `<request text or file> [--lang en\|pl]` \| `docs/estimates/<slug>` | Client asks for a feature quote; revision after answers |
-| `/as:feature` | `<description, files>` \| `docs/features/<slug>` \| `docs/estimates/<slug>` \| `<legacy folder>` `[--lang en\|pl]` | A feature spanning several changes, or new client material |
+| `/as:roadmap` | `<direction>` \| `docs/roadmap/<slug>` `[--lang en\|pl]` | A whole application or a large module: direction and stages before the features are known |
+| `/as:feature` | `<description, files>` \| `docs/features/<slug>` \| `docs/estimates/<slug>` \| `docs/roadmap/<slug> [stage]` \| `<legacy folder>` `[--lang en\|pl]` | A feature spanning several changes, a roadmap stage, or new client material |
 | `/as:implement` | `[slug] [--step <n>]` | Execute an approved plan, in any session |
 | `/as:deliver` | `docs/features/<slug>` \| `docs/issues [request]` `[--max-stages <n>]` | A documented feature or the saved issues, delivered unattended |
 | `/as:finish` | `[base] [--no-simplify] [--no-review] [--no-tests] [--no-docs]` | Feature done, before the PR |
@@ -262,6 +291,7 @@ and PRs, `claude-security` for security-sensitive changes, `frontend-design` for
 | `/as:guidelines` | `[app path] [topic …]` | An app without guidelines, or ones that no longer match the code |
 | `/as:spec-docs` | `[path] [--lang en\|pl]` | Spec refresh |
 | `/as:spec-tests` | `[path]` | Scenario test coverage |
+| `/as:ux` | `<area \| URL> [--env <name>]` | App running: how an area is to use, through its users' eyes |
 | `/as:qa-docs` | `[area \| path]` | Once, then after features change: what browser QA checks |
 | `/as:qa` | `docs/features/<slug>` \| `journeys` \| `<journey ID>…` \| `branch [base]` \| `explore <area>` `[--env <name>]` | App running: check it in a browser |
 

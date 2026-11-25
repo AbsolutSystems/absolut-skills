@@ -1,0 +1,6 @@
+interface:
+  display_name: "Absolut Skills UX"
+  short_description: "Walk an area of the web app as its users: findings on flow and behaviour, report with screenshots"
+  default_prompt: "Use $as:ux to review how this area of the web app is to use, in a browser."
+policy:
+  allow_implicit_invocation: false

@@ -9,8 +9,8 @@
   coverage, test quality, `finish` analysis, `estimate` Impact, `feature` legacy mapping) pass a smaller model in the Agent tool's `model` parameter (e.g. `sonnet`, or `haiku` for
   plain searches); `tech-lead` Architecture briefs pass `model: "opus"` whatever the session model, and are not part
   of the opt-in below; `estimate` Consistency, `review` reviewers, verifiers and provers, the `explain` fact check and the product
-  check (`spec-docs`, `tech-lead`, `finish`, `qa`, `health`; `subagent_type: "general-purpose"`, told to stay read-only) keep the
-  session model; the `explain` inventory may use `haiku`, its tracing `sonnet`.
+  check (`spec-docs`, `tech-lead`, `finish`, `qa`, `health`; `subagent_type: "general-purpose"`, told to stay read-only)
+  and the `ux` reviewers keep the session model; the `explain` inventory may use `haiku`, its tracing `sonnet`.
 - Stronger model (opt-in): the subagents that keep the session model above are the judgement subagents. Before a
   skill starts the first of them, unless the session already runs on Fable, ask with AskUserQuestion whether to run
   them on Fable (better judgement, more tokens) — as one more question in a batch the skill asks at that point, when
@@ -48,7 +48,7 @@
   throw away; keep the machine awake (`caffeinate -i` on macOS). Stages run as Agent tool subagents on the session
   model; a subagent cannot start subagents, so a stage's fan-outs run in sequence inside it. A long run gets its
   context compacted — the loop re-reads its state from the files every stage.
-- Browser (`as:qa`, `as:qa-docs`): the `playwright` plugin from the official marketplace
+- Browser (`as:qa`, `as:qa-docs`, `as:ux`): the `playwright` plugin from the official marketplace
   ([recommended plugins](recommended-plugins.md)) provides the browser tools `mcp__plugin_playwright_playwright__*`:
   `browser_navigate`, `browser_snapshot` (accessibility tree — find controls here, not by guessing selectors),
   `browser_click`, `browser_type`, `browser_fill_form`, `browser_resize`, `browser_take_screenshot` (`filename`

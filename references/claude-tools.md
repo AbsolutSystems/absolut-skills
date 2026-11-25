@@ -58,6 +58,10 @@
   tool also leaves logs and page snapshots in `.playwright-mcp/` in the project root: gitignore it with `.qa/`.
   Missing → `claude plugin install playwright@claude-plugins-official`, then restart the session. Subagents share the
   session's one browser: run them one after another. The judge reads screenshots with Read (it shows images).
+- Mockups (`as:feature`, `as:roadmap`): the browser tools above are optional here — with them, open the nearest
+  existing screen of the running application to read its look (`browser_snapshot`, `browser_take_screenshot`), and
+  open `mockups/index.html` to check that every tab renders. Without them, read the styles from the source and
+  give the user the path to open. In the desktop app a written HTML file can be shown in its browser pane.
 - Worktrees (`as:worktree-create`, `as:worktree-close`): do not use EnterWorktree/ExitWorktree — they manage their own
   worktrees in `.claude/worktrees`. After create, suggest `cd <path> && claude` in a new terminal. Before removing a
   worktree the session is in, `cd <main>` in Bash first.

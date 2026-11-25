@@ -19,6 +19,7 @@ docs/features/
       2026-10-12-pricing.md         # text of the spreadsheet, from scripts/xlsx_text.py
       2026-10-20-email-refunds.md   # pasted e-mail or chat: header + text verbatim
       2026-10-22-meeting.md         # meeting or call notes
+    mockups/                        # optional: HTML mockups of the flows' screens and their viewer
 ```
 
 Same rules as spec pages ([../../spec-docs/references/markdown-format.md](../../spec-docs/references/markdown-format.md)):
@@ -108,7 +109,7 @@ Support handles ~40 requests a week to remove one item; today the whole order mu
 
 ### UF1 — Cancel items of an order
 
-**Covers:** AC1, AC2 · **Starts:** order details → "Cancel items", shown only while the order has not shipped
+**Covers:** AC1, AC2 · **Starts:** order details → "Cancel items", shown only while the order has not shipped · **Mockups:** [viewer](mockups/index.html)
 
 1. Order details — the customer ticks the items to cancel → the refund amount for the ticked items appears.
 2. Confirm — "Cancel 2 items" → order details again: the items are marked cancelled, the total is lower, and a message says when the refund arrives.
@@ -170,6 +171,9 @@ E-mail to the customer after a cancellation · AC3
   only: no layout, colours or component names. `**Covers:**` lists the criteria the flow serves; every criterion a
   user reaches through the interface is covered by a flow. Numbered like AC, never renumbered. A feature without a
   user interface has one line under the heading instead ("No user interface — a nightly job.").
+- `**Mockups:**` on a flow's meta line links the viewer of its HTML mockups, when the user asked for them
+  ([mockups.md](mockups.md)): an illustration of the flow, in the application's own look when it has one. The
+  flow text and the criteria win over a mockup; the version chosen between several is a decision `D<n>`.
 - Roadmap phases: `### Phase <n> — <name>` (translated with the page) ending in the status `⏳ planned`,
   `🔄 in progress`, `✅ done` or `🗑️ dropped` — emoji and English words fixed, last on the heading line; `spec_lint.py`
   finds phases by them. One phase = one change proposal and ends with working, tested value. An `in progress`
@@ -207,7 +211,7 @@ Moves use `git mv` (history is kept) and rename to the source naming rule; nothi
 
 ## Ownership
 
-`as:feature` writes the page and the catalogue (and, for a roadmap stage, that stage's `**Feature:**` link and
+`as:feature` writes the page, its `mockups/` and the catalogue (and, for a roadmap stage, that stage's `**Feature:**` link and
 status on the roadmap page); `as:roadmap` adds `**Roadmap:**` to the meta line of a feature it links. `as:tech-lead` sets a phase to `in progress` and links its proposal;
 `as:finish` sets it to `done` or `dropped`, relinks it to the archive, fills `**Realised by:**`, the Now line, the
 feature status and the catalogue row. `as:deliver` writes its run report to `<slug>/delivery.md`. Other skills only

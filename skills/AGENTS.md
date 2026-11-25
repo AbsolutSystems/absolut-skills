@@ -19,7 +19,8 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
 - `roadmap` — product-level direction of an application or a large module in `docs/roadmap/<slug>/`, in stages (one
   feature each); owns `references/roadmap-format.md`.
 - `feature` — living feature docs in `docs/features/<slug>/` (page + `sources/`); owns
-  `references/feature-format.md` and `scripts/xlsx_text.py`.
+  `references/feature-format.md`, `scripts/xlsx_text.py`, and the mockups of screens: `references/mockups.md` and
+  `assets/mockups.html` (the viewer with one tab per version; also used by `roadmap`).
 - `implement` — executes a proposal's approved `## Plan` step by step in any session.
 - `deliver` — unattended loop over a feature's roadmap, or over the issues in `docs/issues/`, through `tech-lead`,
   `implement`, `finish` and `fix`; owns `references/autopilot.md` (the policy that replaces their questions, the stage brief and the report format).
@@ -67,6 +68,11 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
   subagents (`claude-tools.md`). The `ux` issue kind is defined in `issue-format.md`.
 - User flows (`UF<n>`, `feature-format.md`) are read by `tech-lead` (From feature steps 2–3), `qa` (step 2), `qa-docs`
   and `ux` — rename the section or the ID together.
+- Mockups (`feature/references/mockups.md`): `feature` (step 3) and `roadmap` (step 2) write them after a yes to
+  their mockups question, before their approval gate; the viewer `feature/assets/mockups.html` reads `tabs.js`
+  (`window.MOCKUPS`) — change the two together. `tech-lead` (From feature steps 2–3) links mockup files from plan
+  steps and `implement` (step 4) reads them; neither asks anything new, so `autopilot.md` has no line for them.
+  `spec_lint.py` reads only `*.md`, so it checks the links to mockups, not the files in `mockups/`.
 - Renaming or restructuring a step or reference in one skill means updating every skill that links to it — the
   validator checks link targets and `#anchors`, but not step numbers or section names quoted in prose.
 - `finish` (step 4) and `deliver` follow `review` in branch mode (`finish` passes its step 3 new clones as the
@@ -113,6 +119,7 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
   `.guidelines/` — `guidelines` writes, `agent-docs` fixes drift and keeps the app `AGENTS.md` index; `docs/features/` —
   `feature` writes, `tech-lead` sets a phase `in progress`, `finish` sets it `done` and updates the page, `deliver`
   writes `<slug>/delivery.md` (and `docs/deliveries/` for issues runs); `sources/` are never edited after saving;
+  `mockups/` (feature and roadmap) are written only by the skill that owns the page, `index.html` is a verbatim copy;
   `docs/roadmap/` — `roadmap` writes (and adds `**Roadmap:**` to a feature page it links), `feature` sets a stage's
   `**Feature:**` link and `in progress` with the Now line and catalogue row;
   `docs/qa/` — `qa-docs` writes `index.md` and `journeys.md`, `qa` writes `runs/` (also inside `deliver`);

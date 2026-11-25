@@ -57,7 +57,7 @@ Point either host at a local clone instead of `AbsolutSystems/absolut-skills`, e
 | design a feature, investigate a bug, choose between options | `/as:tech-lead` (also starts on its own) |
 | analyse and price a client's feature request | `/as:estimate` |
 | talk through the direction of a whole application or a large module and split it into stages (one feature each) | `/as:roadmap` |
-| keep a feature's why, acceptance criteria, user flow, roadmap and sources (PDF, e-mails) in one place | `/as:feature` |
+| keep a feature's why, acceptance criteria, user flow (with mockups to choose from), roadmap and sources (PDF, e-mails) in one place | `/as:feature` |
 | continue an approved plan, also in a new session | `/as:implement` (also starts on its own) |
 | deliver a whole documented feature, or fix all saved problems, unattended (e.g. overnight) | `/as:deliver` |
 | wrap up a feature before the PR (simplify, review, spec, tests, docs) | `/as:finish` (also starts on its own) |
@@ -137,6 +137,7 @@ module gets a short plan without a proposal.
     → saves the sources verbatim in docs/features/cancel-items/sources/ (PDF, .xlsx + its text, pasted e-mails)
     → docs/features/cancel-items/index.md: why, acceptance criteria linked to module scenarios, the user flow
       (screens, steps, empty and error states), phases, decisions
+    → on request, HTML mockups of the screens in the application's own look, 2–3 versions behind tabs — you pick one
 /as:tech-lead docs/features/cancel-items       # plans the next phase as a change proposal → the feature flow
 /as:feature docs/features/cancel-items         # a new e-mail or document: records it and what it changes
 ```
@@ -152,7 +153,8 @@ Bigger than one feature — a whole application, a large module, a direction? St
 /as:roadmap customers should manage their own orders without writing to support
     → what exists today, then a product-level discussion: users, capabilities, rules, order — no technical design
     → sizes it: one feature → sends you to /as:feature; several → a roadmap
-    → docs/roadmap/customer-self-service/index.md: direction, agreed capabilities, decisions, stages (one feature each)
+    → docs/roadmap/customer-self-service/index.md: direction, agreed capabilities, decisions, stages (one feature each),
+      the map of screens; on request, mockups of the application's frame (for a new application also its look, in versions)
 /as:feature docs/roadmap/customer-self-service   # documents the next planned stage as a feature, linked both ways
 /as:roadmap docs/roadmap/customer-self-service   # later: refresh stage statuses, record what changed in the direction
 ```
@@ -254,7 +256,7 @@ and PRs, `claude-security` for security-sensitive changes, `frontend-design` for
 | `docs/spec/**/*.md` | `init`, `spec-docs`, `finish` | Module contracts: requirements and scenarios with IDs |
 | `docs/spec/changes/<slug>.md` | `tech-lead`, `implement` (ticks) | Open change proposal: decision, scenarios, `## Plan` |
 | `docs/spec/changes/archive/` | `finish` | Merged proposals — the decision log |
-| `docs/features/<slug>/` | `feature`; phase status by `tech-lead`, `finish`; `delivery.md` by `deliver` | Feature page (why, acceptance criteria, roadmap, decisions) and `sources/` kept verbatim |
+| `docs/features/<slug>/` | `feature`; phase status by `tech-lead`, `finish`; `delivery.md` by `deliver` | Feature page (why, acceptance criteria, user flow, roadmap, decisions), `sources/` kept verbatim and optional `mockups/` |
 | `docs/roadmap/<slug>/` | `roadmap`; a stage's feature link by `feature` | Product direction of an application or a large module: agreed capabilities, decisions, stages (one feature each) and `sources/` |
 | `docs/estimates/<slug>/` | `estimate` | Client request analysis and hour estimate: `analysis.md` (internal), `client.md` (to send) |
 | `docs/deliveries/<branch>.md` | `deliver` | Report of an unattended issues run |
@@ -421,6 +423,13 @@ It starts from a description with files or pasted text, from an accepted estimat
 from the code and archived proposals), or from a legacy documentation folder (each file mapped to a feature and a
 role, moved with `git mv` after your approval). `as:tech-lead docs/features/<slug>` plans the next phase, `as:finish`
 marks it done; `spec_lint.py` checks links, sources and that phase statuses match their proposals.
+
+For a feature with a user interface the page also holds the user flow, and — when you say yes to its question —
+mockups in `mockups/`: static HTML, in the application's own look when it already has screens (built from its styles
+and nearest screen), plain wireframes when it does not. Where there is a real choice you get 2–3 versions: open
+`mockups/index.html`, switch with the bar at the top (each version fills the whole page), and answer "C" or "C with
+the button from A". The chosen version stays and becomes a decision, the others are deleted. A mockup illustrates
+the flow; the text is the contract, and `as:implement` builds the screen from the project's components.
 
 ```text
 /as:feature <description, files, pasted e-mail>

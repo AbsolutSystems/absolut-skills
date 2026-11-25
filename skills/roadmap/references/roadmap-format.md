@@ -20,6 +20,7 @@ docs/roadmap/
   <slug>/
     index.md                        # the roadmap page
     sources/                        # material the direction is based on, never edited after it is saved
+    mockups/                        # optional: HTML mockups of the application's frame and their viewer
 ```
 
 Same rules as spec pages ([../../spec-docs/references/markdown-format.md](../../spec-docs/references/markdown-format.md)):
@@ -45,7 +46,7 @@ Customers change and follow their own orders without writing to support.
 
 **Now:** stage 1 in progress — [Partial order cancellation](../../features/partial-cancel/index.md). **Next:** stage 2, address change.
 
-**On this page:** [Stages](#stages) · [Decisions](#decisions) · [Open questions](#open-questions) · [Sources](#sources)
+**On this page:** [Stages](#stages) · [Screens](#screens) · [Decisions](#decisions) · [Open questions](#open-questions) · [Sources](#sources)
 
 ## Direction
 
@@ -91,10 +92,21 @@ The customer corrects the address while the parcel can still be redirected.
 
 - **C5** — A support agent sees every change the customer made to an order, with the time.
 
+## Screens
+
+**Navigation:** customer account → Orders → order details. Support panel → Orders → order details. · **Mockups:** [viewer](mockups/index.html)
+
+| Screen | Who | What it is for | Reached from | Stage |
+|--------|-----|----------------|--------------|-------|
+| Order details | Customer | See one order and change it | Orders list, e-mail link | exists — changed in 1, 2 |
+| Cancel items | Customer | Pick the items to cancel and see the refund | Order details | 1 |
+| Order changes | Support agent | What the customer changed, with the time | Order details in the support panel | 3 |
+
 ## Decisions
 
 - **D1** — Most frequent support request first: cancellation before address change ([notes](sources/2026-11-20-meeting-direction.md)).
 - **D2** — Every self-service change is allowed only before shipping; later changes stay with support.
+- **D3** — Changes open in a side panel over the order, not on separate screens; versions A and C rejected ([mockups](mockups/index.html)).
 
 ## Open questions
 
@@ -127,6 +139,13 @@ The customer corrects the address while the parcel can still be redirected.
   across the page, never renumbered or reused, and each belongs to one stage. They become the candidates for the
   feature's acceptance criteria; once the feature page exists, its criteria are the truth and the capabilities stay
   as the record of what was agreed.
+- `## Screens` is the map of the screens the stages add or change, for a roadmap with a user interface: the
+  navigation in one line, then one row per screen — who uses it, what it is for, where it is reached from, and the
+  stage that builds it (`exists` for a screen that is there today). It names screens, it does not design them: the
+  steps and states of each are settled on the feature page (`## User flow`). No user interface → the section is
+  left out. `**Mockups:**` links the viewer of the roadmap's mockups, when the user asked for them
+  ([mockups](../../feature/references/mockups.md)): the frame of the application (navigation, layout of a typical
+  screen) and, for a new application, the look chosen between versions — a decision that binds every stage.
 - A capability that already exists is written as such on its stage ("exists — Orders", with a link to its spec or feature page).
 - Decisions `D<n>` are product decisions that bind every stage. Questions `Q<n>` end with *(product)* or
   *(technical — `as:tech-lead`, stage <n>)*; an answered question becomes a decision or a capability and is removed.
@@ -162,7 +181,7 @@ The link to `../features/index.md` is left out when `docs/features/` does not ex
 
 ## Ownership
 
-`as:roadmap` writes the page and the catalogue. `as:feature`, when it documents a stage
+`as:roadmap` writes the page, its `mockups/` and the catalogue. `as:feature`, when it documents a stage
 (`as:feature docs/roadmap/<slug>`), adds the stage's `**Feature:**` link, sets it to `🔄 in progress`, and brings the roadmap's `**Status:**`, Now line,
 `**Updated:**` and catalogue row in line with it. Later status changes are copied from the feature pages only by
 `as:roadmap`, which also adds `**Roadmap:**` to a feature page that existed before its stage. `as:doctor` and

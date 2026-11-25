@@ -1,6 +1,6 @@
 ---
 name: roadmap
-description: "Discuss the direction of a whole application or a large module at product level and, when it is bigger than one feature, keep it as a roadmap in docs/roadmap/<slug>/: direction, users and goals, what is out of scope, a preliminary specification as plain-language capabilities, product decisions, open questions and stages — each stage is one feature, later documented with as:feature and planned with as:tech-lead. Sizes the topic first: one feature is sent to as:feature and one change to as:tech-lead without writing a roadmap. No technical design. Also refreshes stage statuses from the feature pages and records what changed in the direction. Use only when the user explicitly invokes as:roadmap."
+description: "Discuss the direction of a whole application or a large module at product level and, when it is bigger than one feature, keep it as a roadmap in docs/roadmap/<slug>/: direction, users and goals, what is out of scope, a preliminary specification as plain-language capabilities, a map of the screens (with optional HTML mockups of the application's frame, in versions to choose from), product decisions, open questions and stages — each stage is one feature, later documented with as:feature and planned with as:tech-lead. Sizes the topic first: one feature is sent to as:feature and one change to as:tech-lead without writing a roadmap. No technical design. Also refreshes stage statuses from the feature pages and records what changed in the direction. Use only when the user explicitly invokes as:roadmap."
 disable-model-invocation: true
 argument-hint: "<direction, application or module to discuss | docs/roadmap/<slug>> [--lang en|pl]"
 ---
@@ -13,7 +13,8 @@ and the stages. A stage is one feature; its criteria, phases and technical desig
 `as:feature` and `as:tech-lead`. Do not write production code, feature pages, module pages or change proposals here.
 
 Host-specific mechanics (subagents, asking questions): [Claude Code](../../references/claude-tools.md), [Codex](../../references/codex-tools.md).
-Format: [references/roadmap-format.md](references/roadmap-format.md).
+Format: [references/roadmap-format.md](references/roadmap-format.md). Mockups:
+[../feature/references/mockups.md](../feature/references/mockups.md).
 
 Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex):
 
@@ -30,6 +31,8 @@ Converse in the user's language.
 - Product level, exact. Talk about users, problems, what a person can do and see, rules and limits, order and
   dependencies. "Users can export reports" is too vague; "an accountant downloads the month's invoices as one file
   the accounting system accepts" is the level to reach.
+- Screens are named, not designed: which screens there are, for whom and how they are reached. The steps and
+  states of each belong to its feature.
 - No technical design: no architecture, libraries, data model or APIs. A technical question that comes up is noted
   as an open question for `as:tech-lead`. The one technical fact that belongs here is what already exists.
 - Code and docs first, questions second: never ask what the spec, the feature pages or the code already answer.
@@ -64,9 +67,21 @@ from the sources and from what exists. Cover only what is still unknown:
 - the capabilities — what each kind of user will be able to do that they cannot today, in plain language;
 - the rules and limits the user already knows (who may do what, amounts, deadlines, what must never happen);
 - what is out of scope, and what is deliberately left for later;
+- the screens, for a product with a user interface: the main screens each kind of user works on, how they move
+  between them, and which exist today;
 - order: what must exist first, what proves the idea soonest, what can be dropped if time runs out.
 
 Restate what was agreed after each batch. Stop when the capabilities can be listed and ordered.
+
+**Mockups** — when the screens are known, ask whether to show the frame of the application as mockups, with your
+recommendation: yes for a new application or a module with its own navigation, no for stages that only add to
+existing screens. On yes, follow [../feature/references/mockups.md](../feature/references/mockups.md) with the
+files in `docs/roadmap/<slug>/mockups/`: the navigation and one or two typical screens — not every screen of every
+stage, those are mocked per feature. High fidelity from the application's own styles when it has screens; for a
+new application low fidelity, or — when the user wants to settle the look now — versions of one key screen in
+different visual directions. Versions are whole pages behind the tabs of the viewer; name the one you recommend
+and iterate until the user picks. These are the only files written before step 5; a topic that
+[step 3](#3-size) sends to `as:feature` gets no mockups here.
 
 ### 3. Size
 
@@ -97,7 +112,7 @@ override it.
 Show, briefly:
 
 - new roadmap: slug, direction, users and goals, out of scope, the stages in order (goal, capabilities, depends on),
-  decisions, open questions (technical ones marked for `as:tech-lead`), and the source files to save;
+  the screens with the stage of each, the mockups and the version chosen, decisions, open questions (technical ones marked for `as:tech-lead`), and the source files to save;
 - an existing feature page that will get a `**Roadmap:**` link;
 - update: status corrections from step 1 (stage, stored → derived, the feature page it comes from), and each change
   agreed in step 2. Changing a stage that already has a feature page changes that feature too: say so and suggest
@@ -112,6 +127,8 @@ Ask for approval: all, a subset, or cancel.
   text and every `C`, `D`, `Q` ID and stage number; new ones take the next number; a dropped stage keeps its section
   with the dropped status. Set `**Updated:**` to today and the current commit (`git rev-parse --short HEAD`) and
   rewrite the Now line.
+- Mockups: rename the chosen version without its letter, delete the rejected ones, bring `tabs.js` in line, link
+  the viewer from `## Screens` and record the choice as a decision.
 - Add or update the row in `docs/roadmap/index.md` (create it from the skeleton when missing).
 - A stage linked to a feature page that existed before: add `**Roadmap:**` to that page's meta line
   ([format](../feature/references/feature-format.md)) — the only edit of a feature page here.
@@ -125,10 +142,12 @@ Ask for approval: all, a subset, or cancel.
 - No technical design slipped in: a sentence naming a technology, a table, an endpoint or a class is removed or
   turned into an open question.
 - Every capability is in exactly one stage; the top of the page fits about one screen.
+- A roadmap with a user interface has `## Screens`, every planned screen names its stage, and every mockup file is
+  in `tabs.js` with no version letters left.
 
 ### 8. Summary
 
-Files written, the stages in order with their status, open questions, and what was not checked (sources not
+Files written (mockups too), the stages in order with their status, open questions, and what was not checked (sources not
 readable, areas not explored). Next: `as:feature docs/roadmap/<slug>` documents the next `planned` stage as a
 feature (it links the feature from the stage), then `as:tech-lead docs/features/<slug>` plans its phases; when the
 direction changes or a stage ships → `as:roadmap docs/roadmap/<slug>`. If the repository has `AGENTS.md` files and

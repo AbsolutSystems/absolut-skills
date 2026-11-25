@@ -1,6 +1,6 @@
 ---
 name: feature
-description: "Create and maintain a feature's living documentation in docs/features/<slug>/: why it exists, users and goals, non-goals, user-level acceptance criteria linked to the module scenarios that realise them, the user flow through the screens, a roadmap of phases (one change proposal each), decisions and the sources they came from — client orders, PDFs, spreadsheets, pasted e-mails and meeting notes saved verbatim in sources/. Seeds a feature from an accepted estimate or a roadmap stage, records new sources and what they change, refreshes the roadmap and status, documents an existing feature from the code and archived proposals, and maps a legacy documentation folder into the format. Use only when the user explicitly invokes as:feature."
+description: "Create and maintain a feature's living documentation in docs/features/<slug>/: why it exists, users and goals, non-goals, user-level acceptance criteria linked to the module scenarios that realise them, the user flow through the screens (with optional HTML mockups, in versions to choose from), a roadmap of phases (one change proposal each), decisions and the sources they came from — client orders, PDFs, spreadsheets, pasted e-mails and meeting notes saved verbatim in sources/. Seeds a feature from an accepted estimate or a roadmap stage, records new sources and what they change, refreshes the roadmap and status, documents an existing feature from the code and archived proposals, and maps a legacy documentation folder into the format. Use only when the user explicitly invokes as:feature."
 disable-model-invocation: true
 argument-hint: "<description | file… | docs/features/<slug> | docs/estimates/<slug> | docs/roadmap/<slug> [stage] | legacy folder> [--lang en|pl]"
 ---
@@ -14,7 +14,8 @@ sources are kept verbatim next to it. Do not write production code, module pages
 planned with `as:tech-lead docs/features/<slug>`.
 
 Host-specific mechanics (subagents, asking questions): [Claude Code](../../references/claude-tools.md), [Codex](../../references/codex-tools.md).
-Format, sources and legacy rules: [references/feature-format.md](references/feature-format.md).
+Format, sources and legacy rules: [references/feature-format.md](references/feature-format.md). Mockups:
+[references/mockups.md](references/mockups.md).
 
 Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex):
 
@@ -60,8 +61,8 @@ Converse in the user's language.
 - From a roadmap stage (format: [../roadmap/references/roadmap-format.md](../roadmap/references/roadmap-format.md)):
   the stage's goal and the roadmap's direction give the why, its capabilities `C<n>` are the acceptance criteria
   candidates, the roadmap's out of scope the non-goal candidates, its open questions for this stage the open
-  questions. The roadmap's decisions bind the feature — link them, do not copy; the roadmap becomes a source by
-  link. A stage that already links a feature → update that feature instead.
+  questions, its `## Screens` rows for this stage the screens the flows start from. The roadmap's decisions bind
+  the feature (also the look chosen there) — link them, do not copy; the roadmap becomes a source by link. A stage that already links a feature → update that feature instead.
 - Retroactive: rebuild the criteria from the module scenarios already implemented (they are `**Realised by:**`), the
   user flow from the screens as they are, and the done phases from the archived proposals; ask about the why — the
   code does not know it.
@@ -82,12 +83,19 @@ the steps (screen, action, what they see next), what an empty state shows, what 
 access is missing, and where the user lands after success. Behaviour only — no visual design. An existing page
 without the section gets it on its next update. No user interface (an API, a background job) → one line saying so.
 
+**Mockups** — once the flow is proposed, ask whether to show its screens as mockups, with your recommendation
+([when](references/mockups.md#when)). On yes, follow [references/mockups.md](references/mockups.md): high fidelity
+from the application's own styles when it has screens already, low fidelity otherwise; 2–3 versions where there is
+a real choice, each a whole page behind a tab of the viewer. Give the path of `mockups/index.html`, name the version
+you recommend, and iterate on the user's remarks until they pick. Every remark that changes behaviour changes the
+flow text too. These are the only files written before step 4.
+
 ### 4. Report and gate
 
 Show, briefly:
 
 - new feature: purpose, acceptance criteria (one line each, with the source), the user flows (steps in one line
-  each, with their states), phases with their AC, open questions,
+  each, with their states), the mockups and the version chosen per screen, phases with their AC, open questions,
   the roadmap stage it will be linked from (if any), and the source files to save;
 - update: what each new source changes — AC added, changed or removed, flows changed, new decisions, contradictions — each with a
   short quote of the source; roadmap and status corrections from step 2; changes of the phases the user asked for.
@@ -105,6 +113,8 @@ Ask for approval: all, a subset, or cancel.
 - Write `docs/features/<slug>/index.md` from the skeleton, or edit the existing page minimally: keep hand-written
   text and every `AC`, `UF`, `D`, `Q` ID; new ones take the next number; removed criteria get the removed status. Set
   `**Updated:**` to today and the current commit (`git rev-parse --short HEAD`) and rewrite the Now line.
+- Mockups: rename each chosen version without its letter, delete the rejected ones, bring `tabs.js` in line, link
+  the viewer from each flow's meta line and record each choice as a decision.
 - Add or update the feature's row in `docs/features/index.md` (create it from the skeleton when missing).
 - From a roadmap stage: put `**Roadmap:**` with a link to the roadmap page on the feature's meta line, and on the
   roadmap page add the stage's `**Feature:**` link, set the stage to `🔄 in progress`, and bring the roadmap's
@@ -121,11 +131,13 @@ Ask for approval: all, a subset, or cancel.
 - The top of the page fits about one screen; source text is linked, not copied.
 - A feature with a user interface has `## User flow`: every active criterion a user reaches through the interface is
   named by a flow, and every flow says its empty, error and no-access states (or "none").
+- Mockups: no version letters left, every file is in `tabs.js` and opens, the viewer is linked from its flow, and
+  no mockup shows a step, state or wording the flow text does not have.
 
 ### 7. Summary
 
-Files written (page, catalogue, sources saved or moved), acceptance criteria and phases, open questions, and what was
-not checked (sources not readable, areas not explored). Next: `as:tech-lead docs/features/<slug>` plans the next
+Files written (page, catalogue, sources saved or moved, mockups), acceptance criteria and phases, open questions, and what was
+not checked (sources not readable, areas not explored, where a mockup only approximates the application's look). Next: `as:tech-lead docs/features/<slug>` plans the next
 `planned` phase as a change proposal (then `as:implement` and `as:finish`, which updates this roadmap); a new e-mail
 or document → `as:feature docs/features/<slug>` with it. If the repository has `AGENTS.md` files and the catalogue is
 new, suggest `as:agent-docs` so the root `AGENTS.md` links it. If acceptance criteria were added or changed and

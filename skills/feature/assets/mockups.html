@@ -1,0 +1,72 @@
+<!doctype html>
+<!-- as:mockups viewer 1 — copied by as:feature and as:roadmap, do not edit; the tabs are in tabs.js -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockups</title>
+<style>
+  html, body { height: 100%; margin: 0; }
+  body { display: flex; flex-direction: column; font: 14px/1.4 system-ui, sans-serif; background: #1f2328; }
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px 12px; color: #f0f3f6; }
+  h1 { margin: 0 8px 0 0; font-size: 14px; font-weight: 600; }
+  nav { display: flex; flex-wrap: wrap; gap: 4px; }
+  button { font: inherit; padding: 5px 12px; border: 1px solid #57606a; border-radius: 6px; background: transparent; color: inherit; cursor: pointer; }
+  button:hover { background: #32383f; }
+  button:focus-visible, a:focus-visible { outline: 2px solid #f0f3f6; outline-offset: 2px; }
+  button[aria-selected="true"] { background: #f0f3f6; border-color: #f0f3f6; color: #1f2328; font-weight: 600; }
+  #note { flex: 1 1 240px; color: #c9d1d9; }
+  a { color: #c9d1d9; white-space: nowrap; }
+  iframe { flex: 1; width: 100%; border: 0; background: #fff; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Mockups</h1>
+  <nav id="tabs" role="tablist" aria-label="Mockups"></nav>
+  <span id="note" aria-live="polite"></span>
+  <a id="alone" target="_blank" rel="noopener">Open alone ↗</a>
+</header>
+<iframe id="frame" title="Mockup"></iframe>
+<script src="tabs.js"></script>
+<script>
+  // tabs.js sets: window.MOCKUPS = { title: "…", tabs: [{ id: "a", label: "Version A", file: "confirm-a.html", note: "…" }] }
+  const data = window.MOCKUPS || { title: "Mockups — tabs.js is missing", tabs: [] };
+  const nav = document.getElementById("tabs");
+  const frame = document.getElementById("frame");
+  document.getElementById("title").textContent = document.title = data.title;
+
+  function show(index, focus) {
+    const tab = data.tabs[index];
+    if (!tab) return;
+    [...nav.children].forEach((button, i) => {
+      button.setAttribute("aria-selected", i === index);
+      button.tabIndex = i === index ? 0 : -1;
+    });
+    frame.src = tab.file;
+    document.getElementById("note").textContent = tab.note || "";
+    document.getElementById("alone").href = tab.file;
+    history.replaceState(null, "", "#" + tab.id);
+    if (focus) nav.children[index].focus();
+  }
+
+  data.tabs.forEach((tab, i) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.role = "tab";
+    button.textContent = tab.label;
+    button.addEventListener("click", () => show(i));
+    nav.append(button);
+  });
+  nav.addEventListener("keydown", (event) => {
+    const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+    if (!step) return;
+    const current = [...nav.children].findIndex((button) => button.getAttribute("aria-selected") === "true");
+    show((current + step + data.tabs.length) % data.tabs.length, true);
+  });
+  const fromHash = () => show(Math.max(0, data.tabs.findIndex((tab) => "#" + tab.id === location.hash)));
+  addEventListener("hashchange", fromHash);
+  fromHash();
+</script>
+</body>
+</html>

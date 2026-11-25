@@ -173,11 +173,16 @@ a roadmap of phases, decisions and sources. One phase becomes one change proposa
 1. **Load** the page and say its status and Now line. Pick the first `⏳ planned` phase, or the one the user names; a
    phase already `🔄 in progress` → offer `as:implement` on its proposal instead.
 2. **Ground** as in [Feature](#feature) step 1, starting from the page's modules, the `**Realised by:**` links of
-   done criteria, the user flows (`UF<n>`) of the phase's criteria, and the decisions; a page with `**Roadmap:**` on
+   done criteria, the user flows (`UF<n>`) of the phase's criteria with their mockups (`**Mockups:**`, files in
+   `mockups/`), and the decisions; a page with `**Roadmap:**` on
    its meta line → read that roadmap's Decisions and Out of scope too, they bind the phase; read a source only when
    the page does not answer a question.
 3. **Clarify** only what the phase's criteria, its user flows and the page's open questions leave unknown — a
-   flow's steps and its empty, error and no-access states are requirements: the proposal's scenarios cover them. An
+   flow's steps and its empty, error and no-access states are requirements: the proposal's scenarios cover them. A
+   mockup is the pattern for the layout and content of its screen, not a contract and not code
+   ([mockups](../feature/references/mockups.md#what-a-mockup-is)): the plan step that builds the screen links the
+   mockup file and names the project components it is built from; a component a mockup marks as new is a step of
+   its own; where a mockup and the flow text differ, the text wins — say so. An
    answer that changes a criterion or a flow, or adds a decision, is recorded on the feature page with `as:feature`
    after this run — say so.
 4. Continue the [Feature](#feature) path from step 3. The proposal's `## Why` links the feature instead of repeating

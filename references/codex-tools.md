@@ -34,5 +34,7 @@
   named as in [Claude Code](claude-tools.md) without the `mcp__plugin_playwright_playwright__` prefix. The judge views
   screenshots with the host's image viewer. Without subagents, `as:qa` executes every scenario in the main thread
   and judges afterwards in a separate pass (the report marks the judge `same agent`).
+- Mockups (`as:feature`, `as:roadmap`): the browser tools are optional, as in [Claude Code](claude-tools.md);
+  without them, read the styles from the source and give the user the path of `mockups/index.html` to open.
 - Worktrees (`as:worktree-create`, `as:worktree-close`): after create, suggest starting Codex in `<path>`; before
   removing a worktree the session is in, run the commands from `<main>` (`git -C <main>` or `cd <main>`).

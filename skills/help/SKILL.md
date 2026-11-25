@@ -30,7 +30,7 @@ Show this table as it is, in the user's language:
 | design a feature, investigate a bug or slow code, choose between options | `as:tech-lead` (also starts on its own) |
 | analyse and price a client's feature request | `as:estimate` |
 | talk through the direction of a whole application or a large module and split it into stages (one feature each) | `as:roadmap` |
-| keep a feature's why, acceptance criteria, user flow, roadmap and sources (PDF, e-mails) in one place | `as:feature` |
+| keep a feature's why, acceptance criteria, user flow (with mockups to choose from), roadmap and sources (PDF, e-mails) in one place | `as:feature` |
 | continue an approved plan, also in a new session | `as:implement` (also starts on its own) |
 | deliver a whole documented feature, or fix all saved problems, unattended (e.g. overnight) | `as:deliver` |
 | wrap up a feature before the PR (simplify, review, spec, tests, docs) | `as:finish` (also starts on its own) |

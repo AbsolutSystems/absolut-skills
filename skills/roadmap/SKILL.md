@@ -73,16 +73,6 @@ from the sources and from what exists. Cover only what is still unknown:
 
 Restate what was agreed after each batch. Stop when the capabilities can be listed and ordered.
 
-**Mockups** — when the screens are known, ask whether to show the frame of the application as mockups, with your
-recommendation: yes for a new application or a module with its own navigation, no for stages that only add to
-existing screens. On yes, follow [../feature/references/mockups.md](../feature/references/mockups.md) with the
-files in `docs/roadmap/<slug>/mockups/`: the navigation and one or two typical screens — not every screen of every
-stage, those are mocked per feature. High fidelity from the application's own styles when it has screens; for a
-new application low fidelity, or — when the user wants to settle the look now — versions of one key screen in
-different visual directions. Versions are whole pages behind the tabs of the viewer; name the one you recommend
-and iterate until the user picks. These are the only files written before step 5; a topic that
-[step 3](#3-size) sends to `as:feature` gets no mockups here.
-
 ### 3. Size
 
 New roadmaps only — an update of an existing roadmap skips this step and goes to step 4 for the stages that change
@@ -106,6 +96,15 @@ override it.
 - A capability that exists already is marked as existing, not planned again; a feature page that already covers a
   stage is linked from it.
 - Every capability belongs to exactly one stage or to "out of scope".
+
+**Mockups** — when the stages and their screens are known, say the slug of the roadmap, then ask whether to show
+the frame of the application as mockups, with your recommendation: yes for a new application or a module with its own navigation, no for stages that only add to
+existing screens. On yes, follow [../feature/references/mockups.md](../feature/references/mockups.md) with the
+files in `docs/roadmap/<slug>/mockups/`: the navigation and one or two typical screens — not every screen of every
+stage, those are mocked per feature. High fidelity from the application's own styles when it has screens; for a
+new application low fidelity, or — when the user wants to settle the look now — versions of one key screen in
+different visual directions. Versions are whole pages behind the tabs of the viewer; name the one you recommend
+and iterate until the user picks. These are the only files written before step 5.
 
 ### 5. Report and gate
 
@@ -142,8 +141,8 @@ Ask for approval: all, a subset, or cancel.
 - No technical design slipped in: a sentence naming a technology, a table, an endpoint or a class is removed or
   turned into an open question.
 - Every capability is in exactly one stage; the top of the page fits about one screen.
-- A roadmap with a user interface has `## Screens`, every planned screen names its stage, and every mockup file is
-  in `tabs.js` with no version letters left.
+- A roadmap with a user interface has `## Screens` and every planned screen names its stage. With mockups: every
+  file is in `tabs.js`, no version letters are left; without: the page has no `**Mockups:**` link.
 
 ### 8. Summary
 

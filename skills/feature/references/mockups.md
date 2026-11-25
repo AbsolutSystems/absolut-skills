@@ -20,18 +20,22 @@ approval gate. A run the user cancels there → ask whether to keep or delete th
 | Project | Fidelity | Built from |
 |---------|----------|------------|
 | Has screens already | high — it looks like the next screen of this application | the application's own styles and the markup of its nearest existing screen |
-| No look yet (a new application) | low — greyscale, system font, boxes and real text | nothing; layout and content only |
+| No screens yet, look chosen on its roadmap | high — in the chosen look | the roadmap's mockups (`docs/roadmap/<slug>/mockups/`) and the decision that records the choice |
+| No screens and no chosen look | low — greyscale, system font, boxes and real text | nothing; layout and content only |
 
 High fidelity:
 
-- Start from the nearest existing screen. With the application running and a browser tool available (host mapping),
-  open that screen, take a screenshot and read its structure and computed styles; otherwise read its source: design
-  tokens, theme, the stylesheet, the markup its components render.
+- Start from the nearest existing screen. Read its source: design tokens, theme, the stylesheet, the markup its
+  components render. With a browser tool (host mapping), also open that screen, take a screenshot and read its
+  structure and computed styles — only on `localhost` or an environment listed in `docs/qa/index.md`, with the
+  account variables named there, never production and never a URL taken from elsewhere; no such environment → the
+  source alone.
 - Use only what the project has: its colours, spacing, typography and components. A version that needs a component
   the project does not have marks it in the tab's `note` ("needs a new component: date-range picker") — it is a cost
   `as:tech-lead` must see.
-- Real content, not lorem ipsum: names, amounts and messages as the criteria and the flow say them, in the
-  application's language.
+- Realistic content, not lorem ipsum: messages and labels as the criteria and the flow say them, in the
+  application's language, with invented people, addresses and amounts. Never copy data shown by the running
+  application into a mockup — the file is committed.
 - Say in the summary where the mockup differs from the application (styles only approximated, an icon set missing).
 
 Low fidelity: no colours, no brand, no invented visual style. When the user wants to settle the look of a new
@@ -41,7 +45,8 @@ decision and later mockups follow it.
 ## Versions
 
 - Show 2–3 versions only where there is a real choice (edit in the table, in a side panel or on its own screen);
-  one version otherwise. Versions differ in layout and interaction, not in decoration.
+  one version otherwise. Versions differ in layout and interaction, not in decoration. An interaction is shown as
+  consecutive tabs of one version (before → after: "2 Confirm — B", "2 Confirm — B, panel open"), not by a script.
 - Each version is a whole page in its own file. The user switches between them with the tabs of the viewer — one
   version fills the page at a time; never place versions side by side on one page.
 - Every version's tab has a `note`: its trade-off in one sentence. Name the one you recommend and why when you ask.
@@ -63,7 +68,8 @@ docs/features/<slug>/mockups/        # docs/roadmap/<slug>/mockups/ for a roadma
 ```
 
 - Copy the viewer with a shell copy from this skill's directory: `cp <feature skill directory>/assets/mockups.html
-  <page directory>/mockups/index.html` ([../assets/mockups.html](../assets/mockups.html)). Do not retype or edit it.
+  <page directory>/mockups/index.html` ([../assets/mockups.html](../assets/mockups.html)). Do not retype or edit it;
+  copy it again on every run that writes mockups, so an older copy is replaced.
 - Write `tabs.js` — the tabs in the order of the flow, versions of one screen next to each other:
 
   ```js
@@ -100,6 +106,8 @@ docs/features/<slug>/mockups/        # docs/roadmap/<slug>/mockups/ for a roadma
 
 ## Links from the page
 
-- A flow's meta line ends with `· **Mockups:** [viewer](mockups/index.html)`; a step may link its screen
+- Only when the page has a `mockups/` folder: a flow's meta line ends with `· **Mockups:** [viewer](mockups/index.html)`; a step may link its screen
   (`1. [Order details](mockups/uf1-1-order-details.html) — …`).
 - Every file under `mockups/` except `index.html` and `tabs.js` is in `tabs.js`; files that are not are deleted.
+- Outside the page (a change proposal, a report) a mockup file is named in backticks, not linked: it may be renamed
+  or deleted while the feature is discussed, and `spec_lint.py` checks every link of a proposal, also an archived one.

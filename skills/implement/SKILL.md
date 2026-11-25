@@ -29,7 +29,7 @@ Arguments (`$ARGUMENTS` in Claude Code, plain text after the mention in Codex):
    - tests first for the step's `error` and `edge` scenarios, through the module's public entry points, with the
      scenario ID in the test name or tag; run them and see them fail for the right reason;
    - then the code, reusing what the plan names; then the remaining tests of the step;
-   - a step that links a mockup (`docs/features/<slug>/mockups/`): open it and match its layout, content and
+   - a step that names a mockup (a file in `docs/features/<slug>/mockups/`): read it and, if it is still there, match its layout, content and
      states with the project's own components and styles — never copy the mockup's markup or CSS;
    - rerun the module's tests (and lint/type-check/build if documented); fix until green.
 5. **Tick** — mark the step `- [x]` in the proposal. A milestone is done when its tests pass; say so before the next.

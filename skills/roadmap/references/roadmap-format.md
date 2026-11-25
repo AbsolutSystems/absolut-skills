@@ -143,7 +143,8 @@ The customer corrects the address while the parcel can still be redirected.
   navigation in one line, then one row per screen — who uses it, what it is for, where it is reached from, and the
   stage that builds it (`exists` for a screen that is there today). It names screens, it does not design them: the
   steps and states of each are settled on the feature page (`## User flow`). No user interface → the section is
-  left out. `**Mockups:**` links the viewer of the roadmap's mockups, when the user asked for them
+  left out. `**Mockups:**` links the viewer of the roadmap's mockups — only when the user asked for them and
+  `mockups/` exists, otherwise the line and a decision like D3 are left out
   ([mockups](../../feature/references/mockups.md)): the frame of the application (navigation, layout of a typical
   screen) and, for a new application, the look chosen between versions — a decision that binds every stage.
 - A capability that already exists is written as such on its stage ("exists — Orders", with a link to its spec or feature page).

@@ -85,7 +85,7 @@ without the section gets it on its next update. No user interface (an API, a bac
 
 **Mockups** — once the flow is proposed, ask whether to show its screens as mockups, with your recommendation
 ([when](references/mockups.md#when)). On yes, follow [references/mockups.md](references/mockups.md): high fidelity
-from the application's own styles when it has screens already, low fidelity otherwise; 2–3 versions where there is
+from the application's own styles when it has screens already (or from the look chosen on its roadmap), low fidelity otherwise; 2–3 versions where there is
 a real choice, each a whole page behind a tab of the viewer. Give the path of `mockups/index.html`, name the version
 you recommend, and iterate on the user's remarks until they pick. Every remark that changes behaviour changes the
 flow text too. These are the only files written before step 4.
@@ -131,7 +131,7 @@ Ask for approval: all, a subset, or cancel.
 - The top of the page fits about one screen; source text is linked, not copied.
 - A feature with a user interface has `## User flow`: every active criterion a user reaches through the interface is
   named by a flow, and every flow says its empty, error and no-access states (or "none").
-- Mockups: no version letters left, every file is in `tabs.js` and opens, the viewer is linked from its flow, and
+- Mockups, when the user asked for them (otherwise the page has no `**Mockups:**` link): no version letters left, every file is in `tabs.js` and opens, the viewer is linked from its flow, and
   no mockup shows a step, state or wording the flow text does not have.
 
 ### 7. Summary

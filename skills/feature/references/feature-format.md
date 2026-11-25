@@ -171,7 +171,8 @@ E-mail to the customer after a cancellation · AC3
   only: no layout, colours or component names. `**Covers:**` lists the criteria the flow serves; every criterion a
   user reaches through the interface is covered by a flow. Numbered like AC, never renumbered. A feature without a
   user interface has one line under the heading instead ("No user interface — a nightly job.").
-- `**Mockups:**` on a flow's meta line links the viewer of its HTML mockups, when the user asked for them
+- `**Mockups:**` on a flow's meta line links the viewer of its HTML mockups — only when the user asked for them
+  and `mockups/` exists; otherwise the line has no such part
   ([mockups.md](mockups.md)): an illustration of the flow, in the application's own look when it has one. The
   flow text and the criteria win over a mockup; the version chosen between several is a decision `D<n>`.
 - Roadmap phases: `### Phase <n> — <name>` (translated with the page) ending in the status `⏳ planned`,

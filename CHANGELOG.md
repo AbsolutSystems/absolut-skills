@@ -6,8 +6,9 @@ Mockups: the user flow of 1.21.0 described the screens in words; now they can be
 
 - `feature` (Clarify): after proposing the flow it asks whether to show the screens as mockups (recommended for new
   or re-laid-out screens, not for a small change). Static HTML in `docs/features/<slug>/mockups/` — high fidelity,
-  built from the application's own styles and its nearest screen, when the project already has a look; low-fidelity
-  wireframes when it does not.
+  built from the application's own styles and its nearest screen, when the project already has a look (or from the
+  look chosen on its roadmap); low-fidelity wireframes when it does not. Content is invented, never copied from the
+  running application, which is opened only on `localhost` or an environment of `docs/qa/index.md`.
 - Versions: 2–3 where there is a real choice. Each version is a whole page; `mockups/index.html` (the viewer,
   `skills/feature/assets/mockups.html`, copied verbatim) has a bar of tabs at the top that swaps the page, with the
   trade-off of the open version next to them. You pick one or a mix; the chosen file stays, the rest are deleted,
@@ -17,7 +18,7 @@ Mockups: the user flow of 1.21.0 described the screens in words; now they can be
   there, on versions of one key screen. `feature` starts a stage's flows from its screens.
 - Rules in `skills/feature/references/mockups.md`: a mockup is an illustration (the criteria and the flow text win),
   a pattern for layout and content (never copied as code) and a record (not maintained after the screens ship).
-- `tech-lead` (From feature) links the mockup from the plan step that builds the screen and names the project
+- `tech-lead` (From feature) names the mockup in the plan step that builds the screen and names the project
   components it uses; `implement` matches the mockup with the project's own components and styles.
 - `deliver` is unchanged: mockups are settled with you in `feature`, before an unattended run.
 

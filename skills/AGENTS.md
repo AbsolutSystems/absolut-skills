@@ -68,10 +68,10 @@ Each directory is one skill of the `as` plugin: `SKILL.md` (frontmatter + host-a
   subagents (`claude-tools.md`). The `ux` issue kind is defined in `issue-format.md`.
 - User flows (`UF<n>`, `feature-format.md`) are read by `tech-lead` (From feature steps 2–3), `qa` (step 2), `qa-docs`
   and `ux` — rename the section or the ID together.
-- Mockups (`feature/references/mockups.md`): `feature` (step 3) and `roadmap` (step 2) write them after a yes to
+- Mockups (`feature/references/mockups.md`): `feature` (step 3) and `roadmap` (step 4, after sizing) write them after a yes to
   their mockups question, before their approval gate; the viewer `feature/assets/mockups.html` reads `tabs.js`
-  (`window.MOCKUPS`) — change the two together. `tech-lead` (From feature steps 2–3) links mockup files from plan
-  steps and `implement` (step 4) reads them; neither asks anything new, so `autopilot.md` has no line for them.
+  (`window.MOCKUPS`) — change the two together (`tests/test_mockups.py` checks the example in `mockups.md` against
+  the viewer). `tech-lead` (From feature steps 2–3) names mockup files in plan steps, in backticks, and `implement` (step 4) reads them; neither asks anything new, so `autopilot.md` has no line for them.
   `spec_lint.py` reads only `*.md`, so it checks the links to mockups, not the files in `mockups/`.
 - Renaming or restructuring a step or reference in one skill means updating every skill that links to it — the
   validator checks link targets and `#anchors`, but not step numbers or section names quoted in prose.

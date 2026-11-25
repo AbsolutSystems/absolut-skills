@@ -59,9 +59,10 @@
   Missing → `claude plugin install playwright@claude-plugins-official`, then restart the session. Subagents share the
   session's one browser: run them one after another. The judge reads screenshots with Read (it shows images).
 - Mockups (`as:feature`, `as:roadmap`): the browser tools above are optional here — with them, open the nearest
-  existing screen of the running application to read its look (`browser_snapshot`, `browser_take_screenshot`), and
-  open `mockups/index.html` to check that every tab renders. Without them, read the styles from the source and
-  give the user the path to open. In the desktop app a written HTML file can be shown in its browser pane.
+  existing screen of the running application to read its look (`browser_snapshot`, `browser_take_screenshot`;
+  environments as `mockups.md` allows). They do not open `file://` pages, so the viewer is not checked in the
+  browser: check that every file in `tabs.js` exists, and give the user the path of `mockups/index.html` to open in
+  their own browser.
 - Worktrees (`as:worktree-create`, `as:worktree-close`): do not use EnterWorktree/ExitWorktree — they manage their own
   worktrees in `.claude/worktrees`. After create, suggest `cd <path> && claude` in a new terminal. Before removing a
   worktree the session is in, `cd <main>` in Bash first.
